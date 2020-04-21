@@ -1,0 +1,87 @@
+<head>
+  <title>FirstApp</title>
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.9/angular-material.min.css">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+
+</head>
+
+<body>
+<!-- Angular Material Dependencies -->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-animate.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-aria.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.6/angular-messages.min.js"></script>
+
+<!-- Angular Material Library -->
+<script src="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.12/angular-material.min.js"></script>
+
+<script src="app.js"></script>
+
+
+
+
+
+
+<div ng-app = "app" layout="row">
+
+  <div ng-controller="cardController" layout="column" style="height: 500px" md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()">
+
+
+      <md-sidenav class="md-sidenav-left" md-component-id="left" md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()">
+        <md-toolbar>
+          <h1>Test :)</h1>
+        </md-toolbar>
+      </md-sidenav>
+
+
+        <div class="movingCardContainer">
+          <div id="leaderboard">
+            <ul>
+              <li>Dan</li>
+              <li>Jake</li>
+            </ul>
+          </div>
+
+
+          <div ng-class="{'cardSelected': isCardSelected  }" class="card" id="blackCard">
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+          </div>
+
+
+          <md-button ng-show="isCardSelected" class="card" id="selectedCard"  ng-click = "selectedCard.onClick()">
+            <p>{{selectedCard.text}}</p>
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+          </md-button>
+
+          <md-button ng-show = "isCardSelected" class="confirmSelectionButton">Confirm Selection</md-button>
+
+        </div>
+
+
+
+        <div class="cardContainer"  >
+          <md-button ng-repeat="card in cards" class="card"  ng-click = "card.onClick()" ng-hide="card.selected">
+
+            <p>{{card.text}}</p>
+            <!--This is an empty image which is used to preserve aspect ratio-->
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+          </md-button>
+        </div>
+
+
+
+  </div>
+
+</div>
+
+
+
+
+</body>
+
+</html>
