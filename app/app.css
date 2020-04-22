@@ -127,6 +127,27 @@ body {
   opacity: 0;
   transition: all 0.2s; }
 
+.judgeContainer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll; }
+  .judgeContainer__blackCard {
+    position: relative;
+    transform: translate(-50%, 0);
+    height: 50%;
+    background-color: black;
+    left: 50%;
+    top: 50%;
+    margin-top: 5%;
+    margin-bottom: 5%; }
+    .judgeContainer__blackCard--choosing {
+      top: 15%;
+      height: 30%; }
+  .judgeContainer__card {
+    height: 100%;
+    width: 100%; }
+
 /*Menu Styles*/
 #joinGame {
   position: absolute;

@@ -43,7 +43,23 @@
 
     <!-- Page setup when judge -->
 
-    <div class="judgeContainer"></div>
+    <div class="judgeContainer" ng-show = "isJudge">
+
+        <div class="card judgeContainer__blackCard" ng-class = "{'judgeContainer__blackCard--choosing' : judgeChoosing}" ng-click="judgeChoosing = !judgeChoosing">
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+        </div>
+
+        <md-grid-list md-cols = "2" md-row-height = "63:88" md-gutter="4px" style="margin:4px;">
+
+            <md-grid-tile ng-repeat="card in cards">
+                <div class="card judgeContainer__card">
+                    {{card.text}}
+                </div>
+
+            </md-grid-tile>
+
+        </md-grid-list>
+    </div>
 
 
 

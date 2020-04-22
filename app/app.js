@@ -26,14 +26,13 @@ app.controller("cardController", function($scope, $mdSidenav, $timeout) {
     $scope.popUpMessage = '';
     $scope.showPopUp = false;
 
-    $scope.isJudge = false;
+    $scope.isJudge = true;
 
 
     //normal play
     class Card {
     constructor(xPos, text) {
       this.selected = false;
-      this.x = xPos;
       this.text = text;
     };
 
@@ -89,6 +88,8 @@ app.controller("cardController", function($scope, $mdSidenav, $timeout) {
 
 
   //Judge Setup
+
+    $scope.judgeChoosing = true;
 
   //Methods used in both Judge and Playing
   $scope.sideNavOpen = false;
