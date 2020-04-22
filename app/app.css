@@ -1,196 +1,138 @@
-
-
 body {
-  background-color : grey;
+  background-color: grey;
   color: ghostwhite;
   font-family: Arial, sans-serif;
-  margin: 0px;
-}
+  margin: 0px; }
 
 #topbar {
-
-  background-color: black;
+  background: black;
   color: white;
   height: 5%;
-  width:100%;
+  width: 100%; }
 
-}
-@media(max-width:500px) {
+@media (max-width: 500px) {
   #topbar {
-    display:none;
-  }
-}
-
-
+    display: none; } }
 #leaderboard {
   margin: 0px;
   background-color: #999999;
   border-radius: 0 0 0 1vw;
   float: right;
   max-width: 25vw;
-  padding:20px;
-}
-
+  padding: 20px; }
 
 #title {
-  line-height:5%;
+  line-height: 5%;
   font-size: 250%;
-  float:left;
-
-}
+  float: left; }
 
 .md-button.card, .card {
-  position:relative;
-  display:inline-block;
-  top:50%;
-  left:0;
-  border-radius:9%/6%;
+  position: relative;
+  display: inline-block;
+  border-radius: 9%/6%;
   background-color: white;
-  text-align:center;
-
-
-  height:90%;
-  color:black;
-
-  box-shadow: 0 0 15px rgba(0,0,0,0.4);
-  margin:2px;
-
-
-  transition: all 0.25s;
-  transform:translate(0, -50%);
-
-
-}
-
+  height: 90%;
+  color: black;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+  margin: 2px;
+  transition: all 0.25s; }
 
 .card > img {
-  position:relative;
-  height:71.6%;/*exact aspect ratio of cards */
-  margin:0;
-
-}
+  position: relative;
+  height: 71.6%;
+  /*exact aspect ratio of cards */
+  margin: 0; }
 
 .md-button.card:not([disabled]):hover {
   background-color: #f3f3f3;
-  transform:translate(0, -51.5%);
-}
+  transform: translate(0, -51.5%); }
 
 #blackCard {
-  position:absolute;
-  background-color:black;
-  color:white;
-  height:50%;
-  max-width:50%;
-
-
-  transform:translate(-50%, -50%);
-
-  left:50%;
-  top:50%;
-  transition-timing-function: ease-out;
-
-
-}
+  position: absolute;
+  background-color: black;
+  color: white;
+  height: 50%;
+  max-width: 50%;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 50%;
+  transition-timing-function: ease-out; }
 
 #blackCard.cardSelected {
-  left:25%;
-  transition-timing-function: ease-out;
-}
-
-
-
+  left: 25%;
+  transition-timing-function: ease-out; }
 
 #selectedCard {
-  position:absolute;
-  max-width:50%;
-
-  height:50%;
-
-
-  left:75%;
-  top:50%;
-  transform:translate(-50%, -50%);
-
+  position: absolute;
+  max-width: 50%;
+  height: 50%;
+  left: 75%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   transition: all 0.2s;
-  padding:0px;
-}
-
+  padding: 0px; }
 
 .cardContainer {
-  position:absolute;
-  background-color: cadetblue;
-  width:100%;
-  min-height:200px;
-  height:30%;
-  bottom:0;
-
-  overflow-x:scroll;
-  overflow-y: visible;
-
+  position: absolute;
+  background-color: grey;
+  width: 100%;
+  min-height: 200px;
+  height: 30%;
+  bottom: 0;
+  overflow-x: scroll;
+  overflow-y: hidden;
   white-space: nowrap;
-  transition: all 2s;
+  transition: all 0.2s; }
+  .cardContainer__card {
+    top: 50%;
+    transform: translate(0, -50%);
+    height: 95%; }
+  .cardContainer__card--notFocused {
+    top: 120%; }
 
-}
-
+.cardContainer.ng-hide {
+  bottom: -40%; }
 
 .movingCardContainer {
-  position:absolute;
-  background-color: slategrey;
-  width:100%;
-  height:70%;
-  top:0;
-
-
-}
-
+  position: absolute;
+  background-color: grey;
+  width: 100%;
+  height: 70%;
+  top: 0;
+  /* Add something here to deal with min height 200px cards */ }
+  .movingCardContainer__popUpText {
+    position: absolute;
+    transform: translate(-50%, 0);
+    left: 50%;
+    top: 85%;
+    color: white;
+    opacity: 90%;
+    font-size: 2.5rem;
+    text-align: center;
+    white-space: nowrap;
+    transition: opacity 0.09s; }
+    .movingCardContainer__popUpText.ng-hide {
+      opacity: 0;
+      transition: opacity 1s; }
+  @media (max-height: 667px) {
+    .movingCardContainer {
+      height: auto;
+      top: 0;
+      bottom: 200px; }
+      .movingCardContainer__popUpText {
+        top: auto;
+        bottom: 10px; } }
 
 .card.ng-hide {
-  opacity:0;
-  transition: all 0.2s;
-}
-
-
-.md-button.confirmSelectionButton{
-  position:absolute;
-  width:80%;
-
-  padding-top:10%;
-  top:90%;
-  left:50%;
-  background-color:white;
-  color: #343434;
-
-  border-radius:10px;
-  transition: all 0.2s;
-
-  overflow:hidden;
-  white-space: nowrap;
-  transform:translate(-50%, -50%);
-
-}
-
-.md-button.confirmSelectionButton:not([disabled]):hover{
-  background-color: #b3b3b3;
-  transition: all 0.2s;
-}
-
-.md-button.confirmSelectionButton.ng-hide {
   opacity: 0;
-  width: 0px;
-  transition: all 0.2s;
+  transition: all 0.2s; }
 
+/*Menu Styles*/
+#joinGame {
+  position: absolute;
+  height: 48%;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 25%; }
 
-}
-
-@media(max-height:667px){
-  .md-button.confirmSelectionButton {
-
-    position:fixed;
-    top: auto;
-    bottom:175px;
-    height:50px;
-    padding:10px;
-
-
-  }
-}
+/*# sourceMappingURL=app.css.map */

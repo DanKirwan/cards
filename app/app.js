@@ -1,9 +1,36 @@
 
 
-const app = angular.module("app",['ngAnimate','ngAria','ngMaterial']);
+const app = angular.module("app",['ngAnimate','ngAria','ngMaterial', 'ngRoute']);
+app.config(function($routeProvider) {
+    $routeProvider
+        .when("/", {
+            templateUrl: "mainMenu.htm",
+            controller: "menuController"
+        })
+        .when("/game", {
+            templateUrl: "game.htm",
+            controller: "cardController"
+        })
+        .when("/createGame", {
+            templateUrl: "createGame.htm",
+            controller: "menuController"
+    });
 
-app.controller("cardController", function($scope, $mdSidenav) {
-  class Card {
+});
+
+app.controller("cardController", function($scope, $mdSidenav, $timeout) {
+
+    $scope.selectedCard = null;
+    $scope.cardsFocussed = true;
+
+    $scope.popUpMessage = '';
+    $scope.showPopUp = false;
+
+    $scope.isJudge = false;
+
+
+    //normal play
+    class Card {
     constructor(xPos, text) {
       this.selected = false;
       this.x = xPos;
@@ -11,27 +38,59 @@ app.controller("cardController", function($scope, $mdSidenav) {
     };
 
     onClick() {
-      if(this.selected == false) {
-        for(let x = 0; x < $scope.cards.length; x++) {
-          let card = $scope.cards[x];
-          card.selected = false;
+
+
+        if(this.selected == false) {
+
+          if ($scope.cardsFocussed) {
+
+              for (let x = 0; x < $scope.cards.length; x++) {
+                  let card = $scope.cards[x];
+                  card.selected = false;
+              }
+              //Selecting Card Logic
+              this.selected = true;
+              $scope.selectedCard = this;
+
+              $scope.cardsFocussed = false;
+
+
+              //Pop up handingR
+              $scope.popUpMessage = "Card Selected";
+              $scope.showPopUp = true;
+
+              $timeout( function() {
+                  $scope.showPopUp = false;
+              }, 100);
+
+              console.log(this.text);
+          } else {
+              $scope.focusCards();
+
         }
-        this.selected = true;
-        $scope.isCardSelected = true;
-        $scope.selectedCard = this;
-
-        console.log(this.text);
-
-      } else {
-        this.selected = false;
-        $scope.isCardSelected = false;
-        $scope.selectedCard = null;
+        } else { //Card already selected so not in card bar
+            this.selected = false;
+            $scope.selectedCard = null;
+            $scope.focusCards();
       }
+
+      console.log($scope.cardsFocussed);
     }
 
   }
 
+  $scope.focusCards = function () {
+        $scope.cardsFocussed = true;
+  };
 
+  $scope.unfocusCards = function () {
+        $scope.cardsFocussed = false;
+  };
+
+
+  //Judge Setup
+
+  //Methods used in both Judge and Playing
   $scope.sideNavOpen = false;
 
   $scope.openSideNav  = function() {
@@ -42,8 +101,11 @@ app.controller("cardController", function($scope, $mdSidenav) {
       $mdSidenav('left').close();
   }
 
-  $scope.selectedCard = null;
-  $scope.isCardSelected = false;
+
+
+
+
+
 
   $scope.cards = [
       new Card(10,  "Test1"),
@@ -70,3 +132,19 @@ app.controller("cardController", function($scope, $mdSidenav) {
 
 
 });
+
+app.controller("menuController", function ($scope) {
+    class Game {
+        constructor(name, id) { //other stuff about game as in private max players etc
+            this.name = name;
+            this.id = 0;
+        }
+
+
+    }
+
+    $scope.gameName = '';
+
+
+});
+

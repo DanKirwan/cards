@@ -1,0 +1,50 @@
+<div ng-controller="cardController" layout="column" style="height: 500px; overflow:hidden;" md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()" >
+
+
+    <md-sidenav class="md-sidenav-left" md-component-id="left" md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()">
+        <md-toolbar>
+            <h1>Test :)</h1>
+        </md-toolbar>
+        <a class = "md-button" md-whiteframe="5" href="#!" style="color:black">Menu</a>
+    </md-sidenav>
+
+
+    <div class="movingCardContainer" ng-hide="isJudge">
+
+
+
+        <div ng-class="{'cardSelected': selectedCard != null  }" class="card" id="blackCard">
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+        </div>
+
+
+        <md-button ng-show="selectedCard != null" class="card" id="selectedCard"  ng-click = "selectedCard.onClick()">
+            <p>{{selectedCard.text}}</p>
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+        </md-button>
+
+        <div class = 'movingCardContainer__popUpText' ng-show="showPopUp">
+            {{popUpMessage}}
+        </div>
+
+
+    </div>
+
+
+    <div class="cardContainer" md-swipe-down = 'unfocusCards()' md-swipe-up = 'focusCards()' ng-hide="isJudge" >
+        <md-button  ng-repeat="card in cards" class="card cardContainer__card " ng-class = "{'cardContainer__card--notFocused' : !cardsFocussed}" ng-click = "card.onClick()" ng-hide="card.selected">
+
+            <p>{{card.text}}</p>
+            <!--This is an empty image which is used to preserve aspect ratio-->
+            <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+        </md-button>
+    </div>
+
+
+    <!-- Page setup when judge -->
+
+    <div class="judgeContainer"></div>
+
+
+
+</div>
