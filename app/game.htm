@@ -43,18 +43,22 @@
 
     <!-- Page setup when judge -->
 
-    <div class="judgeContainer" ng-show = "isJudge">
+    <div ng-controller = "judgeController" class="judgeContainer" ng-show = "isJudge"  md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()">
 
-        <div class="card judgeContainer__blackCard" ng-class = "{'judgeContainer__blackCard--choosing' : judgeChoosing}" ng-click="judgeChoosing = !judgeChoosing">
+        <div class="card judgeContainer__blackCard" ng-class = "{'judgeContainer__blackCard--choosing' : judgeChoosing}" ng-click="judgeChoosing = !judgeChoosing" >
             <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
         </div>
 
-        <md-grid-list md-cols = "2" md-row-height = "63:88" md-gutter="4px" style="margin:4px;">
+        <md-button class = "md-button judgeContainer__confirmbtn" ng-show = 'chosenJudgeCard != null'>
+            Confirm Card Selection
+        </md-button>
 
-            <md-grid-tile ng-repeat="card in cards">
-                <div class="card judgeContainer__card">
+        <md-grid-list md-cols = "{{getCardColumns()}}" md-row-height = "63:88" md-gutter = "0.5%" style="margin-left:8px; margin-right:8px;">
+
+            <md-grid-tile ng-repeat="card in judgeCards">
+                <md-button class="card judgeContainer__card  " style="height: 100%" ng-class="{'judgeContainer__card--selected': card.selected}" ng-click = 'card.onClick()'>
                     {{card.text}}
-                </div>
+                </md-button>
 
             </md-grid-tile>
 

@@ -18,7 +18,10 @@ app.config(function($routeProvider) {
 
 });
 
-app.controller("cardController", function($scope, $mdSidenav, $timeout) {
+
+
+
+app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout) {
 
     $scope.selectedCard = null;
     $scope.cardsFocussed = true;
@@ -31,7 +34,7 @@ app.controller("cardController", function($scope, $mdSidenav, $timeout) {
 
     //normal play
     class Card {
-    constructor(xPos, text) {
+    constructor(text) {
       this.selected = false;
       this.text = text;
     };
@@ -87,9 +90,10 @@ app.controller("cardController", function($scope, $mdSidenav, $timeout) {
   };
 
 
-  //Judge Setup
 
-    $scope.judgeChoosing = true;
+
+
+
 
   //Methods used in both Judge and Playing
   $scope.sideNavOpen = false;
@@ -109,30 +113,78 @@ app.controller("cardController", function($scope, $mdSidenav, $timeout) {
 
 
   $scope.cards = [
-      new Card(10,  "Test1"),
+      new Card("Test1"),
 
-      new Card(30,  "Test2"),
-      new Card(70,  "Test3"),
-      new Card(40,  "Test4"),
-      new Card(60,  "Test5"),
-      new Card(50,  "Test6"),
-      new Card(30,  "Test7"),
-      new Card(70,  "Test8"),
-      new Card(40,  "Test9"),
-      new Card(60,  "Test10"),
+      new Card("Test2"),
+      new Card("Test3"),
+      new Card("Test4"),
+      new Card("Test5"),
+      new Card("Test6"),
+      new Card("Test7"),
+      new Card("Test8"),
+      new Card("Test9"),
+      new Card("Test10"),
       ]
 
 
 
-  $scope.openLeftMenu = function() {
-    $mdSidenav('left').toggle();
-    console.log($mdSidenav('left').isOpen());
-  }
+
 
 
 
 
 });
+
+
+app.controller("judgeController", function ($scope, $mdMedia) {
+    //Judge Setup
+    $scope.chosenJudgeCard = null;
+
+
+    class JudgeCard {
+        constructor(text) {
+            this.text = text;
+            this.selected = false;
+        }
+
+        onClick() {
+            let selected = this.selected;
+            for (let x = 0; x < $scope.judgeCards.length; x++) {
+                let card = $scope.judgeCards[x];
+                card.selected = false;
+            }
+
+            this.selected = !selected;
+
+            if(this.selected) $scope.chosenJudgeCard = this;
+            else $scope.chosenJudgeCard = null;
+            console.debug(this.text + " Seleceted");
+        }
+    }
+
+    $scope.judgeCards = [
+        new JudgeCard('TestOne'),
+        new JudgeCard('TestTwo'),
+        new JudgeCard('TestOne'),
+        new JudgeCard('TestTwo'),
+        new JudgeCard('TestOne'),
+        new JudgeCard('TestTwo')
+    ];
+
+
+
+    $scope.judgeChoosing = true;
+
+    $scope.getCardColumns = function () {
+        if ($mdMedia('xs')) return 2;
+        if ($mdMedia('sm') || $mdMedia('md')) return 5;
+        return 10;
+    };
+});
+
+
+
+
 
 app.controller("menuController", function ($scope) {
     class Game {
