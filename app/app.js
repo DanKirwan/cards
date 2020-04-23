@@ -175,6 +175,14 @@ app.controller("judgeController", function ($scope, $mdMedia) {
 
     $scope.judgeChoosing = true;
 
+
+
+    $scope.confirmJudgeCard = function () {
+        //send stuff to server about winning card
+
+    };
+
+
     $scope.getCardColumns = function () {
         if ($mdMedia('xs')) return 2;
         if ($mdMedia('sm') || $mdMedia('md')) return 5;

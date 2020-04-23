@@ -49,14 +49,14 @@
             <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
         </div>
 
-        <md-button class = "md-button judgeContainer__confirmbtn" ng-show = 'chosenJudgeCard != null'>
+        <md-button class = "md-button judgeContainer__confirmbtn" ng-show = 'chosenJudgeCard != null' ng-click="confirmJudgeCard()">
             Confirm Card Selection
         </md-button>
 
         <md-grid-list md-cols = "{{getCardColumns()}}" md-row-height = "63:88" md-gutter = "0.5%" style="margin-left:8px; margin-right:8px;">
 
             <md-grid-tile ng-repeat="card in judgeCards">
-                <md-button class="card judgeContainer__card  " style="height: 100%" ng-class="{'judgeContainer__card--selected': card.selected}" ng-click = 'card.onClick()'>
+                <md-button ng-disabled="!isJudge" class="card judgeContainer__card  " style="height: 100%" ng-class="{'judgeContainer__card--selected': card.selected}" ng-click = 'card.onClick()'>
                     {{card.text}}
                 </md-button>
 

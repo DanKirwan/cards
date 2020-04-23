@@ -127,6 +127,8 @@ body {
   white-space: nowrap;
   transition: all 0.2s;
 
+  text-align:center;
+
 
 
 
@@ -195,6 +197,8 @@ body {
       bottom: 10px;
     }
   }
+
+  //TODO fix textures on white card here when hovered - BEM
 
 }
 
@@ -292,12 +296,107 @@ body {
 /*Menu Styles*/
 
 
-#joinGame {
+
+.mainMenu {
   position:absolute;
-  height:48%;
 
-  transform:translate(-50%, -50%);
 
-  left:50%;
-  top:25%;
+  width:100%;
+  height:100%;
+  text-align:center;
+  background-color: #f9f9f9;
+  color:black;
+  margin:0;
+
+  &__title {
+    margin-bottom: 20%;
+  }
+
+
+  &__joinGame {
+    position:relative;
+    display:block;
+
+
+    width:70%;
+    height:50px;
+
+    left:50%;
+    transform:translate(-50%);
+
+    overflow:visible;
+    white-space:nowrap;
+
+    margin-bottom: 50%;
+
+    &__btn {
+      width:20%;
+      min-width:10%;
+      margin:0;
+      height:100%;
+
+      padding:0;
+      float:right;
+
+      border:2px solid black;
+      border-radius:0 5px 5px 0;
+
+
+    }
+
+    &__input {
+
+      font-family: Roboto, "Helvetica Neue", sans-serif;
+      font-size:15px;
+      text-align:center;
+
+
+      position:absolute;
+
+      left:0;
+      width:80%;
+      height:100%;
+
+      margin:0;
+      padding:0;
+
+
+      border: 2px solid black;
+      border-right:none;
+      border-radius:5px 0 0 5px;
+
+      transition: all 0.1s;
+
+      &:focus{
+        font-size:20px;
+        transition: all 0.1s;
+      }
+
+    }
+
+
+
+
+    }
+
+
+
+
+
+
+
+  &__btn {
+    height:50px;
+    font-weight:bold;
+
+    width:70%;
+    background-color:white;
+    border: 2px solid black;
+    border-radius: 5px;
+
+
+    &:not([disabled]):hover {
+      background-color: #e2e2e2;
+    }
+  }
 }
