@@ -29,7 +29,7 @@ app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout
     $scope.popUpMessage = '';
     $scope.showPopUp = false;
 
-    $scope.isJudge = true;
+    $scope.isJudge = false;
 
 
     //normal play
