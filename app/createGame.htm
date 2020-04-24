@@ -1,19 +1,40 @@
-<div class = "cgHeader" layout="row">
-    <a href="#!" class="md-button" style="color:black;">Return</a>
-    <h1 style="color:black;"> Players 0/2</h1>
-    <h1 style=" position:relative; color:black; float:right;">ABCD</h1>
+<md-toolbar>
+
+    <div class="md-toolbar-tools">
+        <md-button class="md-icon-button" aria-label="Main Menu">
+            <md-icon md-svg-icon="img/arrow_back-48dp.svg"></md-icon>
+        </md-button>
+
+        <h2 flex  style="text-align:center;">Players: 0/20</h2>
+        <div layout="column" layout-align="center center" >
+
+            <p style="margin:1px; font-size:10px;">Game Code</p>
+            <h1>ABCD</h1>
+
+        </div>
+    </div>
+
+</md-toolbar>
 
 
-</div>
+<md-input-container class="cg__input">
+    <label>Max Players</label>
+    <input type="number" step="1" min="0" max = "20" >
+</md-input-container>
+
+<md-button flex ng-click="showCardPacks = !showCardPacks"> <!-- needs styling work -->
+    Card Packs
+</md-button>
 
 
-<div class = "cgSettings">
+<md-list ng-show="showCardPacks" class="md-2-line">
+    <md-list-item ng-repeat="pack in cardPacks">
+        <img ng-src="img/temp_cards-48dp.svg">
+        <div class="md-list-item-text">
+            <h3>{{pack.name}}</h3>
+            <p>{{pack.desc}}</p>
+        </div>
+    </md-list-item>
 
 
-
-    <md-input-container class="cgSettings__input">
-        <label>Max Players</label>
-        <input type="number" step="1" min="0" max = "20" >
-    </md-input-container>
-
-</div>
+</md-list>

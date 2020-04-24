@@ -430,33 +430,22 @@ body {
 
 
 //creating game
+.cg {
 
-.cgHeader {
-
-  text-align:center;
-  width:100%;
-
-
-  border-bottom:2px solid black;
-}
-
-.cgSettings {
-  position:relative;
+  &__Header {
+    position: relative;
+    text-align: center;
+    width: 100%;
 
 
-  width:100%;
-  height:100%;
-  background-color:white;
-
+  }
 
 
   &__input {
 
-    width:60%;
-    margin-left:4%;
-    background-color:white;
-    border:5px solid black;
-    border-radius:5px;
+    width: 60%;
+    margin-left: 4%;
+    background-color: white;
+
   }
 }
-

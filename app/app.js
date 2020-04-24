@@ -194,7 +194,7 @@ app.controller("judgeController", function ($scope, $mdMedia) {
 
 
 
-app.controller("menuController", function ($scope) {
+app.controller("menuController", function ($scope, $mdDialog, $mdMedia, $timeout) {
     class Game {
         constructor(name, id) { //other stuff about game as in private max players etc
             this.name = name;
@@ -203,6 +203,39 @@ app.controller("menuController", function ($scope) {
 
 
     }
+
+    class CardPack {
+        constructor(name, description) {
+            this.name=name;
+            this.desc = description;
+            this.selected = false;
+
+        }
+    }
+
+
+    $scope.showSwipeAlert = function(ev) {
+        if (!$mdMedia("gt-md")) {
+            console.log("Showing Popup")
+            $mdDialog.show(
+                $mdDialog.alert()
+                    .parent(angular.element(document.querySelector('#mainMenu')))
+                    .clickOutsideToClose(true)
+                    .title("Opening the Menu")
+                    .textContent("Swipe right to open the toolbar in game")
+                    .ok("Got it!")
+                    .targetEvent(ev)
+            );
+        }
+    };
+
+    $scope.showCardPacks = false;
+    $scope.cardPacks = [
+        new CardPack("UK TEST", "Obviously superior set of cards"),
+        new CardPack("US Test", "not as funny america sucks"),
+        new CardPack("Custom Pack", "Something less witty as it wasn't written by the Cards against humanity team")
+    ]
+
 
     $scope.gameName = '';
 
