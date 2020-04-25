@@ -448,4 +448,39 @@ body {
     background-color: white;
 
   }
+
+
+  &__btn {
+
+    width: 60%;
+    margin-left: 4%;
+
+    border: 2px solid black;
+    border-radius: 5px;
+  }
+
+  &__packList {
+
+
+    transition-delay:0.1s;
+
+    transition:0.2s;
+
+
+    &.ng-hide {
+      opacity:0;
+      transition-delay:0.3s;
+      transition:0.2s;
+    }
+
+    &__item {
+      transition: all 0.5s;
+
+      &.ng-hide {
+        height: 0;
+        min-height:0;
+        transition: all 0.2s;
+      }
+    }
+  }
 }
