@@ -2,7 +2,7 @@
 
     <div class="md-toolbar-tools cg__toolbar">
         <a href = "#!" class="md-icon-button" aria-label="Main Menu">
-            <md-icon md-svg-icon="img/arrow_back-48dp.svg"></md-icon>
+            <md-icon md-svg-icon="img/arrow_back-48dp.svg" style="fill:white;"></md-icon>
         </a>
 
         <h2 flex  style="text-align:center;">Players: 0/20</h2>
@@ -16,13 +16,24 @@
 
 </md-toolbar>
 
-
-<md-input-container class="cg__input">
-    <label>Max Players</label>
-    <input type="number" step="1" min="0" max = "20" >
-</md-input-container>
-
 <div layout="column">
+
+
+
+    <md-button ngclipboard data-clipboard-text="www.somecoolname.com/ABCD" class = "cg__shareLink" ng-mouseenter = "shareHovered = true" ng-mouseleave="shareHovered = false" flex>
+        <div ng-show = "shareHovered">www.somecoolname.com/ABCD</div>
+        <div ng-hide = "shareHovered">Click to copy game link</div>
+    </md-button>
+
+    <md-button class = "cg__startGame" ng-click="startGame()" flex >Start Game</md-button>
+
+
+    <md-input-container class="cg__input">
+        <label>Max Players</label>
+        <input type="number" step="1" min="0" max = "20" style="border-color:black;">
+    </md-input-container>
+
+
     <md-button flex ng-click="showCardPacks = !showCardPacks" class = "cg__btn" layout="row"> <!-- needs styling work -->
         <div flex> Card Packs</div>
         <md-icon md-svg-icon="img/join_game.svg"  style="transition: all 0.2s;" ng-style="showCardPacks ? {transform: 'rotate(90deg)'} : {transsform:'none'}"></md-icon>
@@ -54,7 +65,9 @@
         <md-list-item ng-repeat="player in players">
             <h3 flex>{{player.name}}</h3>
 
-            <md-icon class="md-secondary" md-svg-icon="img/remove_player-48dp.svg" ng-click="players.remove(player)"></md-icon>
+            <md-icon class="md-secondary" md-svg-icon="img/remove_player-48dp.svg" ng-click="players.remove(player)">
+                <md-tooltip md-direction="left" md-delay = "100">Remove Player</md-tooltip>
+            </md-icon>
         </md-list-item>
     </md-list>
 

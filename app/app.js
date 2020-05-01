@@ -1,6 +1,6 @@
 
 
-const app = angular.module("app",['ngAnimate','ngAria','ngMaterial', 'ngRoute']);
+const app = angular.module("app",['ngAnimate','ngAria','ngMaterial', 'ngRoute','ngclipboard']);
 app.config(function($routeProvider) {
     $routeProvider
         .when("/", {
@@ -80,7 +80,7 @@ app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout
 
               $timeout( function() {
                   $scope.showPopUp = false;
-              }, 100);
+              }, 200);
 
               console.log(this.text);
           } else {
@@ -233,14 +233,15 @@ app.controller("menuController", function ($scope, $mdDialog, $mdMedia, $timeout
 
     $scope.showSwipeAlert = function(ev) {
         if (!$mdMedia("gt-md")) {
+
             console.log("Showing Popup");
             $mdDialog.show(
                 $mdDialog.alert()
-                    .parent(angular.element(document.querySelector('#mainMenu')))
                     .clickOutsideToClose(true)
                     .title("Opening the Menu")
                     .textContent("Swipe right to open the toolbar in game")
                     .ok("Got it!")
+
                     .targetEvent(ev)
             );
         }

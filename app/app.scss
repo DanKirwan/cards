@@ -432,6 +432,7 @@ body {
 //creating game
 .cg {
 
+
   &__toolbar {
     background:black;
 
@@ -450,16 +451,64 @@ body {
     margin-left: 4%;
     background-color: white;
 
+
+    margin-bottom:0;
+
+  }
+
+  &__shareLink {
+
+
+
+
+    border: 2px solid black;
+    border-radius: 5px;
+    margin:4%;
+
+
+
+    background:white;
+    color:black;
+
+
+    &:not([disabled]):hover {
+      background-color:black;
+      color:white;
+    }
+
+  }
+
+  &__startGame {
+
+    border-radius: 5px;
+    margin:4%;
+
+
+    background:black;
+    color:white;
+
+    font-weight:bold;
+    font-size:20px;
+
+    padding:10px;
+    &:not([disabled]):hover {
+      background: #1b1b1b;
+    }
+
   }
 
 
   &__btn {
 
+    position:relative;
     width: 60%;
+    min-width:250px;
     margin-left: 4%;
 
     border: 2px solid black;
     border-radius: 5px;
+
+    margin-bottom:5%;
   }
 
   &__packList {
