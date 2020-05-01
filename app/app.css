@@ -234,10 +234,12 @@ body {
     .mainMenu__btn:not([disabled]):hover {
       background-color: #e2e2e2; }
 
-.cg__Header {
-  position: relative;
+.cg__toolbar {
+  background: black; }
+.cg__heading {
   text-align: center;
-  width: 100%; }
+  margin: 4%;
+  border-bottom: 2px solid black; }
 .cg__input {
   width: 60%;
   margin-left: 4%;
