@@ -1,7 +1,11 @@
 {
-  "strict": "global",
+  "strict": false,
+  "esversion": 6,
   "globals": {
-    // AngularJS
+
+
+
+    //AngularJS
     "angular": false,
 
     // AngularJS mocks

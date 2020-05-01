@@ -19,6 +19,23 @@ app.config(function($routeProvider) {
 });
 
 
+app.controller("globalController", function($scope) {
+
+    class Player {
+        constructor (id, name) {
+            this.id = id;
+            this.name = name;
+            this.leader = false;
+        }
+    }
+
+    $scope.players = [
+        new Player(0, "Dan"),
+        new Player(1, "Test1")
+    ];
+
+});
+
 
 
 app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout) {
@@ -37,7 +54,7 @@ app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout
     constructor(text) {
       this.selected = false;
       this.text = text;
-    };
+    }
 
     onClick() {
 
@@ -100,11 +117,11 @@ app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout
 
   $scope.openSideNav  = function() {
       $mdSidenav('left').open();
-  }
+  };
 
   $scope.closeSideNav = function() {
       $mdSidenav('left').close();
-  }
+  };
 
 
 
@@ -124,7 +141,7 @@ app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout
       new Card("Test8"),
       new Card("Test9"),
       new Card("Test10"),
-      ]
+      ];
 
 
 
@@ -216,7 +233,7 @@ app.controller("menuController", function ($scope, $mdDialog, $mdMedia, $timeout
 
     $scope.showSwipeAlert = function(ev) {
         if (!$mdMedia("gt-md")) {
-            console.log("Showing Popup")
+            console.log("Showing Popup");
             $mdDialog.show(
                 $mdDialog.alert()
                     .parent(angular.element(document.querySelector('#mainMenu')))
@@ -234,7 +251,7 @@ app.controller("menuController", function ($scope, $mdDialog, $mdMedia, $timeout
         new CardPack("UK TEST", "Obviously superior set of cards"),
         new CardPack("US Test", "not as funny america sucks"),
         new CardPack("Custom Pack", "Something less witty as it wasn't written by the Cards against humanity team")
-    ]
+    ];
 
 
     $scope.gameName = '';

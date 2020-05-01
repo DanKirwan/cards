@@ -1,6 +1,6 @@
 <md-toolbar>
 
-    <div class="md-toolbar-tools">
+    <div class="md-toolbar-tools cg__toolbar">
         <a href = "#!" class="md-icon-button" aria-label="Main Menu">
             <md-icon md-svg-icon="img/arrow_back-48dp.svg"></md-icon>
         </a>
@@ -47,5 +47,15 @@
         Advanced Settings
 
     </md-button>
+
+
+    <h3 flex class = "cg__heading"> Players</h3>
+    <md-list>
+        <md-list-item ng-repeat="player in players">
+            <h3 flex>{{player.name}}</h3>
+
+            <md-icon class="md-secondary" md-svg-icon="img/remove_player-48dp.svg" ng-click="players.remove(player)"></md-icon>
+        </md-list-item>
+    </md-list>
 
 </div>
