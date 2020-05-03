@@ -1,6 +1,6 @@
 
 
-const app = angular.module("app",['ngAnimate','ngAria','ngMaterial', 'ngRoute','ngclipboard']);
+const app = angular.module("app",['ngAnimate','ngAria','ngMaterial', 'ngRoute','ngclipboard', 'ngWebSocket', ]);
 app.config(function($routeProvider) {
     $routeProvider
         .when("/", {
@@ -36,9 +36,43 @@ app.controller("globalController", function($scope) {
 
 });
 
+app.factory("serverData", function($websocket) {
+
+    let ws = $websocket('ws://localhost:8080');
+
+    let myHand = [];
+
+    let othersCards = [];
 
 
-app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout) {
+
+    ws.onMessage(function(msg) {
+     myHand.push(msg.data);
+    });
+    console.log(myHand);
+
+    return {
+        myHand : myHand,
+        othersCards : othersCards,
+        send: function(msg) {
+            if(angular.isString(msg)) {
+                ws.send(msg);
+            }
+            else if(angular.isObject(msg)) {
+                ws.send(JSON.stringify(msg));
+            }
+
+        }
+    }
+
+
+});
+
+
+
+app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout, serverData) {
+
+    $scope.server = serverData;
 
     $scope.selectedCard = null;
     $scope.cardsFocussed = true;
@@ -47,7 +81,6 @@ app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout
     $scope.showPopUp = false;
 
     $scope.isJudge = false;
-
 
     //normal play
     class Card {
@@ -59,7 +92,8 @@ app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout
     onClick() {
 
 
-        if(this.selected == false) {
+
+        if(this.selected === false) {
 
           if ($scope.cardsFocussed) {
 
@@ -117,6 +151,7 @@ app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout
 
   $scope.openSideNav  = function() {
       $mdSidenav('left').open();
+
   };
 
   $scope.closeSideNav = function() {
@@ -128,20 +163,19 @@ app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout
 
 
 
-
   $scope.cards = [
       new Card("Test1"),
-
       new Card("Test2"),
       new Card("Test3"),
-      new Card("Test4"),
-      new Card("Test5"),
-      new Card("Test6"),
-      new Card("Test7"),
-      new Card("Test8"),
-      new Card("Test9"),
-      new Card("Test10"),
-      ];
+      new Card("test4"),
+      new Card( "test5"),
+      new Card( "test6"),
+      new Card( "test7"),
+      new Card( "test8"),
+      new Card( "test9"),
+      new Card("test10")];
+  console.log($scope.server.myHand);
+
 
 
 
