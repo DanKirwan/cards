@@ -1,0 +1,26 @@
+<md-dialog aria-label="Pick your Name" ng-controller="dialogController">
+    <form ng-cloak>
+
+        <md-dialog-content style="">
+            <div class="md-dialog-content" style = "overflow:hidden;">
+                <h2> Pick a Name</h2>
+
+                <h3>This is the name other players will see you with in game</h3>
+
+                <md-input>
+                    <md-input-container>
+                        <label>Your Name</label>
+                        <input name="email" ng-model="username" ng-change="usrNameChange()">
+
+                        <div class="hint" ng-show="!isNameValid">This username is already taken</div>
+                    </md-input-container>
+                </md-input>
+
+                <md-button class = "mainMenu__btn" style="position:relative;" ng-disabled="!isNameValid" ng-click="usrSetName()">
+                    Confirm Name
+                </md-button>
+            </div>
+        </md-dialog-content>
+
+    </form>
+</md-dialog>

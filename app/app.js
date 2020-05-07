@@ -1,6 +1,6 @@
 
 
-const app = angular.module("app",['ngAnimate','ngAria','ngMaterial', 'ngRoute','ngclipboard', 'ngWebSocket', 'cards.services' ]);
+const app = angular.module("app",['ngAnimate','ngAria','ngMaterial', 'ngRoute','ngclipboard', 'cards.services' ]);
 app.config(function($routeProvider) {
     $routeProvider
         .when("/", {
@@ -36,12 +36,36 @@ app.controller("globalController", function($scope) {
 });
 
 
+app.controller("dialogController", function($scope, socket, $mdDialog) {
+
+    $scope.username = null;
+    $scope.nameValid = true;
+
+    $scope.usrNameChange = function() {
+        socket.emit("user:checkName", {name: $scope.username});
+        socket.on('user:isNameValid', function(data) {
+           $scope.isNameValid = data.isNameValid;
+        })
+    };
 
 
 
-app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout, socket) {
+    $scope.usrSetName = function() {
+        socket.emit("user:setName", {name: $scope.username});
 
-    socket.emit('test1', JSON.stringify({msg: 'TEST'}));
+        if($scope.nameValid) {
+         $mdDialog.cancel();
+        }
+
+    }
+
+
+
+});
+
+
+app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout) {
+
 
     $scope.selectedCard = null;
     $scope.cardsFocussed = true;
@@ -239,13 +263,12 @@ app.controller("menuController", function ($scope, $mdDialog, $mdMedia, $timeout
 
             console.log("Showing Popup");
             $mdDialog.show(
-                $mdDialog.alert()
-                    .clickOutsideToClose(true)
-                    .title("Opening the Menu")
-                    .textContent("Swipe right to open the toolbar in game")
-                    .ok("Got it!")
-
-                    .targetEvent(ev)
+                {
+                    templateUrl: 'pickNameDialog.tmpl.html',
+                    parent:angular.element(document.body),
+                    targetEvent: ev,
+                    clickOutsideToClose: false
+                }
             );
         }
     };

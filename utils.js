@@ -1,8 +1,8 @@
 exports.Player =  class Player {
-    constructor(id, gameId, name) {
+    constructor(id, name) {
         this.id = id;
-        this.name = name;
-        this.gameId = gameId;
+        this.name = null;
+        this.gameId = null;
     }
 
 }
