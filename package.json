@@ -21,7 +21,8 @@
     "mongoose": "^5.9.11",
     "ngclipboard": "^2.0.0",
     "sass": "^1.26.5",
-    "websocket": "^1.0.31"
+    "socket.io": "^2.3.0",
+    "uuid": "^8.0.0"
   },
   "devDependencies": {
     "angular-mocks": "^1.7.5",
@@ -32,6 +33,7 @@
     "karma-chrome-launcher": "^2.2.0",
     "karma-firefox-launcher": "^1.1.0",
     "karma-jasmine": "^1.1.2",
+    "nodemon": "^2.0.3",
     "protractor": "^5.4.1"
   },
   "scripts": {
@@ -40,7 +42,8 @@
     "postupdate-deps": "npm run copy-libs",
     "copy-libs": "cpx \"node_modules/{angular,angular-*,html5-boilerplate/dist}/**/*\" app/lib -C",
     "prestart": "npm install",
-    "start": "http-server -a localhost -p 8000 -c-1 ./app",
+    "start": "node ./bin/www",
+    "devstart": "nodemon ./bin/www",
     "pretest": "npm install",
     "test": "karma start karma.conf.js",
     "test-single-run": "npm test -- --single-run",

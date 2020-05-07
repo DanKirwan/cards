@@ -1,6 +1,6 @@
 
 
-const app = angular.module("app",['ngAnimate','ngAria','ngMaterial', 'ngRoute','ngclipboard', 'ngWebSocket', ]);
+const app = angular.module("app",['ngAnimate','ngAria','ngMaterial', 'ngRoute','ngclipboard', 'ngWebSocket', 'cards.services' ]);
 app.config(function($routeProvider) {
     $routeProvider
         .when("/", {
@@ -20,7 +20,6 @@ app.config(function($routeProvider) {
 
 
 app.controller("globalController", function($scope) {
-
     class Player {
         constructor (id, name) {
             this.id = id;
@@ -36,43 +35,13 @@ app.controller("globalController", function($scope) {
 
 });
 
-app.factory("serverData", function($websocket) {
-
-    let ws = $websocket('ws://localhost:8080');
-
-    let myHand = [];
-
-    let othersCards = [];
 
 
 
-    ws.onMessage(function(msg) {
-     myHand.push(msg.data);
-    });
-    console.log(myHand);
 
-    return {
-        myHand : myHand,
-        othersCards : othersCards,
-        send: function(msg) {
-            if(angular.isString(msg)) {
-                ws.send(msg);
-            }
-            else if(angular.isObject(msg)) {
-                ws.send(JSON.stringify(msg));
-            }
+app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout, socket) {
 
-        }
-    }
-
-
-});
-
-
-
-app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout, serverData) {
-
-    $scope.server = serverData;
+    socket.emit('test1', JSON.stringify({msg: 'TEST'}));
 
     $scope.selectedCard = null;
     $scope.cardsFocussed = true;
