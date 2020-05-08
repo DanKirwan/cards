@@ -9,16 +9,20 @@ exports.Player =  class Player {
 
 
 exports.Game = class Game {
-    constructor(gameId, name) {
+    constructor(gameId, name, maxPlayers) {
         this.name = name;
         this.id = gameId;
-        this.players = [];
+        this.maxPlayers = maxPlayers;
+        this.players = {};
         this.judgeIdx = 0;
 
     }
 
     addPlayer(player) {
-        this.players.concat(players);
+        if(Object.keys(this.players).length <  this.maxPlayers) {
+            this.players[player.id] = player;
+        }
+
     }
 
     removePlayer(player) {

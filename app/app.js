@@ -1,13 +1,13 @@
 
 
-const app = angular.module("app",['ngAnimate','ngAria','ngMaterial', 'ngRoute','ngclipboard', 'cards.services' ]);
+const app = angular.module("app",['ngMessages','ngAnimate','ngAria','ngMaterial', 'ngRoute','ngclipboard', 'cards.services']);
 app.config(function($routeProvider) {
     $routeProvider
         .when("/", {
             templateUrl: "mainMenu.htm",
             controller: "menuController"
         })
-        .when("/game", {
+        .when("/game/:gameCode", {
             templateUrl: "game.htm",
             controller: "cardController"
         })
@@ -19,10 +19,27 @@ app.config(function($routeProvider) {
 });
 
 
-app.controller("globalController", function($scope) {
+app.controller("globalController", function($scope, $mdDialog, $mdMedia) {
+
+
+    $scope.pickNameDialog = function(ev) {
+        if (!$mdMedia("gt-md")) {
+
+            console.log("Showing Popup");
+            $mdDialog.show(
+                {
+                    templateUrl: 'pickNameDialog.tmpl.html',
+                    parent:angular.element(document.body),
+                    targetEvent: ev,
+                    clickOutsideToClose: false
+                }
+            );
+        }
+    };
+
     class Player {
-        constructor (id, name) {
-            this.id = id;
+        constructor (name) {
+
             this.name = name;
             this.leader = false;
         }
@@ -238,7 +255,7 @@ app.controller("judgeController", function ($scope, $mdMedia) {
 
 
 
-app.controller("menuController", function ($scope, $mdDialog, $mdMedia, $timeout) {
+app.controller("menuController", function ($scope, socket, $location) {
     class Game {
         constructor(name, id) { //other stuff about game as in private max players etc
             this.name = name;
@@ -258,20 +275,7 @@ app.controller("menuController", function ($scope, $mdDialog, $mdMedia, $timeout
     }
 
 
-    $scope.showSwipeAlert = function(ev) {
-        if (!$mdMedia("gt-md")) {
 
-            console.log("Showing Popup");
-            $mdDialog.show(
-                {
-                    templateUrl: 'pickNameDialog.tmpl.html',
-                    parent:angular.element(document.body),
-                    targetEvent: ev,
-                    clickOutsideToClose: false
-                }
-            );
-        }
-    };
 
     $scope.showCardPacks = false;
     $scope.cardPacks = [
@@ -282,6 +286,37 @@ app.controller("menuController", function ($scope, $mdDialog, $mdMedia, $timeout
 
 
     $scope.gameName = '';
+
+    $scope.maxPlayers = 20;
+
+
+    $scope.gameCreated = null;
+    $scope.gameCode = null;
+
+    $scope.startGame = function() {
+        socket.emit("game:create", {
+            name: $scope.gameName,
+            maxPlayers: $scope.maxPlayers
+        });
+
+        socket.on("game:confirmCreate", function(data) {
+
+            $scope.gameCreated = data.confirmed;
+            $scope.gameCode = data.code;
+
+            console.log(data.code);
+
+            $location.path("/game/" + data.code);
+            }
+        )
+
+    };
+
+    $scope.$on("$locationChangeStart", function(ev) {
+        if($scope.gameCreated !== true && $location.path() === '/#!/createGame') {
+            ev.preventDefault();
+        }
+    })
 
 
 });

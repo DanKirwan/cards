@@ -16,7 +16,7 @@
 
 </md-toolbar>
 
-<div layout="column">
+<div layout="column" ng-controller="menuController">
 
 
 
@@ -30,9 +30,32 @@
     <h3 class="cg__heading">Settings</h3>
 
     <md-input-container class="cg__input">
-        <label>Max Players</label>
-        <input type="number" step="1" min="0" max = "20" style="border-color:black;">
+        <label>Game Name</label>
+        <input type="text" style="border-color:black;" ng-model="gameName">
+        <div class="hint" style="font-size:10px">Optional</div>
     </md-input-container>
+
+    <form name="maxPlayerForm">
+        <md-input-container class="cg__input">
+            <label>Max Players</label>
+            <input name="playerCount" type="number" ng-model = "maxPlayers" step="1" min="3" max = "20" style="border-color:black;" value="{{maxPlayers}}" >
+
+
+            <div ng-messages="maxPlayerForm.playerCount.$error" multiple md-auto-hide="false">
+
+                <div ng-message="min">
+                    You cant play with less than 3 people!
+                </div>
+
+                <div ng-message="max">
+                    Maximum players in a game is 20
+                </div>
+            </div>
+
+
+        </md-input-container>
+
+    </form>
 
 
     <md-button flex ng-click="showCardPacks = !showCardPacks" class = "cg__btn" layout="row"> <!-- needs styling work -->

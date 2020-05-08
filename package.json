@@ -11,7 +11,7 @@
     "angular-aria": "^1.7.9",
     "angular-loader": "^1.7.5",
     "angular-material": "^1.1.21",
-    "angular-messages": "^1.7.9",
+    "angular-messages": "^1.7.5",
     "angular-route": "^1.7.9",
     "angular-websocket": "^2.0.1",
     "clipboard": "^2.0.6",
