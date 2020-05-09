@@ -69,7 +69,7 @@ exports.Card = class Card {
 };
 
 exports.Player =  class Player {
-    constructor(id, name) {
+    constructor(id) {
         this.id = id;
         this.name = null;
         this.gameId = null;

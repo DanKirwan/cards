@@ -19,6 +19,7 @@ app.config(function($routeProvider) {
 });
 
 
+
 app.controller("globalController", function($scope, $mdDialog, $mdMedia, socket) {
 
 
@@ -49,13 +50,15 @@ app.controller("globalController", function($scope, $mdDialog, $mdMedia, socket)
 });
 
 
-app.controller("dialogController", function($scope, socket, $mdDialog) {
+app.controller("dialogController", function(globals, $scope, socket, $mdDialog) {
 
-    $scope.username = '';
+    $scope.inputUsername = '';
+
     $scope.nameValid = true;
 
     $scope.usrNameChange = function() {
-        socket.emit("user:checkName", {name: $scope.username});
+        globals.username = $scope.inputUsername;
+        socket.emit("user:checkName", {name: globals.username});
         socket.on('user:isNameValid', function(data) {
            $scope.isNameValid = data.isNameValid;
         })
@@ -64,7 +67,7 @@ app.controller("dialogController", function($scope, socket, $mdDialog) {
 
 
     $scope.usrSetName = function() {
-        socket.emit("user:setName", {name: $scope.username});
+        socket.emit("user:setName", {name: globals.username});
 
         if($scope.nameValid) {
          $mdDialog.cancel();
@@ -256,6 +259,7 @@ app.controller("mainMenuController", function($scope, socket, $location) {
     $scope.validGame = false;
     $scope.gameId = null;
 
+    //TODO fix this join game thing and route to main menu if not a valid game code
 
 
 
@@ -294,7 +298,7 @@ app.controller("mainMenuController", function($scope, socket, $location) {
 
 })
 
-app.controller("menuController", function ($scope, socket, $location, $routeParams) {
+app.controller("menuController", function (globals, $rootScope, $scope, socket, $location, $routeParams, Player) {
 
 
 
@@ -325,9 +329,7 @@ app.controller("menuController", function ($scope, socket, $location, $routePara
 
 
     $scope.showCardPacks = false;
-    $scope.cardPacks = [
-
-    ];
+    $scope.cardPacks = [];
 
 
     $scope.gameName = '';
@@ -353,11 +355,67 @@ app.controller("menuController", function ($scope, socket, $location, $routePara
                 $scope.cardPacks.push(new CardPack(pack.name, pack.desc));
             }
 
+            $scope.players = [];
+            for(let pName of data.players) {
+                console.log(pName);
+                let newPlayer = new Player(pName);
 
-            $scope.players = data.players;
+                if(pName === globals.username) {
+                    newPlayer.admin = true;
+                }
+                $scope.players.push(newPlayer);
+
+
+            }
         });
 
     };
+
+    function containsPlayer(name) {
+        let cont = false;
+
+        for(let p of $scope.players) {
+            if(p.name === name) {
+                cont = true;
+            }
+        }
+
+        return cont;
+    }
+
+    function getIdxFromName(name) {
+        let idx = -1;
+
+        for(let i = 0; i < $scope.players.length; i++) {
+            if($scope.players[i].name === name) {
+                idx = i;
+            }
+        }
+
+        return idx;
+    }
+    socket.on("game:playerLeave", function(data) {
+
+        if(containsPlayer(data.name)) {
+            $scope.players.splice(getIdxFromName(data.name), 1);
+        }
+    });
+
+    socket.on("game:playerJoin", function(data) {
+        let p = new Player(data.name);
+
+        if(p.name === globals.username) {
+            p.admin = true;
+        }
+
+        if(!containsPlayer(data.name)) {
+            $scope.players.push(p);
+        }
+
+        console.log($scope.players);
+
+
+    });
 
 
     $scope.startGame = function() {

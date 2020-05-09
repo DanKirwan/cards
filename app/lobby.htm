@@ -94,10 +94,10 @@
     <h3 flex class = "cg__heading"> Players</h3>
     <md-list>
         <md-list-item ng-repeat="player in players">
-            <h3 flex>{{player}}</h3>
+            <h3 flex>{{player.name}}</h3>
 
 
-            <md-icon ng-show="isAdmin" class="md-secondary" md-svg-icon="img/remove_player-48dp.svg" ng-click="players.remove(player)">
+            <md-icon ng-show="isAdmin && !player.admin" class="md-secondary" md-svg-icon="img/remove_player-48dp.svg" ng-click="players.remove(player)">
                 <md-tooltip md-direction="left" md-delay = "100">Remove Player</md-tooltip>
             </md-icon>
         </md-list-item>

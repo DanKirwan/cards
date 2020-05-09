@@ -10,10 +10,10 @@
                 <md-input>
                     <md-input-container>
                         <label>Your Name</label>
-                        <input name="username" ng-model="username" ng-change="usrNameChange()">
+                        <input ng-model="inputUsername" ng-change="usrNameChange()">
 
-                        <div class="hint" style="color:red" ng-show="!isNameValid && username !== ''">This username is already taken</div>
-                        <div class="hint" style="color:red" ng-show="username === ''">You must enter a username</div>
+                        <div class="hint" style="color:red" ng-show="!isNameValid && inputUsername !== ''">This username is already taken</div>
+                        <div class="hint" style="color:red" ng-show="inputUsername === ''">You must enter a username</div>
 
                     </md-input-container>
                 </md-input>

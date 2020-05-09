@@ -43,16 +43,18 @@ function nameValid(name) {
     return isValid;
 }
 
-function safeJoinGame(gameId, playerId) {
+function safeJoinGame(gameId, playerId, socket) {
     let pCurrGame = clients[playerId].gameId;
     if(!(gameId === pCurrGame)) {
         if(pCurrGame !== null) {
             games[pCurrGame].removePlayer(playerId);
+            socket.leave(pCurrGame)
         }
 
-        if(games[gameId] !== null) {
+        if(games[gameId] !== undefined) {
             games[gameId].addPlayer(clients[playerId]);
             clients[playerId].gameId = gameId;
+            socket.join(gameId);
             return true;
         } else {
             return false;
@@ -68,11 +70,11 @@ io.on('connection', (socket) => {
   socket.emit("user:getName");
 
 
-  let userID = socket.id;
+  let userId = socket.id;
 
-  console.log("Connected: " + userID)
-  let player = new Player(userID);
-  clients[userID] = player;
+  console.log("Connected: " + userId)
+  let player = new Player(userId);
+  clients[userId] = player;
 
   //User handling
   socket.on("user:checkName", function(data) {
@@ -87,7 +89,7 @@ io.on('connection', (socket) => {
             player.name = data.name;
             console.log(clients);
         } else {
-            console.log(new Date() + " Error when setting name: " + userID)
+            console.log(new Date() + " Error when setting name: " + userId)
         }
     });
 
@@ -111,7 +113,7 @@ io.on('connection', (socket) => {
         let id = util.getNewGameID();
         games[id] = new Game(id, null, null);
 
-        safeJoinGame(id, socket.id);
+        safeJoinGame(id, socket.id, socket);
         games[id].setGameAdmin(clients[socket.id]);
         console.log(games);
         console.log('Player created game: ' + socket.id + "Client: " + clients[socket.id]);
@@ -138,7 +140,7 @@ io.on('connection', (socket) => {
 
 
         if(gameLobby !== undefined) {
-            safeJoinGame(data.gameId, socket.id);
+            safeJoinGame(data.gameId, socket.id, socket);
             console.log(gameLobby);
 
             socket.emit("game:lobbyInfo", {
@@ -153,8 +155,20 @@ io.on('connection', (socket) => {
                 //TODO add card packs and stuff here
             });
 
+
+            //update other players that player has joined
+
+            io.to(data.gameId).emit("game:playerJoin", {name: clients[socket.id].name});
+
         }
     });
+
+    socket.on("game:removePlayer", function(data) {
+
+
+    });
+
+
 
     //TODO leave lobbies if you actually leave them, update players when they join and a load of other stuff
 
@@ -199,8 +213,11 @@ io.on('connection', (socket) => {
 
 
     socket.on("disconnect", function() {
-        console.log(new Date() + " - Connection Terminated: " + userID);
-        delete clients[userID];
+        if(clients[userId].gameId !== undefined) {
+            io.to(clients[userId].gameId).emit("game:playerLeave", {name: clients[userId].name});
+        }
+        console.log(new Date() + " - Connection Terminated: " + userId);
+        delete clients[userId];
     })
 
 
