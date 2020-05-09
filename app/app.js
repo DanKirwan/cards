@@ -11,51 +11,47 @@ app.config(function($routeProvider) {
             templateUrl: "game.htm",
             controller: "cardController"
         })
-        .when("/createGame", {
-            templateUrl: "createGame.htm",
+        .when("/lobby/:gameCode", {
+            templateUrl: "lobby.htm",
             controller: "menuController"
     });
 
 });
 
 
-app.controller("globalController", function($scope, $mdDialog, $mdMedia) {
+app.controller("globalController", function($scope, $mdDialog, $mdMedia, socket) {
 
 
-    $scope.pickNameDialog = function(ev) {
-        if (!$mdMedia("gt-md")) {
+    $scope.pickNameDialog = function() {
 
-            console.log("Showing Popup");
-            $mdDialog.show(
-                {
-                    templateUrl: 'pickNameDialog.tmpl.html',
-                    parent:angular.element(document.body),
-                    targetEvent: ev,
-                    clickOutsideToClose: false
-                }
-            );
-        }
+
+        console.log("Showing Popup");
+        $mdDialog.show(
+            {
+                templateUrl: 'pickNameDialog.tmpl.html',
+                parent: angular.element(document.body),
+                clickOutsideToClose: false,
+                escapeToClose:false,
+
+
+            }
+        )
     };
 
-    class Player {
-        constructor (name) {
+    socket.on("user:getName", function(data) {
+        $scope.pickNameDialog();
+    });
 
-            this.name = name;
-            this.leader = false;
-        }
-    }
 
-    $scope.players = [
-        new Player(0, "Dan"),
-        new Player(1, "Test1")
-    ];
+    $scope.players = [];
+
 
 });
 
 
 app.controller("dialogController", function($scope, socket, $mdDialog) {
 
-    $scope.username = null;
+    $scope.username = '';
     $scope.nameValid = true;
 
     $scope.usrNameChange = function() {
@@ -81,7 +77,7 @@ app.controller("dialogController", function($scope, socket, $mdDialog) {
 });
 
 
-app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout) {
+app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout, $routeParams) {
 
 
     $scope.selectedCard = null;
@@ -253,9 +249,60 @@ app.controller("judgeController", function ($scope, $mdMedia) {
 
 
 
+app.controller("mainMenuController", function($scope, socket, $location) {
+
+    //main menu code
+
+    $scope.validGame = false;
+    $scope.gameId = null;
 
 
-app.controller("menuController", function ($scope, socket, $location) {
+
+
+
+    $scope.checkGameExists = function() {
+        socket.emit("game:checkExists", {gameId:$scope.gameId})
+
+        socket.on("game:confirmExists", function(data) {
+            $scope.validGame = data.exists;
+            console.log(data.exists);
+        })
+    };
+
+    $scope.joinGame = function() {
+
+        if($scope.validGame) {
+            socket.emit("game:join", {gameId: $scope.gameId});
+
+        }
+
+
+        //Write the code to either to into lobby or into game if its started
+
+    };
+
+
+    $scope.createGame = function() {
+        socket.emit("game:create");
+        socket.on("game:confirmCreate", function(data) {
+            if(data.confirmed) {
+                $location.path('/lobby/' + data.code);
+            }
+        });
+    }
+
+
+})
+
+app.controller("menuController", function ($scope, socket, $location, $routeParams) {
+
+
+
+
+    //create game code
+
+
+
     class Game {
         constructor(name, id) { //other stuff about game as in private max players etc
             this.name = name;
@@ -279,9 +326,7 @@ app.controller("menuController", function ($scope, socket, $location) {
 
     $scope.showCardPacks = false;
     $scope.cardPacks = [
-        new CardPack("UK TEST", "Obviously superior set of cards"),
-        new CardPack("US Test", "not as funny america sucks"),
-        new CardPack("Custom Pack", "Something less witty as it wasn't written by the Cards against humanity team")
+
     ];
 
 
@@ -290,16 +335,38 @@ app.controller("menuController", function ($scope, socket, $location) {
     $scope.maxPlayers = 20;
 
 
+    $scope.isAdmin = false;
+
+
+
+
     $scope.gameCreated = null;
-    $scope.gameCode = null;
+    $scope.gameCode = $routeParams.gameCode;
+
+    $scope.getLobbyInfo = function() {
+        socket.emit("game:joinLobby", {gameId: $scope.gameCode});
+
+        socket.on("game:lobbyInfo", function(data) {
+            $scope.isAdmin = data.isAdmin;
+
+            for(let pack of data.cardPacks) {
+                $scope.cardPacks.push(new CardPack(pack.name, pack.desc));
+            }
+
+
+            $scope.players = data.players;
+        });
+
+    };
+
 
     $scope.startGame = function() {
-        socket.emit("game:create", {
+        socket.emit("game:begin", {
             name: $scope.gameName,
             maxPlayers: $scope.maxPlayers
         });
 
-        socket.on("game:confirmCreate", function(data) {
+        socket.on("game:confirmBegin", function(data) {
 
             $scope.gameCreated = data.confirmed;
             $scope.gameCode = data.code;
@@ -312,11 +379,7 @@ app.controller("menuController", function ($scope, socket, $location) {
 
     };
 
-    $scope.$on("$locationChangeStart", function(ev) {
-        if($scope.gameCreated !== true && $location.path() === '/#!/createGame') {
-            ev.preventDefault();
-        }
-    })
+
 
 
 });

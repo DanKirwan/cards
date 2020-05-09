@@ -1,4 +1,4 @@
-<div class = "mainMenu" id="mainMenu" >
+<div class = "mainMenu" id="mainMenu" ng-controller="mainMenuController" >
 
     <h1 class = "mainMenu__title">Name Of Game</h1>
 
@@ -6,17 +6,17 @@
             <div class="mainMenu__joinGame">
 
 
-                <input class="mainMenu__joinGame__input" placeholder="GAME CODE" >
+                <input class="mainMenu__joinGame__input" placeholder="GAME CODE" ng-model="gameId" ng-change="checkGameExists()">
 
-                <a href="#!game" class= "md-button mainMenu__joinGame__btn" >
+                <md-button ng-click="joinGame()" ng-disabled = "!validGame" class= " mainMenu__joinGame__btn" >
                     <md-icon md-svg-icon="img/join_game.svg" style="position:absolute; transform:translate(-50%, -50%); top:50%;"></md-icon>
-                </a>
+                </md-button>
 
             </div>
         </div>
 
 
-    <a href="#!createGame"class = " md-button mainMenu__btn" style="bottom:20px;">Create New Game</a>
+    <md-button  ng-click = "createGame()"  class = " mainMenu__btn" style="bottom:20px;">Create New Game</md-button>
 
     <!--<md-button class = "mainMenu__btn">Find Public Game</md-button>-->
 

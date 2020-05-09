@@ -2,10 +2,7 @@ angular.module("cards.services", [])
 
     .factory('socket', function($rootScope) {
 
-    let socket = io.connect('localhost:80');
-    socket.on("test", function() {
-        console.log("TEST");
-    });
+    let socket = io.connect('87.112.192.250:80');
 
     return {
         on: function(eventName, callback) {

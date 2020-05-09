@@ -1,0 +1,106 @@
+<md-toolbar>
+
+    <div class="md-toolbar-tools cg__toolbar">
+        <a href = "#!" class="md-icon-button" aria-label="Main Menu">
+            <md-icon md-svg-icon="img/arrow_back-48dp.svg" style="fill:white;"></md-icon>
+        </a>
+
+        <h2 flex  style="text-align:center;">Players: 0/20</h2>
+        <div layout="column" layout-align="center center" >
+
+            <p style="margin:1px; font-size:10px;">Game Code</p>
+            <h1>{{gameCode}}</h1>
+
+        </div>
+    </div>
+
+</md-toolbar>
+
+<div layout="column" ng-controller="menuController" ng-init="getLobbyInfo()">
+
+    <h1 flex  ng-hide="isAdmin" style="text-align:center;"> Waiting for game to start</h1>
+
+
+    <md-button ngclipboard data-clipboard-text="www.somecoolname.com/{{gameCode}}" class = "cg__shareLink" ng-mouseenter = "shareHovered = true" ng-mouseleave="shareHovered = false" flex>
+        <div ng-show = "shareHovered">www.somecoolname.com/{{gameCode}}</div>
+        <div ng-hide = "shareHovered">Click to copy game link</div>
+    </md-button>
+
+    <div ng-show="isAdmin">
+        <md-button class = "cg__startGame" ng-click="startGame()" flex >Start Game</md-button>
+
+        <h3 class="cg__heading">Settings</h3>
+
+        <md-input-container class="cg__input">
+            <label>Game Name</label>
+            <input type="text" style="border-color:black;" ng-model="gameName">
+            <div class="hint" style="font-size:10px">Optional</div>
+        </md-input-container>
+
+        <form name="maxPlayerForm">
+            <md-input-container class="cg__input">
+                <label>Max Players</label>
+                <input name="playerCount" type="number" ng-model = "maxPlayers" step="1" min="3" max = "20" style="border-color:black;" value="{{maxPlayers}}" >
+
+
+                <div ng-messages="maxPlayerForm.playerCount.$error" multiple md-auto-hide="false">
+
+                    <div ng-message="min">
+                        You cant play with less than 3 people!
+                    </div>
+
+                    <div ng-message="max">
+                        Maximum players in a game is 20
+                    </div>
+                </div>
+
+
+            </md-input-container>
+
+        </form>
+
+
+        <md-button flex ng-click="showCardPacks = !showCardPacks" class = "cg__btn" layout="row"> <!-- needs styling work -->
+            <div flex> Card Packs</div>
+            <md-icon md-svg-icon="img/join_game.svg"  style="transition: all 0.2s;" ng-style="showCardPacks ? {transform: 'rotate(90deg)'} : {transsform:'none'}"></md-icon>
+        </md-button>
+
+
+        <md-list ng-show="showCardPacks" class="cg__packList md-2-line">
+            <md-list-item ng-repeat="pack in cardPacks" ng-show="showCardPacks" class="cg__packList__item">
+                <img ng-src="img/temp_cards-48dp.svg">
+                <div class="md-list-item-text" flex>
+                    <h3>{{pack.name}}</h3>
+                    <p>{{pack.desc}}</p>
+                </div>
+
+                <md-checkbox ng-model="pack.selected"></md-checkbox>
+            </md-list-item>
+
+
+        </md-list>
+
+        <md-button class = "cg__btn">
+            Advanced Settings
+
+        </md-button>
+
+
+    </div>
+
+
+
+
+    <h3 flex class = "cg__heading"> Players</h3>
+    <md-list>
+        <md-list-item ng-repeat="player in players">
+            <h3 flex>{{player}}</h3>
+
+
+            <md-icon ng-show="isAdmin" class="md-secondary" md-svg-icon="img/remove_player-48dp.svg" ng-click="players.remove(player)">
+                <md-tooltip md-direction="left" md-delay = "100">Remove Player</md-tooltip>
+            </md-icon>
+        </md-list-item>
+    </md-list>
+
+</div>
