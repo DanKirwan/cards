@@ -84,6 +84,7 @@ exports.Player =  class Player {
 
 exports.Game = class Game {
     constructor(gameId, name, maxPlayers) {
+        this.inGame = false; //this means that its in the lobby
         this.name = '';
         this.id = gameId;
         this.maxPlayers = 20;

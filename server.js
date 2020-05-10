@@ -88,6 +88,7 @@ io.on('connection', (socket) => {
         if(nameValid(data.name)) {
             player.name = data.name;
             console.log(clients);
+            socket.emit("user:confirmName");
         } else {
             console.log(new Date() + " Error when setting name: " + userId)
         }
@@ -102,7 +103,28 @@ io.on('connection', (socket) => {
             gameExists = true;
         }
 
-        socket.emit("game:confirmExists", {exists: gameExists})
+        socket.emit("game:confirmExists", {
+            exists: gameExists
+        });
+
+
+    });
+
+    socket.on("route:checkGameExists", function(data) {
+        let gameExists = (data.gameId in games);
+
+        socket.emit("route:confirmGameExists",
+            {exists: gameExists});
+    });
+
+    socket.on("game:getStatus", function(data) {
+
+        console.log(`Checking game exists: ${data.gameId}`);
+
+        if(data.gameId in games) {
+
+            socket.emit("game:status", {inGame:games[data.gameId].inGame})
+        }
 
 
     });

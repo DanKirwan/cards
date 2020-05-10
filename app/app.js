@@ -7,6 +7,10 @@ app.config(function($routeProvider) {
             templateUrl: "mainMenu.htm",
             controller: "menuController"
         })
+        .when("/:gameCode", {
+            templateUrl: "routing.htm",
+            controller: "routingController"
+        })
         .when("/game/:gameCode", {
             templateUrl: "game.htm",
             controller: "cardController"
@@ -20,7 +24,7 @@ app.config(function($routeProvider) {
 
 
 
-app.controller("globalController", function($scope, $mdDialog, $mdMedia, socket) {
+app.controller("globalController", function($scope, $mdDialog, $mdMedia, socket, globals) {
 
 
     $scope.pickNameDialog = function() {
@@ -43,11 +47,39 @@ app.controller("globalController", function($scope, $mdDialog, $mdMedia, socket)
         $scope.pickNameDialog();
     });
 
+    socket.on("user:confirmName", function() {
+
+        globals.usernameSet = true;
+    });
+
 
     $scope.players = [];
 
 
 });
+
+app.controller("routingController", function($scope, socket, globals, $routeParams, server) {
+
+
+
+
+    $scope.initFunct = function() {
+        if(globals.usernameSet){
+            server.handleRouting($routeParams.gameCode);
+        } else {
+
+            socket.on("user:confirmName", function() {
+                server.handleRouting($routeParams.gameCode);
+            }
+        )}
+    };
+
+
+
+});
+
+
+
 
 
 app.controller("dialogController", function(globals, $scope, socket, $mdDialog) {
@@ -252,7 +284,7 @@ app.controller("judgeController", function ($scope, $mdMedia) {
 
 
 
-app.controller("mainMenuController", function($scope, socket, $location) {
+app.controller("mainMenuController", function($scope, socket, server, $location) {
 
     //main menu code
 
@@ -265,18 +297,19 @@ app.controller("mainMenuController", function($scope, socket, $location) {
 
 
     $scope.checkGameExists = function() {
-        socket.emit("game:checkExists", {gameId:$scope.gameId})
+        server.checkGameExists($scope.gameId);
 
         socket.on("game:confirmExists", function(data) {
             $scope.validGame = data.exists;
             console.log(data.exists);
-        })
+        });
+        //TODO see if theres a better way of doing this
     };
 
     $scope.joinGame = function() {
 
         if($scope.validGame) {
-            socket.emit("game:join", {gameId: $scope.gameId});
+            $location.path("/"+$scope.gameId);
 
         }
 
@@ -298,7 +331,7 @@ app.controller("mainMenuController", function($scope, socket, $location) {
 
 })
 
-app.controller("menuController", function (globals, $rootScope, $scope, socket, $location, $routeParams, Player) {
+app.controller("menuController", function (server, globals, $rootScope, $scope, socket, $location, $routeParams, Player) {
 
 
 
@@ -345,7 +378,26 @@ app.controller("menuController", function (globals, $rootScope, $scope, socket, 
     $scope.gameCreated = null;
     $scope.gameCode = $routeParams.gameCode;
 
+
+    $scope.initFunct = function () {
+
+        if(globals.usernameSet){
+            server.handleRouting($routeParams.gameCode);
+            $scope.getLobbyInfo();
+        } else {
+
+            socket.on("user:confirmName", function() {
+                server.handleRouting($routeParams.gameCode);
+                $scope.getLobbyInfo();
+            });
+        }
+
+
+    };
+
     $scope.getLobbyInfo = function() {
+
+
         socket.emit("game:joinLobby", {gameId: $scope.gameCode});
 
         socket.on("game:lobbyInfo", function(data) {
