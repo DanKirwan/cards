@@ -120,13 +120,17 @@ app.controller("mainMenuController", function($scope, socket, game, globals) {
 
 
     $scope.game = game;
+    $scope.globals = globals;
 
     //TODO fix this join game thing and route to main menu if not a valid game code
 
 
     $scope.checkGame = function() {
         console.log(globals.gameId);
+
         game.checkExists();
+
+
 
 
     };

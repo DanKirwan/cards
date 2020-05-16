@@ -115,7 +115,7 @@ cServices.factory('routing', function(socket, $mdDialog, $location, globals) {
 
 
 
-cServices.factory("game", function(socket, globals, Player, $location) {
+cServices.factory("game", function(socket, globals, Player, $location, $mdDialog) {
 
     //Right now, only the first time you join you can create a game, afterwards it wont let you
     let game = {};
@@ -247,6 +247,8 @@ cServices.factory("game", function(socket, globals, Player, $location) {
             game.players.splice(getIdxFromName(data.name), 1);
         }
 
+        console.log(globals.username + "Your name - Player To Remove" + data.name)
+
         if(data.name === globals.username) {
             //Someone has kicked this person
             $mdDialog.show(
@@ -254,7 +256,7 @@ cServices.factory("game", function(socket, globals, Player, $location) {
                     .parent(angular.element(document.body))
                     .clickOutsideToClose(true)
                     .title("You have been kicked from the game")
-                    .ok("Okay")
+                    .ok("Main Menu")
             ).then(function () {
                 $location.path("/");
             }, function () {

@@ -69,8 +69,11 @@ exports.Card = class Card {
 };
 
 exports.Player =  class Player {
-    constructor(id) {
+    constructor(id, socket) {
         this.id = id;
+        this.socket = socket;
+
+
         this.name = null;
         this.gameId = null;
 
@@ -178,6 +181,8 @@ exports.Game = class Game {
 
     removePlayer(player) {
         delete this.players[player.id];
+
+        delete this.admins[player.id];
     }
 
     getJudge() {

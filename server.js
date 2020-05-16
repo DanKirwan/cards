@@ -43,22 +43,11 @@ function nameValid(name) {
 }
 
 
-function isInGame(player) {
-    if (player.gameId !== null) {
-        if (games[player.gameId] !== undefined) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
 function safeJoinGame(gameId, player, socket) {
 
 
 
-    if(gameId === player.gameId) {
+    if(gameId === player.gameId && gameId !== null) {
         return true;
     } else {
         let currentGame = player.gameId;
@@ -81,7 +70,7 @@ function safeJoinGame(gameId, player, socket) {
 }
 
 
-function safeLeaveGame(gameId, player) {
+function safeLeaveGame(gameId, player, socket) {
     if(games[gameId] !== undefined && gameId === player.gameId ) {
         player.gameId = null;
         games[gameId].removePlayer(player);
@@ -118,7 +107,7 @@ io.on('connection', (socket) => {
 
 
   console.log("Connected: " + socket.id)
-  let player = new Player(socket.id);
+  let player = new Player(socket.id, socket);
   clients[socket.id] = player;
 
   //User handling
@@ -187,7 +176,7 @@ io.on('connection', (socket) => {
             socket.emit("game:info", {
                 isAdmin: (socket.id in games[id].admins),
                 players: games[id].getPlayerNames(),
-                inGame:games[data.gameId].inGame
+                inGame: games[data.gameId].inGame
 
             });
 
@@ -196,7 +185,7 @@ io.on('connection', (socket) => {
 
 
         } else{
-            socket.emit("game:failedJoin")
+            socket.emit("game:failedJoin");
             console.log(new Date() + "  - User " + socket.id + " failed to join game " + "id");
         }
 
@@ -229,8 +218,9 @@ io.on('connection', (socket) => {
             && player.gameId === playerToRemove.gameId
             && player.id in games[clients[socket.id].gameId].admins) {
 
-            safeLeaveGame(player.gameId, playerToRemove);
+
             io.to(playerToRemove.gameId).emit("game:playerLeave", {name: playerToRemove.name});
+            safeLeaveGame(playerToRemove.gameId, playerToRemove, playerToRemove.socket);
 
             if(games[player.gameId].players.length === 0) {
                safeDeleteGame(player.gameId);
@@ -241,20 +231,38 @@ io.on('connection', (socket) => {
     });
 
     socket.on("game:leave", function(data) {
-        let playerToRemove = clients[idFromName(data.name)];
 
-
-        if(playerToRemove === player) {
-            let gameId = playerToRemove.gameId;
-            safeLeaveGame(player.gameId, player);
+            let gameId = player.gameId; //Must be saved as it is deleted in safeLeaveGame()
+            safeLeaveGame(player.gameId, player, socket);
 
             io.to(gameId).emit("game:playerLeave", {name: player.name});
-        }
 
+            let game = games[gameId];
+            if(game !== undefined) {
+
+                if(Object.keys(game.players).length === 0) {
+                    console.log(`Deleting empty game ${gameId}`);
+                    safeDeleteGame(player.gameId);
+
+                } else if(Object.keys(game.admins).length === 0) {
+
+                    let newAdmin = game.players[Object.keys(game.players)[0]];
+                    game.setGameAdmin(newAdmin);
+                    //Ugly way of setting the next available player to admin
+
+                    io.to(newAdmin.id).emit("game:info", {
+                        isAdmin: true,
+                        players: game.getPlayerNames(),
+                        inGame: game.inGame
+                    });
+
+
+
+                }
+            }
         //TODO add functionality to delete game when noone is in it and if admin is removed make it so that a new admin is selected
     });
 
-    //TODO bug to fix: if you arent in main menu when you put in your name to start then you get no data from the server
 
 
 
@@ -315,11 +323,11 @@ io.on('connection', (socket) => {
 
 
     socket.on("disconnect", function() {
-        if(isInGame(socket.id)){
+        if(player.gameId !== null){
 
             io.to(player.gameId).emit("game:playerLeave", {name: clients[socket.id].name});
 
-            safeLeaveGame(player.gameId, player)
+            safeLeaveGame(player.gameId, player, socket)
 
         }
         console.log(new Date() + " - Connection Terminated: " + socket.id);
