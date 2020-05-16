@@ -47,10 +47,6 @@ app.controller("globalController", function($scope, $mdDialog, $mdMedia, socket,
         $scope.pickNameDialog();
     });
 
-    socket.on("user:confirmName", function() {
-
-        globals.usernameSet = true;
-    });
 
 
     $scope.players = [];
@@ -58,18 +54,20 @@ app.controller("globalController", function($scope, $mdDialog, $mdMedia, socket,
 
 });
 
-app.controller("routingController", function($scope, socket, globals, $routeParams, server) {
+app.controller("routingController", function($scope, socket, globals, $routeParams, game) {
 
 
 
 
     $scope.initFunct = function() {
-        if(globals.usernameSet){
-            server.handleRouting($routeParams.gameCode);
+        if(globals.username !== null){
+            globals.gameId = $routeParams.gameCode;
+            game.join();
         } else {
 
             socket.on("user:confirmName", function() {
-                server.handleRouting($routeParams.gameCode);
+                globals.gameId = $routeParams.gameCode;
+                game.join();
             }
         )}
     };
@@ -112,6 +110,132 @@ app.controller("dialogController", function(globals, $scope, socket, $mdDialog) 
 });
 
 
+
+
+
+
+app.controller("mainMenuController", function($scope, socket, game, globals) {
+
+    //main menu code
+
+
+    $scope.game = game;
+
+    //TODO fix this join game thing and route to main menu if not a valid game code
+
+
+    $scope.checkGame = function() {
+        console.log(globals.gameId);
+        game.checkExists();
+
+
+    };
+
+    $scope.joinGame = function() {
+
+        if(game.valid) {
+            game.join();
+        }
+
+    };
+
+
+    $scope.createGame = function() {
+        game.create();
+    }
+
+
+});
+
+app.controller("menuController", function (game, globals, $rootScope, $scope, socket, lobby, $routeParams) {
+
+
+
+
+
+
+
+
+    $scope.showCardPacks = false;
+    $scope.lobby = lobby;
+    $scope.game = game;
+    $scope.globals = globals;
+
+
+
+
+    $scope.initLobby= function () {
+        globals.gameId = $routeParams.gameCode;
+        if(globals.username !== null){
+            game.join();
+            lobby.populate();
+        } else {
+
+            socket.on("user:confirmName", function() {
+                game.join();
+                lobby.populate();
+            });
+        }
+
+
+    };
+
+
+
+    $scope.startGame = function() {
+        socket.emit("game:begin", {
+            name: game.name,
+            maxPlayers: game.maxPlayers
+        });
+
+        socket.on("game:confirmBegin", function(data) {
+
+            //Todo fix this shouldn't be $scope.
+            $scope.gameCreated = data.confirmed;
+
+
+            console.log(data.code);
+
+            //$location.path("/game/" + data.code);
+            }
+        )
+    };
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout, $routeParams) {
 
 
@@ -125,61 +249,61 @@ app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout
 
     //normal play
     class Card {
-    constructor(text) {
-      this.selected = false;
-      this.text = text;
-    }
-
-    onClick() {
-
-
-
-        if(this.selected === false) {
-
-          if ($scope.cardsFocussed) {
-
-              for (let x = 0; x < $scope.cards.length; x++) {
-                  let card = $scope.cards[x];
-                  card.selected = false;
-              }
-              //Selecting Card Logic
-              this.selected = true;
-              $scope.selectedCard = this;
-
-              $scope.cardsFocussed = false;
-
-
-              //Pop up handingR
-              $scope.popUpMessage = "Card Selected";
-              $scope.showPopUp = true;
-
-              $timeout( function() {
-                  $scope.showPopUp = false;
-              }, 200);
-
-              console.log(this.text);
-          } else {
-              $scope.focusCards();
-
-        }
-        } else { //Card already selected so not in card bar
+        constructor(text) {
             this.selected = false;
-            $scope.selectedCard = null;
-            $scope.focusCards();
-      }
+            this.text = text;
+        }
 
-      console.log($scope.cardsFocussed);
+        onClick() {
+
+
+
+            if(this.selected === false) {
+
+                if ($scope.cardsFocussed) {
+
+                    for (let x = 0; x < $scope.cards.length; x++) {
+                        let card = $scope.cards[x];
+                        card.selected = false;
+                    }
+                    //Selecting Card Logic
+                    this.selected = true;
+                    $scope.selectedCard = this;
+
+                    $scope.cardsFocussed = false;
+
+
+                    //Pop up handingR
+                    $scope.popUpMessage = "Card Selected";
+                    $scope.showPopUp = true;
+
+                    $timeout( function() {
+                        $scope.showPopUp = false;
+                    }, 200);
+
+                    console.log(this.text);
+                } else {
+                    $scope.focusCards();
+
+                }
+            } else { //Card already selected so not in card bar
+                this.selected = false;
+                $scope.selectedCard = null;
+                $scope.focusCards();
+            }
+
+            console.log($scope.cardsFocussed);
+        }
+
     }
 
-  }
-
-  $scope.focusCards = function () {
+    $scope.focusCards = function () {
         $scope.cardsFocussed = true;
-  };
+    };
 
-  $scope.unfocusCards = function () {
+    $scope.unfocusCards = function () {
         $scope.cardsFocussed = false;
-  };
+    };
 
 
 
@@ -187,35 +311,34 @@ app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout
 
 
 
-  //Methods used in both Judge and Playing
-  $scope.sideNavOpen = false;
+    //Methods used in both Judge and Playing
+    $scope.sideNavOpen = false;
 
-  $scope.openSideNav  = function() {
-      $mdSidenav('left').open();
+    $scope.openSideNav  = function() {
+        $mdSidenav('left').open();
 
-  };
+    };
 
-  $scope.closeSideNav = function() {
-      $mdSidenav('left').close();
-  };
-
-
+    $scope.closeSideNav = function() {
+        $mdSidenav('left').close();
+    };
 
 
 
 
-  $scope.cards = [
-      new Card("Test1"),
-      new Card("Test2"),
-      new Card("Test3"),
-      new Card("test4"),
-      new Card( "test5"),
-      new Card( "test6"),
-      new Card( "test7"),
-      new Card( "test8"),
-      new Card( "test9"),
-      new Card("test10")];
-  console.log($scope.server.myHand);
+
+
+    $scope.cards = [
+        new Card("Test1"),
+        new Card("Test2"),
+        new Card("Test3"),
+        new Card("test4"),
+        new Card( "test5"),
+        new Card( "test6"),
+        new Card( "test7"),
+        new Card( "test8"),
+        new Card( "test9"),
+        new Card("test10")];
 
 
 
@@ -281,216 +404,3 @@ app.controller("judgeController", function ($scope, $mdMedia) {
         return 10;
     };
 });
-
-
-
-app.controller("mainMenuController", function($scope, socket, server, $location) {
-
-    //main menu code
-
-    $scope.validGame = false;
-    $scope.gameId = null;
-
-    //TODO fix this join game thing and route to main menu if not a valid game code
-
-
-
-
-    $scope.checkGameExists = function() {
-        server.checkGameExists($scope.gameId);
-
-        socket.on("game:confirmExists", function(data) {
-            $scope.validGame = data.exists;
-            console.log(data.exists);
-        });
-        //TODO see if theres a better way of doing this
-    };
-
-    $scope.joinGame = function() {
-
-        if($scope.validGame) {
-            $location.path("/"+$scope.gameId);
-
-        }
-
-
-        //Write the code to either to into lobby or into game if its started
-
-    };
-
-
-    $scope.createGame = function() {
-        socket.emit("game:create");
-        socket.on("game:confirmCreate", function(data) {
-            if(data.confirmed) {
-                $location.path('/lobby/' + data.code);
-            }
-        });
-    }
-
-
-})
-
-app.controller("menuController", function (server, globals, $rootScope, $scope, socket, $location, $routeParams, Player) {
-
-
-
-
-    //create game code
-
-
-
-    class Game {
-        constructor(name, id) { //other stuff about game as in private max players etc
-            this.name = name;
-            this.id = 0;
-        }
-
-
-    }
-
-    class CardPack {
-        constructor(name, description) {
-            this.name=name;
-            this.desc = description;
-            this.selected = false;
-
-        }
-    }
-
-
-
-
-    $scope.showCardPacks = false;
-    $scope.cardPacks = [];
-
-
-    $scope.gameName = '';
-
-    $scope.maxPlayers = 20;
-
-
-    $scope.isAdmin = false;
-
-
-
-
-    $scope.gameCreated = null;
-    $scope.gameCode = $routeParams.gameCode;
-
-
-    $scope.initFunct = function () {
-
-        if(globals.usernameSet){
-            server.handleRouting($routeParams.gameCode);
-            $scope.getLobbyInfo();
-        } else {
-
-            socket.on("user:confirmName", function() {
-                server.handleRouting($routeParams.gameCode);
-                $scope.getLobbyInfo();
-            });
-        }
-
-
-    };
-
-    $scope.getLobbyInfo = function() {
-
-
-        socket.emit("game:joinLobby", {gameId: $scope.gameCode});
-
-        socket.on("game:lobbyInfo", function(data) {
-            $scope.isAdmin = data.isAdmin;
-
-            for(let pack of data.cardPacks) {
-                $scope.cardPacks.push(new CardPack(pack.name, pack.desc));
-            }
-
-            $scope.players = [];
-            for(let pName of data.players) {
-                console.log(pName);
-                let newPlayer = new Player(pName);
-
-                if(pName === globals.username) {
-                    newPlayer.admin = true;
-                }
-                $scope.players.push(newPlayer);
-
-
-            }
-        });
-
-    };
-
-    function containsPlayer(name) {
-        let cont = false;
-
-        for(let p of $scope.players) {
-            if(p.name === name) {
-                cont = true;
-            }
-        }
-
-        return cont;
-    }
-
-    function getIdxFromName(name) {
-        let idx = -1;
-
-        for(let i = 0; i < $scope.players.length; i++) {
-            if($scope.players[i].name === name) {
-                idx = i;
-            }
-        }
-
-        return idx;
-    }
-    socket.on("game:playerLeave", function(data) {
-
-        if(containsPlayer(data.name)) {
-            $scope.players.splice(getIdxFromName(data.name), 1);
-        }
-    });
-
-    socket.on("game:playerJoin", function(data) {
-        let p = new Player(data.name);
-
-        if(p.name === globals.username) {
-            p.admin = true;
-        }
-
-        if(!containsPlayer(data.name)) {
-            $scope.players.push(p);
-        }
-
-        console.log($scope.players);
-
-
-    });
-
-
-    $scope.startGame = function() {
-        socket.emit("game:begin", {
-            name: $scope.gameName,
-            maxPlayers: $scope.maxPlayers
-        });
-
-        socket.on("game:confirmBegin", function(data) {
-
-            $scope.gameCreated = data.confirmed;
-            $scope.gameCode = data.code;
-
-            console.log(data.code);
-
-            $location.path("/game/" + data.code);
-            }
-        )
-
-    };
-
-
-
-
-});
-

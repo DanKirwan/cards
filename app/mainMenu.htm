@@ -6,13 +6,15 @@
             <div class="mainMenu__joinGame">
 
 
-                <input class="mainMenu__joinGame__input" placeholder="GAME CODE" ng-model="gameId" ng-change="checkGameExists()">
+                <input class="mainMenu__joinGame__input" placeholder="GAME CODE" ng-model="game.id" ng-change="checkGame()">
 
-                <md-button ng-click="joinGame()" ng-disabled = "!validGame" class= " mainMenu__joinGame__btn" >
-                    <md-icon md-svg-icon="img/join_game.svg" style="position:absolute; transform:translate(-50%, -50%); top:50%;"></md-icon>
+                <md-button ng-click="joinGame()" ng-disabled = "!game.valid" class= " mainMenu__joinGame__btn" >
+                    <md-icon ng-show="game.valid" md-svg-icon="img/join_game.svg" style="position:absolute; transform:translate(-50%, -50%); top:50%;"></md-icon>
                 </md-button>
 
             </div>
+
+            <div class="hint" style="color:red;" ng-hide="game.valid">This is not a valid code</div>
         </div>
 
 
