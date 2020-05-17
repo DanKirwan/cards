@@ -33,7 +33,7 @@ cServices.factory('socket', function($rootScope) {
 cServices.factory("globals", function() {
     return {
         username: null,
-        usernameSet: false,
+
         players: [],
         gameId: '',
     }
@@ -65,54 +65,30 @@ cServices.factory('Player', function() {
 });
 
 
+cServices.factory("gamePlay", function(socket, globals) {
 
-cServices.factory('routing', function(socket, $mdDialog, $location, globals) {
+    let gamePlay = {};
 
+    gamePlay.myHand = [];
 
+    //gameplay
 
+    socket.on("game:fullHand", function(data) {
+        gamePlay.myHand = data.myHand;
 
-    return { //TODO make sure this is the best way of defining things (its probably not)
+        console.log(gamePlay.myHand);
 
-
-
-
-        initRouting: function() {
-            socket.on("route:confirmRoute", function(data) {
-                console.log(`checking game exists ${data.exists}`);
-                if(data.exists) {
-                    socket.emit("game:getStatus", {gameId: globals.gameId});
-
-
-                    socket.on("game:status", function(data) {
-                        console.log(`Game Status: ${data.inGame}`);
-
-                        if(data.inGame) {
-                            //Handle going into the actual game
-                        } else {
-                            //Go to lobby
-                            if(!($location.path() === ("/lobby/"+ globals.gameId))){
-
-                                console.log("going to lobby " + globals.gameId);
-                                $location.path("/lobby/" + globals.gameId);
-
-
-                            }
-                        }
-
-                    });
-
-                } else {
+    });
 
 
 
-                }
-            });
-        }
-    }
-
-});
+    socket.on("game:blackCard", function(data) {
 
 
+    });
+
+
+})
 
 
 cServices.factory("game", function(socket, globals, Player, $location, $mdDialog) {
@@ -327,6 +303,21 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
 
         });
     });
+
+
+    socket.on("game:failedStart", function(data) {
+
+        $mdDialog.show(
+            $mdDialog.alert()
+                .parent(angular.element(document.body))
+                .title(data.message)
+                .ok("Okay!")
+        )
+    });
+
+
+
+
 
 
     return game;

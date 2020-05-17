@@ -43,10 +43,10 @@ app.controller("globalController", function($scope, $mdDialog, $mdMedia, socket,
         )
     };
 
-    socket.on("user:getName", function(data) {
+    socket.on("user:getName", function() {
+        globals.username = null;
         $scope.pickNameDialog();
     });
-
 
 
     $scope.players = [];

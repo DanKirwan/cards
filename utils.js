@@ -2,9 +2,14 @@
 const cards = require('./cards');
 
 
+
 function getRandomKey(obj) {
     return Object.keys(obj)[Math.floor(Math.random() * Object.keys(obj).length)];
-};
+}
+
+function getRandomIndex(arr) {
+    return arr
+}
 
 
 
@@ -39,15 +44,15 @@ exports.getNewGameID = function() {
 
 
 
-getUniqueRandomKey = function(source, keyLog, maxAttempts) {
+getUniqueCard = function(source, cardLog, maxAttempts) { //both are arrays
     maxAttempts = (typeof maxAttempts === 'undefined') ? 1000 : maxAttempts;
     let counter = 0;
     let finding = true;
-    let testKey = null;
+    let testCard = null;
     while(finding) {
         counter ++;
-        testKey = getRandomKey(source);
-        if(! testKey in keyLog) {
+        testCard = source[Math.floor(Math.random() * source.length)];
+        if(cardLog.indexOf(testCard) === -1) {
             finding = false;
         }
 
@@ -57,7 +62,7 @@ getUniqueRandomKey = function(source, keyLog, maxAttempts) {
         }
     }
 
-    return testKey;
+    return testCard;
 };
 
 
@@ -77,7 +82,7 @@ exports.Player =  class Player {
         this.name = null;
         this.gameId = null;
 
-        this.myCards = {};
+        this.myCards = [];
         this.points = 0;
     }
 
@@ -86,17 +91,20 @@ exports.Player =  class Player {
 
 
 exports.Game = class Game {
-    constructor(gameId, name, maxPlayers) {
+    constructor(io, gameId, name, maxPlayers) {
         this.inGame = false; //this means that its in the lobby
         this.name = '';
         this.id = gameId;
-        this.maxPlayers = 20;
+        this.maxPlayers = maxPlayers;
         this.players = {};
         this.admins = {};
+
+        this.io = io;
+
         this.judgeIdx = 0;
         this.currentBlackCard = null;
         this.blackCardHistory = {};
-        this.cardsInPlay = {};
+        this.cardsInPlay = [];
 
     }
 
@@ -115,11 +123,10 @@ exports.Game = class Game {
             for (let j = 0; j < 10; j++) {
 
 
-                let cardId = getUniqueRandomKey(cards.whiteCards, this.cardsInPlay);
-                let cardText = cards.whiteCards[cardId];
+                let cardText = getUniqueCard(cards.whiteCards, this.cardsInPlay);
 
-                this.cardsInPlay[cardId] = p;
-                this.players[p].myCards[cardId] = cardText;
+                this.cardsInPlay.push(cardText);
+                this.players[p].myCards.push(cardText);
 
             }
         }
@@ -132,29 +139,28 @@ exports.Game = class Game {
     }
 
 
-    sendHand(playerId, io) {
-        io.to(playerId).emit('game:fullHand', {hand: this.players[playerId].myCards});
-        io.to(playerId).emit('game:blackCard', {cardText: this.currentBlackCard.text});
-    }
+    sendHand(playerId) {
+        this.io.to(playerId).emit('game:fullHand', {hand: this.players[playerId].myCards});
+        this.io.to(playerId).emit('game:blackCard', {cardText: this.currentBlackCard.text});
+    }   //TODO add multiple card picking
 
-    sendHandToAll(io) {
+    sendHandToAll() {
         for(let p in this.players) {
-            this.sendHand(p, io);
+            this.sendHand(p);
         }
     }
 
-    consumeCard(cardId, playerId) {
-        let newCardId = getUniqueRandomKey();
+    consumeCard(cardText, playerId) {
+        let newCard = getUniqueCard(cards.whiteCards, this.cardsInPlay);
 
 
         let p = this.players[playerId];
-        delete p.myCards[cardId];
+        p.myCards.filter(cText => cText !== cardText);
 
-        delete this.cardsInPlay[cardId];
+        this.cardsInPlay.filter(cText => cText !== cardText);
 
-        let txt = cards.whiteCards[newCardId];
-        this.cardsInPlay[newCardId] = p.id;
-        p.myCards[newCardId] = txt;
+        this.cardsInPlay.push = newCard;
+        p.myCards.push(newCard);
 
 
     }
@@ -194,6 +200,42 @@ exports.Game = class Game {
         this.judgeIdx %= Object.keys(this.players).length;
     }
 
+
+    setMaxPlayers(mPlayers) {
+        if(Number.isInteger(mPlayers)
+            && mPlayers > 2
+            && mPlayers < 21) {
+
+            this.maxPlayers = mPlayers;
+
+            this.io.to(this.id).emit("game:maxPlayers", {maxPlayers: this.maxPlayers});
+
+
+            let pList = Object.keys(this.players);
+            let counter = 100;
+            while(pList.length > mPlayers) {
+                counter --;
+                if(counter < 0) break;
+                console.log("removing Player");
+                let pId = pList[0];
+                if(pId in this.admins) {
+                    pId = pList[pList.length - 1]; //shouldn't remove admin so if first player is admin just select another one
+                }
+                let playerToRemove = this.players[pId];
+                this.io.to(playerToRemove.gameId).emit("game:playerLeave", {name: playerToRemove.name});
+
+                this.removePlayer(playerToRemove);
+                playerToRemove.socket.leave(this.id);
+
+                pList = pList.filter(id => id !== pId);
+
+
+            }
+
+        }
+
+
+    }
 };
 
 

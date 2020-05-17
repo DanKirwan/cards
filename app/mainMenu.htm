@@ -8,7 +8,7 @@
 
                 <input class="mainMenu__joinGame__input" placeholder="GAME CODE" ng-model="globals.gameId" ng-change="checkGame()">
 
-                <md-button ng-click="joinGame()" ng-disabled = "!game.valid" class= " mainMenu__joinGame__btn" >
+                <md-button ng-click="joinGame()" ng-disabled = "!game.valid || globals.username === null" class= " mainMenu__joinGame__btn" >
                     <md-icon ng-show="game.valid" md-svg-icon="img/join_game.svg" style="position:absolute; transform:translate(-50%, -50%); top:50%;"></md-icon>
                 </md-button>
 
@@ -18,7 +18,7 @@
         </div>
 
 
-    <md-button  ng-click = "createGame()"  class = " mainMenu__btn" style="bottom:20px;">Create New Game</md-button>
+    <md-button  ng-disabled = "globals.username === null"  ng-click = "createGame()"  class = " mainMenu__btn" style="bottom:20px;">Create New Game</md-button>
 
     <!--<md-button class = "mainMenu__btn">Find Public Game</md-button>-->
 

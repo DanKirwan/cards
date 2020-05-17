@@ -1,7 +1,7 @@
 
 const { v1: uuidv1} = require('uuid');
 
-
+//TODO check ips and make sure no more than 5 can connect from the same address
 
 const express = require('express');
 const app  = express();
@@ -38,6 +38,10 @@ function nameValid(name) {
             isValid = false;
         }
     });
+
+    if(name === '') {
+        isValid = false;
+    }
 
     return isValid;
 }
@@ -127,6 +131,7 @@ io.on('connection', (socket) => {
             socket.emit("user:confirmName");
         } else {
             console.log(new Date() + " Error when setting name: " + socket.id)
+            socket.emit("user:getName");
         }
     });
 
@@ -151,7 +156,7 @@ io.on('connection', (socket) => {
     socket.on("game:create", function() {
 
         let id = util.getNewGameID();
-        games[id] = new Game(id, null, null);
+        games[id] = new Game(io, id, null, 20);
 
         if(safeJoinGame(id, player, socket)) {
             games[id].setGameAdmin(clients[socket.id]);
@@ -271,68 +276,56 @@ io.on('connection', (socket) => {
 
                 }
             }
-        //TODO add functionality to delete game when noone is in it and if admin is removed make it so that a new admin is selected
     });
 
 
 
 
-    //TODO leave lobbies if you actually leave them, update players when they join and a load of other stuff
 
 
 
     socket.on("game:setMaxPlayers", function(data){
 
-        let mPlayers = data.maxPlayers;
 
-        if(Number.isInteger(mPlayers)
-            && mPlayers > 2
-            && mPlayers < 21
-            && player.gameId !== null
-            && games[player.gameId] !== undefined) {
-
-            games[player.gameId].maxPlayers = mPlayers;
-
-            io.to(player.gameId).emit("game:maxPlayers", {maxPlayers: mPlayers});
-
-
-            let pList = Object.keys(games[player.gameId].players);
-            let counter = 100;
-            while(pList.length > mPlayers) {
-                counter --;
-                if(counter < 0) break;
-                console.log("removing Player");
-                let pId = pList[0];
-                if(pId in games[player.gameId].admins) {
-                    pId = pList[pList.length - 1]; //shouldn't remove admin so if first player is admin just select another one
-                }
-                let playerToRemove = games[player.gameId].players[pId];
-                io.to(playerToRemove.gameId).emit("game:playerLeave", {name: playerToRemove.name});
-                safeLeaveGame(playerToRemove.gameId, playerToRemove, playerToRemove.socket);
-                pList = pList.filter(id => id !== pId);
-
-
-                //Remove this player if they are not the admin and send appropriate packets
-            }
-
-            //TODO remove people from the game if there are more than mPlayers
+        if(player.gameId !== null && games[player.gameId] !== undefined) {
+            games[player.gameId].setMaxPlayers(data.maxPlayers);
         }
+
     });
+
+
 
     //actual gameplay logic
 
     socket.on("game:begin", function(data) {
-        let gameId = clients[socket.id].gameId;
+
+        //TODO send selected cardpacks back to server
+        let gameId = player.gameId;
         if(gameId !== undefined && games[gameId] !== undefined) {
+            let game = games[gameId];
+
+            let playerCount = Object.keys(game.players).length;
 
 
-            games[gameId].maxPlayers = data.maxPlayers;
-            games[gameId].name = data.name;
+            game.setMaxPlayers(data.maxPlayers);
+            game.name = data.name;
 
-            games[gameId].populate();
 
-            games[gameId].sendHandToAll();
+            if(playerCount > 0 && playerCount <= game.maxPlayers) { //TODO make it playerCount > 2 instead
 
+
+                game.populate();
+
+                game.sendHandToAll();
+
+            } else {
+                socket.emit("game:failedStart", {message: "Not enough players in the lobby!"});
+            }
+
+
+
+        } else {
+            socket.emit("game:failedStart", {message: "Couldn't start game"});
         }
     });
 
