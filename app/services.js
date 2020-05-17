@@ -145,6 +145,7 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
         game.inGame = null;
         game.players = [];
         game.populated = false;
+        game.maxPlayers = 20;
     };
 
     function containsPlayer(name) {
@@ -213,7 +214,9 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
 
 
     game.leave =  function() {
-        socket.emit("game:leave"); //TODO make this work
+        if(globals.gameId !== null) {
+            socket.emit("game:leave");
+        }
         game.reset();
         $location.path('/');
 
@@ -238,6 +241,15 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
         });
     };
 
+
+    game.updateMaxPlayers = function() {
+        socket.emit("game:setMaxPlayers", {maxPlayers: game.maxPlayers});
+    };
+
+    socket.on("game:maxPlayers", function(data) {
+
+        game.maxPlayers = data.maxPlayers;
+    });
 
 
 
@@ -273,6 +285,9 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
         game.populated = true;
         game.inGame = data.inGame;
         game.players = [];
+        game.maxPlayers = data.maxPlayers;
+
+
         for(let p of data.players) {
             addPlayer(p);
         }
@@ -297,12 +312,13 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
 
     });
 
-    socket.on("game:failedJoin", function() {
+    socket.on("game:failedJoin", function(data) {
+        game.reset();
         $mdDialog.show(
             $mdDialog.alert()
                 .parent(angular.element(document.body))
                 .clickOutsideToClose(true)
-                .title("This game does not exist!")
+                .title(data.message)
                 .textContent("Make sure you typed the game code right and try again")
                 .ok("Okay!")
         ).then(function () {

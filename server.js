@@ -58,7 +58,7 @@ function safeJoinGame(gameId, player, socket) {
         }
 
         let newGame = games[gameId];
-        if(newGame !== undefined) {
+        if(newGame !== undefined && Object.keys(newGame.players).length < newGame.maxPlayers) {
             newGame.addPlayer(player);
             player.gameId = gameId;
             socket.join(gameId);
@@ -80,6 +80,8 @@ function safeLeaveGame(gameId, player, socket) {
 
 function safeDeleteGame(gameId) {
     if(games[gameId] !== undefined) {
+
+        io.to(gameId).emit("game:failedJoin", {message: "This game has been deleted"});
         delete games[gameId];
     }
 }
@@ -176,8 +178,10 @@ io.on('connection', (socket) => {
             socket.emit("game:info", {
                 isAdmin: (socket.id in games[id].admins),
                 players: games[id].getPlayerNames(),
-                inGame: games[data.gameId].inGame
+                inGame: games[data.gameId].inGame,
+                maxPlayers: games[data.gameId].maxPlayers
 
+                //TODO make this object return from a function inside utils.Game
             });
 
             io.to(data.gameId).emit("game:playerJoin", {name: clients[socket.id].name});
@@ -185,7 +189,13 @@ io.on('connection', (socket) => {
 
 
         } else{
-            socket.emit("game:failedJoin");
+            if(games[data.gameId] === undefined) {
+                socket.emit("game:failedJoin", {message:"This game does not exist!"});
+
+            } else if(Object.keys(games[data.gameId].players).length === games[data.gameId].maxPlayers) {
+                socket.emit("game:failedJoin", {message:"This game is full!"});
+
+            }
             console.log(new Date() + "  - User " + socket.id + " failed to join game " + "id");
         }
 
@@ -253,7 +263,8 @@ io.on('connection', (socket) => {
                     io.to(newAdmin.id).emit("game:info", {
                         isAdmin: true,
                         players: game.getPlayerNames(),
-                        inGame: game.inGame
+                        inGame: game.inGame,
+                        maxPlayers: game.maxPlayers
                     });
 
 
@@ -269,6 +280,44 @@ io.on('connection', (socket) => {
     //TODO leave lobbies if you actually leave them, update players when they join and a load of other stuff
 
 
+
+    socket.on("game:setMaxPlayers", function(data){
+
+        let mPlayers = data.maxPlayers;
+
+        if(Number.isInteger(mPlayers)
+            && mPlayers > 2
+            && mPlayers < 21
+            && player.gameId !== null
+            && games[player.gameId] !== undefined) {
+
+            games[player.gameId].maxPlayers = mPlayers;
+
+            io.to(player.gameId).emit("game:maxPlayers", {maxPlayers: mPlayers});
+
+
+            let pList = Object.keys(games[player.gameId].players);
+            let counter = 100;
+            while(pList.length > mPlayers) {
+                counter --;
+                if(counter < 0) break;
+                console.log("removing Player");
+                let pId = pList[0];
+                if(pId in games[player.gameId].admins) {
+                    pId = pList[pList.length - 1]; //shouldn't remove admin so if first player is admin just select another one
+                }
+                let playerToRemove = games[player.gameId].players[pId];
+                io.to(playerToRemove.gameId).emit("game:playerLeave", {name: playerToRemove.name});
+                safeLeaveGame(playerToRemove.gameId, playerToRemove, playerToRemove.socket);
+                pList = pList.filter(id => id !== pId);
+
+
+                //Remove this player if they are not the admin and send appropriate packets
+            }
+
+            //TODO remove people from the game if there are more than mPlayers
+        }
+    });
 
     //actual gameplay logic
 

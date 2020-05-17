@@ -61,11 +61,14 @@ app.controller("routingController", function($scope, socket, globals, $routePara
 
     $scope.initFunct = function() {
         if(globals.username !== null){
+            game.reset();
+            socket.emit("game:leave");
             globals.gameId = $routeParams.gameCode;
             game.join();
         } else {
 
             socket.on("user:confirmName", function() {
+                game.reset();
                 globals.gameId = $routeParams.gameCode;
                 game.join();
             }

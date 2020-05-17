@@ -21,8 +21,8 @@
     <h1 flex  ng-hide="game.isAdmin" style="text-align:center;"> Waiting for game to start</h1>
 
 
-    <md-button ngclipboard data-clipboard-text="www.somecoolname.com/{{game.code}}" class = "cg__shareLink" ng-mouseenter = "shareHovered = true" ng-mouseleave="shareHovered = false" flex>
-        <div ng-show = "shareHovered">www.somecoolname.com/{{gameCode}}</div>
+    <md-button ngclipboard data-clipboard-text="www.somecoolname.com/{{globals.gameId}}" class = "cg__shareLink" ng-mouseenter = "shareHovered = true" ng-mouseleave="shareHovered = false" flex>
+        <div ng-show = "shareHovered">www.somecoolname.com/{{globals.gameId}}</div>
         <div ng-hide = "shareHovered">Click to copy game link</div>
     </md-button>
 
@@ -40,7 +40,7 @@
         <form name="maxPlayerForm">
             <md-input-container class="cg__input">
                 <label>Max Players</label>
-                <input name="playerCount" type="number" ng-model = "game.maxPlayers" step="1" min="3" max = "20" style="border-color:black;" value="{{maxPlayers}}" >
+                <input name="playerCount" type="number" ng-blur="game.updateMaxPlayers();" ng-model = "game.maxPlayers" step="1" min="3" max = "20" style="border-color:black;" value="{{maxPlayers}}" >
 
 
                 <div ng-messages="maxPlayerForm.playerCount.$error" multiple md-auto-hide="false">
