@@ -82,9 +82,14 @@ body {
   transition: all 0.2s;
   text-align: center; }
   .cardContainer__card {
+    white-space: normal;
     top: 50%;
     transform: translate(0, -50%);
     height: 95%; }
+    .cardContainer__card__textContainer {
+      position: absolute;
+      display: block;
+      width: 90%; }
   .cardContainer__card:not([disabled]):hover {
     background-color: #f3f3f3;
     transform: translate(0, -51.5%); }

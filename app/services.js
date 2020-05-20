@@ -2,7 +2,7 @@ let cServices = angular.module("cards.services", []);
 
 cServices.factory('socket', function($rootScope) {
 
-    let socket = io.connect('84.93.39.204:80');
+    let socket = io.connect('localhost:80'); //TODO change later when an actual website is created
 
     return {
         on: function(eventName, callback) {
@@ -65,30 +65,81 @@ cServices.factory('Player', function() {
 });
 
 
-cServices.factory("gamePlay", function(socket, globals) {
+cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCard) {
 
     let gamePlay = {};
 
     gamePlay.myHand = [];
 
+    gamePlay.blackCard = null;
+
+    gamePlay.round = 1;
+
+    gamePlay.isJudge = null;
+
+    gamePlay.selectedCard = null;
+
     //gameplay
 
-    socket.on("game:fullHand", function(data) {
-        gamePlay.myHand = data.myHand;
+    socket.on("gamePlay:newRound", function(data) {
 
+        gamePlay.selectedCard = null;
+
+
+        for(let cardText of data.hand) {
+            gamePlay.myHand.push(new WhiteCard(cardText))
+        }
+
+        gamePlay.blackCard = data.blackCard;
+
+        gamePlay.round = data.roundNo;
+
+        gamePlay.isJudge = false; //TODO change to data.isJudge;
+
+        if(gamePlay.round === 0) {
+            //First round so deal with routing to game
+
+            if($location.path() !== "/game/"+globals.gameId) {
+                $location.path("/game/"+globals.gameId);
+            }
+
+        }
+
+
+    });
+
+    gamePlay.deselectAll = function() {
+        gamePlay.myHand.forEach(card => card.selected = false);
+        gamePlay.selectedCard = null;
+    };
+
+
+    gamePlay.selectCard = function(card) {
+
+        gamePlay.selectedCard = card;
+
+        if(card.selected) {
+            gamePlay.deselectAll();
+        } else {
+            console.log("selectingCard");
+            for(let cTest of gamePlay.myHand) {
+                console.log(card);
+                console.log(cTest);
+                cTest.selected = card === cTest;
+            }
+
+        }
         console.log(gamePlay.myHand);
-
-    });
-
+    };
 
 
-    socket.on("game:blackCard", function(data) {
 
 
-    });
+
+    return gamePlay;
 
 
-})
+});
 
 
 cServices.factory("game", function(socket, globals, Player, $location, $mdDialog) {
@@ -221,6 +272,14 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
     game.updateMaxPlayers = function() {
         socket.emit("game:setMaxPlayers", {maxPlayers: game.maxPlayers});
     };
+
+    game.begin = function() {
+        socket.emit("game:begin", {
+            name: game.name,
+            maxPlayers: game.maxPlayers
+        });
+    };
+
 
     socket.on("game:maxPlayers", function(data) {
 

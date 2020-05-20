@@ -71,6 +71,11 @@ body {
 }
 
 
+//TODO rewrite the card stuff nicer than this
+
+
+
+
 
 #blackCard {
   position:absolute;
@@ -138,10 +143,19 @@ body {
 
 
    &__card {
-
+    white-space: normal;
     top:50%;
     transform:translate(0, -50%);
     height:95%;
+
+     &__textContainer {
+
+       position:absolute;
+       display:block;
+       width:90%;
+
+
+     }
   }
 
   &__card:not([disabled]):hover {

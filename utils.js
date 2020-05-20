@@ -46,7 +46,7 @@ exports.getNewGameID = function() {
 
 getUniqueCard = function(source, cardLog, maxAttempts) { //both are arrays
     maxAttempts = (typeof maxAttempts === 'undefined') ? 1000 : maxAttempts;
-    let counter = 0;
+    let counter = 0;8
     let finding = true;
     let testCard = null;
     while(finding) {
@@ -140,8 +140,12 @@ exports.Game = class Game {
 
 
     sendHand(playerId) {
-        this.io.to(playerId).emit('game:fullHand', {hand: this.players[playerId].myCards});
-        this.io.to(playerId).emit('game:blackCard', {cardText: this.currentBlackCard.text});
+        this.io.to(playerId).emit('gamePlay:newRound', {
+            hand: this.players[playerId].myCards,
+            blackCard: this.currentBlackCard.text,
+            roundNo: 0,
+            isJudge: this.getJudgeId() === playerId,
+        });
     }   //TODO add multiple card picking
 
     sendHandToAll() {
@@ -191,7 +195,7 @@ exports.Game = class Game {
         delete this.admins[player.id];
     }
 
-    getJudge() {
+    getJudgeId() {
         return Object.keys(this.players)[this.judgeIdx];
     }
 

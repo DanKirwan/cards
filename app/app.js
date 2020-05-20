@@ -24,7 +24,7 @@ app.config(function($routeProvider) {
 
 
 
-app.controller("globalController", function($scope, $mdDialog, $mdMedia, socket, globals) {
+app.controller("globalController", function(gamePlay, $scope, $mdDialog, $mdMedia, socket, globals) {
 
 
     $scope.pickNameDialog = function() {
@@ -154,7 +154,7 @@ app.controller("mainMenuController", function($scope, socket, game, globals) {
 
 });
 
-app.controller("menuController", function (game, globals, $rootScope, $scope, socket, lobby, $routeParams) {
+app.controller("menuController", function (game, gamePlay, globals, $rootScope, $scope, socket, lobby, $routeParams) {
 
 
 
@@ -190,22 +190,7 @@ app.controller("menuController", function (game, globals, $rootScope, $scope, so
 
 
     $scope.startGame = function() {
-        socket.emit("game:begin", {
-            name: game.name,
-            maxPlayers: game.maxPlayers
-        });
-
-        socket.on("game:confirmBegin", function(data) {
-
-            //Todo fix this shouldn't be $scope.
-            $scope.gameCreated = data.confirmed;
-
-
-            console.log(data.code);
-
-            //$location.path("/game/" + data.code);
-            }
-        )
+        game.begin();
     };
 });
 
@@ -243,66 +228,17 @@ app.controller("menuController", function (game, globals, $rootScope, $scope, so
 
 
 
-app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout, $routeParams) {
+app.controller("cardController", function(game, gamePlay, $scope, $mdSidenav, $mdMedia, $timeout, $routeParams) {
 
 
+    $scope.gamePlay = gamePlay;
     $scope.selectedCard = null;
     $scope.cardsFocussed = true;
 
     $scope.popUpMessage = '';
     $scope.showPopUp = false;
 
-    $scope.isJudge = false;
 
-    //normal play
-    class Card {
-        constructor(text) {
-            this.selected = false;
-            this.text = text;
-        }
-
-        onClick() {
-
-
-
-            if(this.selected === false) {
-
-                if ($scope.cardsFocussed) {
-
-                    for (let x = 0; x < $scope.cards.length; x++) {
-                        let card = $scope.cards[x];
-                        card.selected = false;
-                    }
-                    //Selecting Card Logic
-                    this.selected = true;
-                    $scope.selectedCard = this;
-
-                    $scope.cardsFocussed = false;
-
-
-                    //Pop up handingR
-                    $scope.popUpMessage = "Card Selected";
-                    $scope.showPopUp = true;
-
-                    $timeout( function() {
-                        $scope.showPopUp = false;
-                    }, 200);
-
-                    console.log(this.text);
-                } else {
-                    $scope.focusCards();
-
-                }
-            } else { //Card already selected so not in card bar
-                this.selected = false;
-                $scope.selectedCard = null;
-                $scope.focusCards();
-            }
-
-            console.log($scope.cardsFocussed);
-        }
-
-    }
 
     $scope.focusCards = function () {
         $scope.cardsFocussed = true;
@@ -335,17 +271,6 @@ app.controller("cardController", function($scope, $mdSidenav, $mdMedia, $timeout
 
 
 
-    $scope.cards = [
-        new Card("Test1"),
-        new Card("Test2"),
-        new Card("Test3"),
-        new Card("test4"),
-        new Card( "test5"),
-        new Card( "test6"),
-        new Card( "test7"),
-        new Card( "test8"),
-        new Card( "test9"),
-        new Card("test10")];
 
 
 

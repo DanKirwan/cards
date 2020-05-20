@@ -9,17 +9,30 @@
     </md-sidenav>
 
 
-    <div class="movingCardContainer" ng-hide="isJudge">
+    <div class="movingCardContainer" ng-hide="gamePlay.isJudge">
 
 
 
-        <div ng-class="{'cardSelected': selectedCard != null  }" class="card" id="blackCard">
+        <div layout="column" ng-class="{'cardSelected': gamePlay.selectedCard != null  }" class="card cardContainer__card" id="blackCard">
+
+            <div class="cardContainer__card__textContainer">
+                {{gamePlay.blackCard}}
+            </div>
+
             <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+
+
         </div>
 
 
-        <md-button ng-show="selectedCard != null" class="card" id="selectedCard"  ng-click = "selectedCard.onClick()">
-            <p>{{selectedCard.text}}</p>
+        <md-button ng-show="gamePlay.selectedCard !== null" class="card cardContainer__card" id="selectedCard"  ng-click = "gamePlay.selectCard(gamePlay.selectedCard)">
+
+            <div class = "cardContainer__card__textContainer">
+                {{gamePlay.selectedCard.text}}
+
+            </div>
+
+
             <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
         </md-button>
 
@@ -31,10 +44,13 @@
     </div>
 
 
-    <div class="cardContainer" md-swipe-down = 'unfocusCards()' md-swipe-up = 'focusCards()' ng-hide="isJudge" >
-        <md-button  ng-repeat="card in cards" class="card cardContainer__card " ng-class = "{'cardContainer__card--notFocused' : !cardsFocussed}" ng-click = "card.onClick()" ng-hide="card.selected">
+    <div class="cardContainer" md-swipe-down = 'unfocusCards()' md-swipe-up = 'focusCards()' ng-hide="gamePlay.isJudge" >
+        <md-button  ng-repeat="card in gamePlay.myHand" class="card cardContainer__card " ng-class = "{'cardContainer__card--notFocused' : !cardsFocussed}" ng-click = "gamePlay.selectCard(card)" ng-hide="card.selected">
 
-            <p>{{card.text}}</p>
+            <div class="cardContainer__card__textContainer">
+                {{card.text}} <!--TODO make the card text into card objects with selected and stuff-->
+            </div>
+
             <!--This is an empty image which is used to preserve aspect ratio-->
             <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
         </md-button>
@@ -43,7 +59,7 @@
 
     <!-- Page setup when judge -->
 
-    <div style="background:grey;" ng-controller = "judgeController" class="judgeContainer" ng-show = "isJudge"  md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()">
+    <div style="background:grey;" ng-controller = "judgeController" class="judgeContainer" ng-show = "gamePlay.isJudge"  md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()">
 
         <div class="card judgeContainer__blackCard" ng-class = "{'judgeContainer__blackCard--choosing' : judgeChoosing}" ng-click="judgeChoosing = !judgeChoosing" >
             <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
@@ -56,7 +72,7 @@
         <md-grid-list md-cols = "{{getCardColumns()}}" md-row-height = "63:88" md-gutter = "0.5%" style="margin-left:8px; margin-right:8px;">
 
             <md-grid-tile ng-repeat="card in judgeCards">
-                <md-button ng-disabled="!isJudge" class="card judgeContainer__card  " style="height: 100%" ng-class="{'judgeContainer__card--selected': card.selected}" ng-click = 'card.onClick()'>
+                <md-button ng-disabled="!gamePlay.isJudge" class="card judgeContainer__card  " style="height: 100%" ng-class="{'judgeContainer__card--selected': card.selected}" ng-click = 'card.onClick()'>
                     {{card.text}}
                 </md-button>
 
