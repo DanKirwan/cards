@@ -77,11 +77,46 @@ cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCa
 
     gamePlay.isJudge = null;
 
+    gamePlay.judging = false;
+
     gamePlay.selectedCard = null;
+
+    gamePlay.judgecCards = [];
 
     //gameplay
 
+
+    gamePlay.deselectAll = function() {
+        gamePlay.myHand.forEach(card => card.selected = false);
+        gamePlay.selectedCard = null;
+    };
+
+
+    gamePlay.selectCard = function(card) {
+
+        gamePlay.selectedCard = card;
+
+
+        if(card.selected) {
+            socket.emit("gamePlay:pickCard", {cardText: null});
+
+            gamePlay.deselectAll();
+        } else {
+            socket.emit("gamePlay:pickCard", {cardText: card.text});
+
+            for(let cTest of gamePlay.myHand) {
+                console.log(card);
+                console.log(cTest);
+                cTest.selected = card === cTest;
+            }
+
+        }
+        console.log(gamePlay.myHand);
+    };
+
     socket.on("gamePlay:newRound", function(data) {
+
+        gamePlay.judgeCards = [];
 
         gamePlay.selectedCard = null;
 
@@ -95,6 +130,7 @@ cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCa
         gamePlay.round = data.roundNo;
 
         gamePlay.isJudge = false; //TODO change to data.isJudge;
+        gamePlay.judging = false; //same todo as above
 
         if(gamePlay.round === 0) {
             //First round so deal with routing to game
@@ -108,30 +144,16 @@ cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCa
 
     });
 
-    gamePlay.deselectAll = function() {
-        gamePlay.myHand.forEach(card => card.selected = false);
-        gamePlay.selectedCard = null;
-    };
 
+    socket.on("gamePlay:judging", function(data) {
 
-    gamePlay.selectCard = function(card) {
-
-        gamePlay.selectedCard = card;
-
-        if(card.selected) {
-            gamePlay.deselectAll();
-        } else {
-            console.log("selectingCard");
-            for(let cTest of gamePlay.myHand) {
-                console.log(card);
-                console.log(cTest);
-                cTest.selected = card === cTest;
-            }
-
+        gamePlay.juding = true;
+        gamePlay.judgeCards = [];
+        for(let cardText of data.judgeCards) {
+            gamePlay.judgeCards.push(new WhiteCard(cardText))
         }
-        console.log(gamePlay.myHand);
-    };
 
+    });
 
 
 

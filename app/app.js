@@ -24,7 +24,7 @@ app.config(function($routeProvider) {
 
 
 
-app.controller("globalController", function(gamePlay, $scope, $mdDialog, $mdMedia, socket, globals) {
+app.controller("globalController", function($location, gamePlay, $scope, $mdDialog, $mdMedia, socket, globals) {
 
 
     $scope.pickNameDialog = function() {
@@ -48,6 +48,22 @@ app.controller("globalController", function(gamePlay, $scope, $mdDialog, $mdMedi
         $scope.pickNameDialog();
     });
 
+    socket.on("user:confirmName", function(data) {
+        globals.username = data.name;
+    });
+
+    socket.on("session:failedConnect", function(data) {
+        $mdDialog.show(
+            $mdDialog.alert()
+                .parent(angular.element(document.body))
+                .clickOutsideToClose(true)
+                .title(data.message)
+                .ok("Okay")
+        )
+
+        $location.path('/');
+    });
+
 
     $scope.players = [];
 
@@ -67,7 +83,8 @@ app.controller("routingController", function($scope, socket, globals, $routePara
             game.join();
         } else {
 
-            socket.on("user:confirmName", function() {
+            socket.on("user:confirmName", function(data) {
+                globals.username = data.name;
                 game.reset();
                 globals.gameId = $routeParams.gameCode;
                 game.join();
@@ -178,7 +195,8 @@ app.controller("menuController", function (game, gamePlay, globals, $rootScope, 
             lobby.populate();
         } else {
 
-            socket.on("user:confirmName", function() {
+            socket.on("user:confirmName", function(data) {
+                globals.username = data.name;
                 game.join();
                 lobby.populate();
             });

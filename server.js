@@ -3,11 +3,24 @@ const { v1: uuidv1} = require('uuid');
 
 //TODO check ips and make sure no more than 5 can connect from the same address
 
+
+
 const express = require('express');
 const app  = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 
+const session = require("express-session")({
+
+    secret:"no clue what this should be",
+    resave : true, //TODO make sure this is correct or change
+    saveUninitialized:true, //TODO make this false and make sure the user accepts cookies first
+    cookie:{ maxAge: 10000000}
+});
+
+//TODO clean sessions after a certain ammount of time of inactivity
+
+const sharedSession = require("express-socket.io-session");
 
 const util = require('./utils');
 const Player = util.Player;
@@ -18,7 +31,12 @@ const Game = util.Game;
 
 server.listen(80);
 
+app.use(session);
+
+
 app.use(express.static("app"));
+
+
 
 
 
@@ -103,18 +121,62 @@ function idFromName(name) {
 }
 
 
+io.use(sharedSession(session, {
+    autoSave:true
+}));
+
 
 //websocket handling
 io.on('connection', (socket) => {
   console.log(new Date() + " - New connection from origin: " + socket.id );
 
-  socket.emit("user:getName");
 
-
-
-  console.log("Connected: " + socket.id)
   let player = new Player(socket.id, socket);
   clients[socket.id] = player;
+
+
+  let session = socket.handshake.session;
+
+  if(typeof session.connected === 'undefined') {
+      session.connected = 0;
+  }
+
+
+
+
+
+  console.log(session);
+    if(session.connected > 0) {
+        //Already open on this browser dont allow second connection
+
+
+        socket.emit("session:failedConnect", {message: "A game is already open on this browser, make sure you've closed any previous games!"})
+        socket.disconnect(true);
+
+    } else {
+
+        if(typeof session.username !== "undefined") {
+            player.name = session.username;
+            socket.emit('user:confirmName', {name: player.name});
+
+
+            //TODO handle joining games here too
+
+        } else {
+            socket.emit("user:getName");
+
+        }
+
+    }
+    session.connected ++;
+
+
+
+
+
+
+  console.log("Connected: " + socket.id);
+
 
   //User handling
   socket.on("user:checkName", function(data) {
@@ -127,8 +189,11 @@ io.on('connection', (socket) => {
     socket.on("user:setName", function(data) {
         if(nameValid(data.name)) {
             player.name = data.name;
+
+
+            session.username = data.name;
             console.log(clients);
-            socket.emit("user:confirmName");
+            socket.emit("user:confirmName", {name: data.name});
         } else {
             console.log(new Date() + " Error when setting name: " + socket.id)
             socket.emit("user:getName");
@@ -180,14 +245,7 @@ io.on('connection', (socket) => {
         if(safeJoinGame(id, player, socket)){
             console.log("Sending game info to " + id);
 
-            socket.emit("game:info", {
-                isAdmin: (socket.id in games[id].admins),
-                players: games[id].getPlayerNames(),
-                inGame: games[data.gameId].inGame,
-                maxPlayers: games[data.gameId].maxPlayers
-
-                //TODO make this object return from a function inside utils.Game
-            });
+            games[id].sendInfo(player);
 
             io.to(data.gameId).emit("game:playerJoin", {name: clients[socket.id].name});
 
@@ -365,6 +423,10 @@ io.on('connection', (socket) => {
 
 
     socket.on("disconnect", function() {
+        session.gameId = player.gameId;
+        session.connected --;
+        session.save();
+
         if(player.gameId !== null){
 
             io.to(player.gameId).emit("game:playerLeave", {name: clients[socket.id].name});

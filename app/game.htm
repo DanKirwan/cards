@@ -9,7 +9,7 @@
     </md-sidenav>
 
 
-    <div class="movingCardContainer" ng-hide="gamePlay.isJudge">
+    <div class="movingCardContainer" ng-hide="gamePlay.judging">
 
 
 
@@ -44,7 +44,7 @@
     </div>
 
 
-    <div class="cardContainer" md-swipe-down = 'unfocusCards()' md-swipe-up = 'focusCards()' ng-hide="gamePlay.isJudge" >
+    <div class="cardContainer" md-swipe-down = 'unfocusCards()' md-swipe-up = 'focusCards()' ng-hide="gamePlay.judging" >
         <md-button  ng-repeat="card in gamePlay.myHand" class="card cardContainer__card " ng-class = "{'cardContainer__card--notFocused' : !cardsFocussed}" ng-click = "gamePlay.selectCard(card)" ng-hide="card.selected">
 
             <div class="cardContainer__card__textContainer">
@@ -59,7 +59,7 @@
 
     <!-- Page setup when judge -->
 
-    <div style="background:grey;" ng-controller = "judgeController" class="judgeContainer" ng-show = "gamePlay.isJudge"  md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()">
+    <div style="background:grey;" ng-controller = "judgeController" class="judgeContainer" ng-show = "gamePlay.judging"  md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()">
 
         <div class="card judgeContainer__blackCard" ng-class = "{'judgeContainer__blackCard--choosing' : judgeChoosing}" ng-click="judgeChoosing = !judgeChoosing" >
             <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
@@ -72,7 +72,7 @@
         <md-grid-list md-cols = "{{getCardColumns()}}" md-row-height = "63:88" md-gutter = "0.5%" style="margin-left:8px; margin-right:8px;">
 
             <md-grid-tile ng-repeat="card in judgeCards">
-                <md-button ng-disabled="!gamePlay.isJudge" class="card judgeContainer__card  " style="height: 100%" ng-class="{'judgeContainer__card--selected': card.selected}" ng-click = 'card.onClick()'>
+                <md-button ng-disabled="!gamePlay.judging" class="card judgeContainer__card  " style="height: 100%" ng-class="{'judgeContainer__card--selected': card.selected}" ng-click = 'card.onClick()'>
                     {{card.text}}
                 </md-button>
 

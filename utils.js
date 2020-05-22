@@ -240,6 +240,19 @@ exports.Game = class Game {
 
 
     }
-};
+
+
+    sendInfo(player) {
+        player.socket.emit("game:info", {
+            isAdmin: (player.socket.id in this.admins),
+            players: this.getPlayerNames(),
+            inGame: this.inGame,
+            maxPlayers: this.maxPlayers
+
+            //TODO make this object return from a function inside utils.Game
+        });
+    }
+}
+;
 
 
