@@ -9,16 +9,37 @@ const express = require('express');
 const app  = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
+const session = require("express-session");
 
-const session = require("express-session")({
 
-    secret:"no clue what this should be",
-    resave : true, //TODO make sure this is correct or change
-    saveUninitialized:true, //TODO make this false and make sure the user accepts cookies first
-    cookie:{ maxAge: 10000000}
+const mongoose = require('mongoose');
+const dbUrl = 'mongodb://127.0.0.1:27017/cards';
+const MongoStore = require('connect-mongo')(session);
+
+const db = mongoose.connection;
+db.once("open", _ => {
+    console.log("database connected", dbUrl);
+    db.dropCollection("sessions", function(err, result) { //TODO remove this in production
+        if(err){
+            console.log("error deleting sessions", err)
+        } else {
+            console.log("deleted sessions");
+        }
+    })
 });
 
+db.on("error", err => console.log("database connection error", err))
+
+mongoose.connect(dbUrl, {useNewUrlParser: true})
+
+
+
+
+
 //TODO clean sessions after a certain ammount of time of inactivity
+
+
+
 
 const sharedSession = require("express-socket.io-session");
 
@@ -31,7 +52,15 @@ const Game = util.Game;
 
 server.listen(80);
 
-app.use(session);
+let createdSession = session({
+
+    secret:"no clue what this should be",
+    resave : true, //TODO make sure this is correct or change
+    saveUninitialized:true, //TODO make this false and make sure the user accepts cookies first
+    store: new MongoStore({mongooseConnection: db})
+}); //TODO figure out what this should really be called
+
+app.use(createdSession);
 
 
 app.use(express.static("app"));
@@ -69,7 +98,7 @@ function safeJoinGame(gameId, player, socket) {
 
 
 
-    if(gameId === player.gameId && gameId !== null) {
+    if(gameId === player.gameId && gameId !== null && typeof games[gameId] !== 'undefined') {
         return true;
     } else {
         let currentGame = player.gameId;
@@ -106,6 +135,8 @@ function safeDeleteGame(gameId) {
         io.to(gameId).emit("game:failedJoin", {message: "This game has been deleted"});
         delete games[gameId];
     }
+    console.log(games, gameId);
+    console.trace(gameId);
 }
 
 function idFromName(name) {
@@ -121,7 +152,39 @@ function idFromName(name) {
 }
 
 
-io.use(sharedSession(session, {
+function gameLeave(player, socket) {
+    let gameId = player.gameId; //Must be saved as it is deleted in safeLeaveGame()
+    safeLeaveGame(player.gameId, player, socket);
+
+    io.to(gameId).emit("game:playerLeave", {name: player.name});
+
+    let game = games[gameId];
+    if(typeof game !== 'undefined') {
+
+        if(Object.keys(game.players).length === 0) {
+            console.log(`Deleting empty game ${gameId}`);
+            safeDeleteGame(gameId);
+
+        } else if(Object.keys(game.admins).length === 0) {
+
+            let newAdmin = game.players[Object.keys(game.players)[0]];
+            game.setGameAdmin(newAdmin);
+            //Ugly way of setting the next available player to admin
+
+            io.to(newAdmin.id).emit("game:info", {
+                isAdmin: true,
+                players: game.getPlayerNames(),
+                inGame: game.inGame,
+                maxPlayers: game.maxPlayers
+            });
+
+
+
+        }
+    }
+}
+
+io.use(sharedSession(createdSession,  {
     autoSave:true
 }));
 
@@ -139,14 +202,17 @@ io.on('connection', (socket) => {
 
   if(typeof session.connected === 'undefined') {
       session.connected = 0;
+      console.log("setting session to 0")
   }
 
 
 
 
+  session.connected ++;
+  session.save();
 
   console.log(session);
-    if(session.connected > 0) {
+    if(session.connected > 1) {
         //Already open on this browser dont allow second connection
 
 
@@ -155,10 +221,24 @@ io.on('connection', (socket) => {
 
     } else {
 
-        if(typeof session.username !== "undefined") {
+        if(typeof session.username !== "undefined" && nameValid(session.username)) {
             player.name = session.username;
             socket.emit('user:confirmName', {name: player.name});
 
+            if(session.gameId !== null) {
+                let id = session.gameId;
+
+                if(safeJoinGame(id, player, socket)) {
+                    console.log("Player joined game")
+                    games[id].sendInfo(player);
+
+                    io.to(id).emit("game:playerJoin", {name: clients[socket.id].name});
+                } else {
+
+                    session.gameId = null;
+                }
+
+            }
 
             //TODO handle joining games here too
 
@@ -168,7 +248,6 @@ io.on('connection', (socket) => {
         }
 
     }
-    session.connected ++;
 
 
 
@@ -304,36 +383,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on("game:leave", function(data) {
+        gameLeave(player, socket);
 
-            let gameId = player.gameId; //Must be saved as it is deleted in safeLeaveGame()
-            safeLeaveGame(player.gameId, player, socket);
-
-            io.to(gameId).emit("game:playerLeave", {name: player.name});
-
-            let game = games[gameId];
-            if(game !== undefined) {
-
-                if(Object.keys(game.players).length === 0) {
-                    console.log(`Deleting empty game ${gameId}`);
-                    safeDeleteGame(player.gameId);
-
-                } else if(Object.keys(game.admins).length === 0) {
-
-                    let newAdmin = game.players[Object.keys(game.players)[0]];
-                    game.setGameAdmin(newAdmin);
-                    //Ugly way of setting the next available player to admin
-
-                    io.to(newAdmin.id).emit("game:info", {
-                        isAdmin: true,
-                        players: game.getPlayerNames(),
-                        inGame: game.inGame,
-                        maxPlayers: game.maxPlayers
-                    });
-
-
-
-                }
-            }
     });
 
 
@@ -368,6 +419,8 @@ io.on('connection', (socket) => {
             game.setMaxPlayers(data.maxPlayers);
             game.name = data.name;
 
+            game.inGame = true;
+
 
             if(playerCount > 0 && playerCount <= game.maxPlayers) { //TODO make it playerCount > 2 instead
 
@@ -375,6 +428,7 @@ io.on('connection', (socket) => {
                 game.populate();
 
                 game.sendHandToAll();
+                //TODO add players joining once the game has started and add their hand and send it to them
 
             } else {
                 socket.emit("game:failedStart", {message: "Not enough players in the lobby!"});
@@ -427,13 +481,10 @@ io.on('connection', (socket) => {
         session.connected --;
         session.save();
 
-        if(player.gameId !== null){
+        gameLeave(player, socket);
 
-            io.to(player.gameId).emit("game:playerLeave", {name: clients[socket.id].name});
 
-            safeLeaveGame(player.gameId, player, socket)
 
-        }
         console.log(new Date() + " - Connection Terminated: " + socket.id);
         delete clients[socket.id];
     })

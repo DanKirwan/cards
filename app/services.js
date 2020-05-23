@@ -339,6 +339,7 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
     });
 
     socket.on("game:info", function(data) {
+        globals.gameId = data.gameId;
         game.populated = true;
         game.inGame = data.inGame;
         game.players = [];
