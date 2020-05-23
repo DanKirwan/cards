@@ -235,12 +235,21 @@ io.on('connection', (socket) => {
                     io.to(id).emit("game:playerJoin", {name: clients[socket.id].name});
                 } else {
 
+                    if(games[id] === undefined) {
+                        socket.emit("game:failedJoin", {message:"This game does not exist!"});
+
+                    } else if(Object.keys(games[id].players).length === games[data.gameId].maxPlayers) {
+                        socket.emit("game:failedJoin", {message:"This game is full!"});
+
+                    }
+                    console.log(new Date() + "  - User " + socket.id + " failed to join game " + "id");
+
+
                     session.gameId = null;
                 }
 
             }
 
-            //TODO handle joining games here too
 
         } else {
             socket.emit("user:getName");
@@ -443,15 +452,14 @@ io.on('connection', (socket) => {
 
 
 
-    //Lobby Commands
-    socket.on("lobby:join", function(data) {
 
-        let gameLobby = games[data.gameId];
+    //Lobby Commands
+    socket.on("lobby:populate", function() {
+
+        let gameLobby = games[player.gameId];
 
 
         if(gameLobby !== undefined) {
-            safeJoinGame(data.gameId, player, socket);
-            console.log(gameLobby);
 
             socket.emit("lobby:info", {
 
@@ -462,10 +470,6 @@ io.on('connection', (socket) => {
                     new CardPack("Custom Pack", "Something less witty as it wasn't written by the Cards against humanity team")]
 
             });
-
-
-            //update other players that player has joined
-
 
 
         }
@@ -488,12 +492,5 @@ io.on('connection', (socket) => {
         console.log(new Date() + " - Connection Terminated: " + socket.id);
         delete clients[socket.id];
     })
-
-
-
-
-
-
-
 
 });

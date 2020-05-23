@@ -116,19 +116,23 @@ exports.Game = class Game {
         }
         return names;
     }
-    //TODO make it so you can add max players in the lobby
+
+    populatePlayer(playerId) {
+        for (let j = 0; j < 10; j++) {
+
+
+            let cardText = getUniqueCard(cards.whiteCards, this.cardsInPlay);
+
+            this.cardsInPlay.push(cardText);
+            this.players[playerId].myCards.push(cardText);
+
+        }
+
+    }
 
     populate() {
         for (let p in this.players) {
-            for (let j = 0; j < 10; j++) {
-
-
-                let cardText = getUniqueCard(cards.whiteCards, this.cardsInPlay);
-
-                this.cardsInPlay.push(cardText);
-                this.players[p].myCards.push(cardText);
-
-            }
+            this.populatePlayer(p);
         }
 
         //As this is the first black card it doesnt matter checking blackCardHistory
@@ -179,7 +183,15 @@ exports.Game = class Game {
         console.log(Object.keys(this.players).length);
         if(Object.keys(this.players).length <  this.maxPlayers) {
             this.players[player.id] = player;
+
+
+            if(this.inGame) {
+                this.populatePlayer(player.id);
+                this.sendHand(player.id);
+            }
         }
+
+
 
     }
 

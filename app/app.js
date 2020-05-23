@@ -5,7 +5,7 @@ app.config(function($routeProvider) {
     $routeProvider
         .when("/", {
             templateUrl: "mainMenu.htm",
-            controller: "menuController"
+            controller: "mainMenuController"
         })
         .when("/:gameCode", {
             templateUrl: "routing.htm",
@@ -246,7 +246,24 @@ app.controller("menuController", function (game, gamePlay, globals, $rootScope, 
 
 
 
-app.controller("cardController", function(game, gamePlay, $scope, $mdSidenav, $mdMedia, $timeout, $routeParams) {
+app.controller("cardController", function(globals, game, socket, gamePlay, $scope, $mdSidenav, $mdMedia, $timeout, $routeParams) {
+
+    $scope.initGameplay = function () {
+        globals.gameId = $routeParams.gameCode;
+        if(globals.username !== null){
+            game.join();
+
+        } else {
+
+            socket.on("user:confirmName", function(data) {
+                globals.username = data.name;
+                game.join();
+                //TODO maybe remove need for lobby:populate?
+            });
+        }
+
+
+    };
 
 
     $scope.gamePlay = gamePlay;

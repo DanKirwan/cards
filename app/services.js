@@ -86,6 +86,7 @@ cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCa
     //gameplay
 
 
+
     gamePlay.deselectAll = function() {
         gamePlay.myHand.forEach(card => card.selected = false);
         gamePlay.selectedCard = null;
@@ -365,7 +366,7 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
                 $location.path('/lobby/' + globals.gameId);
             }
 
-            socket.emit("lobby:join", {gameId: globals.gameId});
+            socket.emit("lobby:populate");
         }
 
     });
@@ -428,7 +429,7 @@ cServices.factory("lobby", function(game, socket, globals) {
     lobby.populate = function() {
         console.log("POPULATING LOBBY");
 
-        socket.emit("lobby:join", {gameId: globals.gameId});
+        socket.emit("lobby:populate", {gameId: globals.gameId});
 
 
     };
