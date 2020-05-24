@@ -3,9 +3,9 @@
     <md-toolbar>
 
         <div class="md-toolbar-tools cg__toolbar">
-            <a href = "#!" ng-click="game.leave()" class="md-icon-button" aria-label="Main Menu">
+            <md-button ng-click="game.leave()" class="md-icon-button" aria-label="Main Menu">
                 <md-icon md-svg-icon="img/arrow_back-48dp.svg" style="fill:white;"></md-icon>
-            </a>
+            </md-button>
 
             <h2 flex  style="text-align:center;">Round Time: {{gamePlay.roundTime}}</h2>
             <div layout="column" layout-align="center center" >
@@ -23,6 +23,25 @@
             <h1>Test :)</h1>
         </md-toolbar>
         <a class = "md-button" md-whiteframe="5" href="#!" style="color:black">Menu</a>
+
+
+
+        <h3 flex class = "cg__heading"> Players</h3>
+        <md-list>
+            <md-list-item ng-repeat="player in game.players">
+                <h3 flex>{{player.name}}</h3>
+
+                <md-icon ng-show="game.isAdmin && !player.admin" class="md-secondary" md-svg-icon="img/remove_player-48dp.svg" ng-click="game.removePlayer(player.name)">
+                    <md-tooltip md-direction="left" md-delay = "100">Remove Player</md-tooltip>
+                </md-icon>
+
+
+                <h3>{{player.points}}</h3>
+
+
+            </md-list-item>
+        </md-list>
+
     </md-sidenav>
 
 
@@ -90,7 +109,7 @@
 
             <md-grid-tile ng-repeat="card in gamePlay.judgeCards">
                 <md-button ng-disabled="!gamePlay.isJudge" class="card judgeContainer__card  " style="height: 100%" ng-class="{'judgeContainer__card--selected': card.selected}" ng-click = 'gamePlay.pickJudgeCard(card)'>
-                    {{card.text}}
+                    {{card.text}} <!-- TODO make this so the card goes to next line not spills off side-->
                 </md-button>
 
             </md-grid-tile>

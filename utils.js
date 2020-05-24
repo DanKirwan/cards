@@ -57,7 +57,7 @@ getUniqueCard = function(source, cardLog, maxAttempts) { //both are arrays
         }
 
         if(counter > maxAttempts) {
-            console.log('Error finding unique random key');
+            console.log('Error finding unique random card');
             break;
         }
     }
@@ -103,7 +103,7 @@ exports.Game = class Game {
 
         this.judgeIdx = 0;
         this.currentBlackCard = null;
-        this.blackCardHistory = {};
+        this.blackCardHistory = [];
         this.cardsInPlay = [];
 
         this.judgeCards = {};
@@ -111,13 +111,15 @@ exports.Game = class Game {
         this.roundTime = 10;
         this.round = 0;
 
+
+        this.inJudging = false;
     }
 
-    getPlayerNames() {
+    getPlayersToBroadcast() {
         let names = [];
 
         for(let p in this.players) {
-            names.push(this.players[p].name);
+            names.push({name: this.players[p].name, points: this.players[p].points});
         }
         return names;
     }
@@ -147,21 +149,18 @@ exports.Game = class Game {
             this.populatePlayer(p);
         }
 
-        //As this is the first black card it doesnt matter checking blackCardHistory
-        let blackCardId = getRandomKey(cards.blackCards);
-        this.currentBlackCard = cards.blackCards[blackCardId];
-        this.blackCardHistory[blackCardId] = this.currentBlackCard;
 
     }
 
 
     sendHand(playerId) {
         this.io.to(playerId).emit('gamePlay:newRound', {
-            roundTime: this.roundTime,
+            roundTime: this.roundTime, //TODO make it so that this is accurate for players joining in middle of a round
             hand: this.players[playerId].myCards,
-            blackCard: this.currentBlackCard.text,
+            blackCard: this.currentBlackCard,
             roundNo: this.round,
             isJudge: this.getJudgeId() === playerId,
+            inJudging: this.inJudging,
         });
     }   //TODO add multiple card picking
 
@@ -179,9 +178,9 @@ exports.Game = class Game {
         if(typeof p !== 'undefined') {
             p.myCards.filter(cText => cText !== cardText);
 
-            this.cardsInPlay.filter(cText => cText !== cardText);
+            this.cardsInPlay = this.cardsInPlay.filter(cText => cText !== cardText);
 
-            this.cardsInPlay.push = newCard;
+            this.cardsInPlay.push(newCard);
             p.myCards.push(newCard);
 
         }
@@ -190,11 +189,6 @@ exports.Game = class Game {
 
     }
 
-    pickWinningCard(cardId) {
-        if(cardId in this.cardsInPlay) {
-           //This should be written later
-        }
-    }
 
     addPlayer(player) {
         console.log(Object.keys(this.players).length);
@@ -235,18 +229,35 @@ exports.Game = class Game {
 
 
     newRound() {
+        this.round ++;
+
+        this.inJudging = false;
+
+        if(this.currentBlackCard !== null) this.blackCardHistory.push(this.currentBlackCard);
+        this.currentBlackCard = getUniqueCard(cards.blackCards, this.blackCardHistory);
+
+        this.itrJudge();
         this.sendHandToAll();
 
+        this.judgeCards = [];
+
+
         setTimeout(_ => {
-            this.itrJudge();
+
             //Runs after round is completed
+            if(Object.keys(this.judgeCards).length > 0) {
+                this.inJudging = true;
+                this.io.to(this.id).emit("gamePlay:judging", {
+                    judgeCards: Object.values(this.judgeCards)
+                });
 
-            this.io.to(this.id).emit("gamePlay:judging", {
-                judgeCards: Object.values(this.judgeCards)
-            });
+                for (let playerId in this.judgeCards) {
+                    this.consumeCard(this.judgeCards[playerId], playerId)
+                }
+            } else {
 
-            for(let playerId in this.judgeCards) {
-                this.consumeCard(this.judgeCards[playerId], playerId)
+                this.io.to(this.id).emit("gamePlay:alert", {message: "No cards were selected, moving on to next round", okMsg: "Next Round"});
+                this.newRound();
             }
 
 
@@ -255,15 +266,16 @@ exports.Game = class Game {
 
         }, 1000*this.roundTime);
 
-        this.round ++;
     }
 
     judgeChooseCard(cardText) {
         for(let pId in this.judgeCards) {
             if(this.judgeCards[pId] === cardText) {
                 this.players[pId].points ++;
+                this.io.to(this.id).emit("gamePlay:roundWin", {playerName: this.players[pId].name});
             }
         }
+
 
         this.newRound();
     }
@@ -310,7 +322,7 @@ exports.Game = class Game {
         player.socket.emit("game:info", {
             gameId: this.id,
             isAdmin: (player.socket.id in this.admins),
-            players: this.getPlayerNames(),
+            players: this.getPlayersToBroadcast(),
             inGame: this.inGame,
             maxPlayers: this.maxPlayers
 

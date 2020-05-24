@@ -53,10 +53,10 @@ cServices.factory('WhiteCard', function(){
 
 
 cServices.factory('Player', function() {
-    function Player(name) {
+    function Player(name, points) {
         this.name = name;
         this.admin = false;
-        this.points = 0;
+        this.points = points;
 
     }
 
@@ -65,26 +65,45 @@ cServices.factory('Player', function() {
 });
 
 
-cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCard, $interval) {
+cServices.factory('Util', function($mdDialog) {
+
+    let Util = {};
+
+    Util.showAlert = function(title, message, okMsg, resolveFunct, rejectFunct) {
+        okMsg = okMsg || "Okay";
+
+        resolveFunct = resolveFunct || function(){};
+        rejectFunct = rejectFunct || function(){};
+
+
+        $mdDialog.show(
+            $mdDialog.alert()
+                .parent(angular.element(document.body))
+                .clickOutsideToClose(true)
+                .title(title)
+                .textContent(message)
+                .ok(okMsg)
+        ).then(resolveFunct, rejectFunct);
+    }
+
+    return Util
+
+
+});
+
+
+cServices.factory("gamePlay", function(Util, $location, socket, game, globals, WhiteCard, $interval) {
 
     let gamePlay = {};
 
     gamePlay.myHand = [];
-
     gamePlay.blackCard = null;
-
     gamePlay.round = 1;
-
     gamePlay.isJudge = null;
-
     gamePlay.judging = false;
-
     gamePlay.selectedCard = null;
-
     gamePlay.judgeCards = [];
-
     gamePlay.roundTime = 0;
-
     gamePlay.chosenJudgeCard = null;
 
 
@@ -122,7 +141,19 @@ cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCa
 
     gamePlay.pickJudgeCard = function(card) {
         if (gamePlay.judgeCards.indexOf(card) > -1) {
-            gamePlay.chosenJudgeCard = card;
+            card.selected = !card.selected
+
+            if(card.selected) {
+                gamePlay.chosenJudgeCard = card;
+
+                gamePlay.judgeCards.forEach(c => {
+                    if(c !== card) c.selected = false;
+                })
+            } else {
+                gamePlay.chosenJudgeCard = null;
+
+            }
+
         }
     };
 
@@ -133,25 +164,39 @@ cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCa
     };
 
 
+    socket.on("gamePlay:roundWin", function(data) {
+        for(let p of game.players) {
+            if(p.name === data.playerName) p.points ++;
+        }
+    });
+
     socket.on("gamePlay:newRound", function(data) {
 
-        gamePlay.judgeCards = [];
+
+        $interval.cancel(globals.timer);
+
+
 
         gamePlay.roundTime = data.roundTime;
 
         gamePlay.selectedCard = null;
 
+        gamePlay.chosenJudgeCard = null;
+
+        gamePlay.judgeCards = [];
         gamePlay.myHand = [];
         for(let cardText of data.hand) {
             gamePlay.myHand.push(new WhiteCard(cardText))
         }
 
-        gamePlay.blackCard = data.blackCard;
+        gamePlay.blackCard = data.blackCard.text;
+
+        //TODO blackcard.pick need sto be used!
 
         gamePlay.round = data.roundNo;
 
         gamePlay.isJudge = data.isJudge;
-        gamePlay.judging = data.isJudge;
+        gamePlay.judging = data.inJudging || data.isJudge; //Goes to judging if everyone else is or if you're the judge
 
 
         //Route to game if not already in
@@ -177,6 +222,11 @@ cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCa
 
     });
 
+    socket.on("gamePlay:alert", function(data) {
+
+       Util.showAlert(data.message, "", data.okMsg);
+    });
+
 
 
 
@@ -186,7 +236,7 @@ cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCa
 });
 
 
-cServices.factory("game", function(socket, globals, Player, $location, $mdDialog, $interval) {
+cServices.factory("game", function(Util, socket, globals, Player, $location, $mdDialog, $interval) {
 
     //Right now, only the first time you join you can create a game, afterwards it wont let you
     let game = {};
@@ -246,10 +296,10 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
     }
 
 
-    function addPlayer(name) {
+    function addPlayer(name, points) {
         if(!containsPlayer(name) && typeof name !== 'undefined') {
             console.log("adding Player");
-            let p = new Player(name);
+            let p = new Player(name, points);
 
             if(p.name === globals.username) {
                 p.admin = true;
@@ -345,22 +395,17 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
 
         if(data.name === globals.username) {
             //Someone has kicked this person
-            $mdDialog.show(
-                $mdDialog.alert()
-                    .parent(angular.element(document.body))
-                    .clickOutsideToClose(true)
-                    .title("You have been kicked from the game")
-                    .ok("Main Menu")
-            ).then(function () {
-                $location.path("/");
-            }, function () {
-
-            });
+            Util.showAlert("You have been kicked from the game",
+                "",
+                "Main Menu",
+                function () {
+                    $location.path("/");
+                });
         }
     });
 
     socket.on("game:playerJoin", function(data) {
-        addPlayer(data.name);
+        addPlayer(data.name, data.points);
     });
 
     socket.on("game:info", function(data) {
@@ -372,7 +417,7 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
 
 
         for(let p of data.players) {
-            addPlayer(p);
+            addPlayer(p.name, p.points);
         }
 
 
@@ -397,18 +442,14 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
 
     socket.on("game:failedJoin", function(data) {
         game.reset();
-        $mdDialog.show(
-            $mdDialog.alert()
-                .parent(angular.element(document.body))
-                .clickOutsideToClose(true)
-                .title(data.message)
-                .textContent("Make sure you typed the game code right and try again")
-                .ok("Okay!")
-        ).then(function () {
-            $location.path("/");
-        }, function () {
 
-        });
+        Util.showAlert(data.message,
+            "Make sure you typed the game code right and try again",
+            "Okay!",
+            function() {
+            $location.path("/")
+            });
+
     });
 
 

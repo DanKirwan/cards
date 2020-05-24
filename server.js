@@ -153,6 +153,8 @@ function idFromName(name) {
 
 
 function gameLeave(player, socket) {
+
+    //TODO check if in game and if so you cant play with less than 3 people
     let gameId = player.gameId; //Must be saved as it is deleted in safeLeaveGame()
     safeLeaveGame(player.gameId, player, socket);
 
@@ -171,12 +173,7 @@ function gameLeave(player, socket) {
             game.setGameAdmin(newAdmin);
             //Ugly way of setting the next available player to admin
 
-            io.to(newAdmin.id).emit("game:info", {
-                isAdmin: true,
-                players: game.getPlayerNames(),
-                inGame: game.inGame,
-                maxPlayers: game.maxPlayers
-            });
+            game.sendInfo(newAdmin);
 
 
 
@@ -232,7 +229,7 @@ io.on('connection', (socket) => {
                     console.log("Player joined game")
                     games[id].sendInfo(player);
 
-                    io.to(id).emit("game:playerJoin", {name: clients[socket.id].name});
+                    io.to(id).emit("game:playerJoin", {name: player.name, points: player.points});
                 } else {
 
                     if(games[id] === undefined) {
@@ -335,7 +332,7 @@ io.on('connection', (socket) => {
 
             games[id].sendInfo(player);
 
-            io.to(data.gameId).emit("game:playerJoin", {name: clients[socket.id].name});
+            io.to(data.gameId).emit("game:playerJoin", {name: player.name, points: player.points});
 
 
 
@@ -475,7 +472,20 @@ io.on('connection', (socket) => {
 
     //TODO socket.on("gamePlay:judgeChoose...
 
+    socket.on("gamePlay:judgeChoose", function(data) {
 
+        if(typeof games[player.gameId] !== "undefined" ) {
+            let game = games[player.gameId];
+
+
+            if(game.getJudgeId() === player.id) {
+                console.log(`Judge Chose Card ${data.cardText}`);
+                game.judgeChooseCard(data.cardText);
+            }
+        }
+
+
+   });
 
 
 
