@@ -1,5 +1,22 @@
 <div ng-controller="cardController" ng-init="initGameplay()" layout="column" style="height: 500px; overflow:hidden;" md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()" >
 
+    <md-toolbar>
+
+        <div class="md-toolbar-tools cg__toolbar">
+            <a href = "#!" ng-click="game.leave()" class="md-icon-button" aria-label="Main Menu">
+                <md-icon md-svg-icon="img/arrow_back-48dp.svg" style="fill:white;"></md-icon>
+            </a>
+
+            <h2 flex  style="text-align:center;">Round Time: {{gamePlay.roundTime}}</h2>
+            <div layout="column" layout-align="center center" >
+
+                <p style="margin:1px; font-size:10px;">Game Code</p>
+                <h1>{{globals.gameId}}</h1>
+
+            </div>
+        </div>
+
+    </md-toolbar>
 
     <md-sidenav class="md-sidenav-left" md-component-id="left" md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()">
         <md-toolbar>
@@ -65,14 +82,14 @@
             <img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
         </div>
 
-        <md-button class = "md-button judgeContainer__confirmbtn" ng-show = 'chosenJudgeCard != null' ng-click="confirmJudgeCard()">
+        <md-button class = "md-button judgeContainer__confirmbtn" ng-show = 'gamePlay.chosenJudgeCard != null' ng-click="gamePlay.confirmJudgeCard()">
             Confirm Card Selection
         </md-button>
 
         <md-grid-list md-cols = "{{getCardColumns()}}" md-row-height = "63:88" md-gutter = "0.5%" style="margin-left:8px; margin-right:8px;">
 
-            <md-grid-tile ng-repeat="card in judgeCards">
-                <md-button ng-disabled="!gamePlay.judging" class="card judgeContainer__card  " style="height: 100%" ng-class="{'judgeContainer__card--selected': card.selected}" ng-click = 'card.onClick()'>
+            <md-grid-tile ng-repeat="card in gamePlay.judgeCards">
+                <md-button ng-disabled="!gamePlay.isJudge" class="card judgeContainer__card  " style="height: 100%" ng-class="{'judgeContainer__card--selected': card.selected}" ng-click = 'gamePlay.pickJudgeCard(card)'>
                     {{card.text}}
                 </md-button>
 

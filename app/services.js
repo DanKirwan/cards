@@ -33,7 +33,7 @@ cServices.factory('socket', function($rootScope) {
 cServices.factory("globals", function() {
     return {
         username: null,
-
+        timer: null, //Used as the universal countdown which we can cancel before setting another
         players: [],
         gameId: '',
     }
@@ -65,7 +65,7 @@ cServices.factory('Player', function() {
 });
 
 
-cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCard) {
+cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCard, $interval) {
 
     let gamePlay = {};
 
@@ -81,7 +81,12 @@ cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCa
 
     gamePlay.selectedCard = null;
 
-    gamePlay.judgecCards = [];
+    gamePlay.judgeCards = [];
+
+    gamePlay.roundTime = 0;
+
+    gamePlay.chosenJudgeCard = null;
+
 
     //gameplay
 
@@ -99,7 +104,7 @@ cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCa
 
 
         if(card.selected) {
-            socket.emit("gamePlay:pickCard", {cardText: null});
+            socket.emit("gamePlay:pickCard", {cardText: undefined});
 
             gamePlay.deselectAll();
         } else {
@@ -115,13 +120,28 @@ cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCa
         console.log(gamePlay.myHand);
     };
 
+    gamePlay.pickJudgeCard = function(card) {
+        if (gamePlay.judgeCards.indexOf(card) > -1) {
+            gamePlay.chosenJudgeCard = card;
+        }
+    };
+
+    gamePlay.confirmJudgeCard = function() {
+        if(gamePlay.chosenJudgeCard !== null) {
+            socket.emit("gamePlay:judgeChoose", {cardText: gamePlay.chosenJudgeCard.text});
+        }
+    };
+
+
     socket.on("gamePlay:newRound", function(data) {
 
         gamePlay.judgeCards = [];
 
+        gamePlay.roundTime = data.roundTime;
+
         gamePlay.selectedCard = null;
 
-
+        gamePlay.myHand = [];
         for(let cardText of data.hand) {
             gamePlay.myHand.push(new WhiteCard(cardText))
         }
@@ -130,17 +150,18 @@ cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCa
 
         gamePlay.round = data.roundNo;
 
-        gamePlay.isJudge = false; //TODO change to data.isJudge;
-        gamePlay.judging = false; //same todo as above
+        gamePlay.isJudge = data.isJudge;
+        gamePlay.judging = data.isJudge;
 
-        if(gamePlay.round === 0) {
-            //First round so deal with routing to game
 
-            if($location.path() !== "/game/"+globals.gameId) {
-                $location.path("/game/"+globals.gameId);
-            }
-
+        //Route to game if not already in
+        if($location.path() !== "/game/"+globals.gameId) {
+            $location.path("/game/"+globals.gameId);
         }
+
+
+
+        globals.timer = $interval(function() {gamePlay.roundTime --} , 1000, gamePlay.roundTime);
 
 
     });
@@ -148,7 +169,7 @@ cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCa
 
     socket.on("gamePlay:judging", function(data) {
 
-        gamePlay.juding = true;
+        gamePlay.judging = true;
         gamePlay.judgeCards = [];
         for(let cardText of data.judgeCards) {
             gamePlay.judgeCards.push(new WhiteCard(cardText))
@@ -165,7 +186,7 @@ cServices.factory("gamePlay", function($location, socket, game, globals, WhiteCa
 });
 
 
-cServices.factory("game", function(socket, globals, Player, $location, $mdDialog) {
+cServices.factory("game", function(socket, globals, Player, $location, $mdDialog, $interval) {
 
     //Right now, only the first time you join you can create a game, afterwards it wont let you
     let game = {};
@@ -185,6 +206,8 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
     game.isAdmin = null;
 
     game.populated = false;
+
+
 
 
 
@@ -264,6 +287,7 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
 
 
     game.leave =  function() {
+        $interval.cancel(globals.timer);
         if(globals.gameId !== null) {
             socket.emit("game:leave");
         }
@@ -273,9 +297,9 @@ cServices.factory("game", function(socket, globals, Player, $location, $mdDialog
     };
 
     game.join = function() {
-        if(!game.populated) {
+
             socket.emit("game:join", {gameId: globals.gameId});
-        }
+
     };
 
 

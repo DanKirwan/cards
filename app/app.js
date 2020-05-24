@@ -246,7 +246,7 @@ app.controller("menuController", function (game, gamePlay, globals, $rootScope, 
 
 
 
-app.controller("cardController", function(globals, game, socket, gamePlay, $scope, $mdSidenav, $mdMedia, $timeout, $routeParams) {
+app.controller("cardController", function(globals, game, socket, gamePlay, $scope, $mdSidenav, $mdMedia, $timeout, $routeParams, $interval) {
 
     $scope.initGameplay = function () {
         globals.gameId = $routeParams.gameCode;
@@ -267,6 +267,9 @@ app.controller("cardController", function(globals, game, socket, gamePlay, $scop
 
 
     $scope.gamePlay = gamePlay;
+    $scope.game = game;
+    $scope.globals = globals;
+
     $scope.selectedCard = null;
     $scope.cardsFocussed = true;
 

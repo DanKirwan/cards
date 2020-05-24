@@ -109,7 +109,7 @@ function safeJoinGame(gameId, player, socket) {
         }
 
         let newGame = games[gameId];
-        if(newGame !== undefined && Object.keys(newGame.players).length < newGame.maxPlayers) {
+        if(typeof newGame !== 'undefined' && Object.keys(newGame.players).length < newGame.maxPlayers) {
             newGame.addPlayer(player);
             player.gameId = gameId;
             socket.join(gameId);
@@ -436,7 +436,9 @@ io.on('connection', (socket) => {
 
                 game.populate();
 
-                game.sendHandToAll();
+
+
+                game.newRound();
                 //TODO add players joining once the game has started and add their hand and send it to them
 
             } else {
@@ -449,6 +451,35 @@ io.on('connection', (socket) => {
             socket.emit("game:failedStart", {message: "Couldn't start game"});
         }
     });
+
+
+    socket.on("gamePlay:pickCard", function(data) {
+
+        //TODO make it so that if all players have picked cards then the timer goes to 10 seconds and they get a warning popup
+        if(games[player.gameId] !== null) {
+            let game = games[player.gameId];
+
+            if(player.myCards.indexOf(data.cardText) > -1) {
+                game.judgeCards[player.id] = data.cardText;
+            }
+
+            if(typeof data.cardText === 'undefined') {
+                delete game.judgeCards[player.id]
+            }
+
+        }
+
+        console.log("card picked: " + data.cardText);
+    });
+
+
+    //TODO socket.on("gamePlay:judgeChoose...
+
+
+
+
+
+
 
 
 
@@ -491,6 +522,9 @@ io.on('connection', (socket) => {
 
         console.log(new Date() + " - Connection Terminated: " + socket.id);
         delete clients[socket.id];
-    })
+    });
+
+
+
 
 });
