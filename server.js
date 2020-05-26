@@ -461,6 +461,17 @@ io.on('connection', (socket) => {
 
             if(player.myCards.indexOf(data.cardText) > -1) {
                 game.judgeCards[player.id] = data.cardText;
+
+
+                /*if(Object.keys(game.judgeCards).length  === Object.keys(game.players).length - 1) {
+
+                    if(game.currentRoundTime > 3) {
+                        io.to(game.id).emit("gamePlay:accelTimer");
+                        game.currentRoundTime = 3;
+
+
+                    }
+                } //Check if all players have selected a card and accelerate timer*/
             }
 
             if(typeof data.cardText === 'undefined') {

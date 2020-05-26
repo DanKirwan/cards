@@ -120,6 +120,10 @@ cServices.factory('Util', function($mdDialog, $timeout) {
 
 cServices.factory("gamePlay", function(Util, $location, socket, game, globals, WhiteCard, $interval) {
 
+    //TODO say somewhere when you're the judge
+    //TODO Tell everyone else whos judge
+
+
     let gamePlay = {};
 
     gamePlay.myHand = [];
@@ -198,6 +202,12 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
         for(let p of game.players) {
             if(p.name === data.playerName) p.points ++;
         }
+
+        Util.showInfo(`${data.playerName} Has won this round`, 3);
+    });
+
+    socket.on("gamePlay:gameWin", function(data) {
+        Util.showAlert(`${data.playerName} Has Won!`, "", "Main Menu", function(){game.leave()}, function(){game.leave()});
     });
 
     socket.on("gamePlay:newRound", function(data) {
@@ -229,6 +239,10 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
         gamePlay.isJudge = data.isJudge;
         gamePlay.judging = data.inJudging;
 
+        if(gamePlay.isJudge) {
+            Util.showInfo("You are the Card Czar for this round! Wait for all plays to pick a card", 5)
+        }
+
 
         //Route to game if not already in
         if($location.path() !== "/game/"+globals.gameId) {
@@ -248,7 +262,17 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
     });
 
 
+    socket.on("gamePlay:accelTimer", function() {
+        gamePlay.roundTime = 3;
+    });
+
+
     socket.on("gamePlay:judging", function(data) {
+
+        Util.showInfo("Judging is now in progress", 2);
+
+
+
         $interval.cancel(globals.timer);
         globals.timer = $interval(function() {gamePlay.judgeTime --}, 1000, gamePlay.judgeTime);//TODO fix this and maybe use gamePlay.countdown
         gamePlay.judging = true;

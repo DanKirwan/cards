@@ -108,7 +108,7 @@ exports.Game = class Game {
 
         this.judgeCards = {};
 
-        this.roundTime = 10;
+        this.roundTime = 30;
         this.currentRoundTime = this.roundTime;
         this.round = 0;
 
@@ -117,7 +117,7 @@ exports.Game = class Game {
 
         this.judgeTimeout = null;
         this.judgeCounter = null;
-        this.judgeTime = 10;
+        this.judgeTime = 60;
         this.currentJudgeTime = this.judgeTime;
 
 
@@ -286,10 +286,6 @@ exports.Game = class Game {
                 this.newRound();
             }
 
-
-
-
-
         }, 1000*this.roundTime);
 
     }
@@ -299,6 +295,11 @@ exports.Game = class Game {
             if(this.judgeCards[pId] === cardText) {
                 this.players[pId].points ++;
                 this.io.to(this.id).emit("gamePlay:roundWin", {playerName: this.players[pId].name});
+
+
+                if(this.players[pId].points >= this.maxPoints) {
+                    this.io.to(this.id).emit("gamePlay:gameWin", {playerName: this.players[pId].name});
+                } //TODO make this nicer so it asks if you want to play again etc
             }
         }
 

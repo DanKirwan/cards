@@ -154,7 +154,7 @@ body {
        display:block;
        width:90%;
 
-       padding: 10px;
+       padding: 6px;
 
 
      }
@@ -299,6 +299,7 @@ body {
   &__card {
 
       width:100%;
+      white-space:normal;
 
 
        &--selected {

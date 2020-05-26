@@ -115,7 +115,10 @@
 
             <md-grid-tile ng-repeat="card in gamePlay.judgeCards">
                 <md-button ng-disabled="!gamePlay.isJudge" class="card judgeContainer__card  " style="height: 100%" ng-class="{'judgeContainer__card--selected': card.selected}" ng-click = 'gamePlay.pickJudgeCard(card)'>
-                    {{card.text}} <!-- TODO make this so the card goes to next line not spills off side-->
+                    <div class = "cardContainer__card__textContainer">
+                        {{card.text}}
+                    </div>
+
                 </md-button>
 
             </md-grid-tile>

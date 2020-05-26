@@ -90,7 +90,7 @@ body {
       position: absolute;
       display: block;
       width: 90%;
-      padding: 10px; }
+      padding: 6px; }
   .cardContainer__card:not([disabled]):hover {
     background-color: #f3f3f3;
     transform: translate(0, -51.5%); }
@@ -169,7 +169,8 @@ body {
       min-height: 0;
       transition: all 0.2s; }
   .judgeContainer__card {
-    width: 100%; }
+    width: 100%;
+    white-space: normal; }
     .judgeContainer__card--selected {
       z-index: 2;
       transform: scale(1.06); }
