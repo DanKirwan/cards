@@ -24,9 +24,9 @@ app.config(function($routeProvider) {
 
 
 
-app.controller("globalController", function($location, gamePlay, $scope, $mdDialog, $mdMedia, socket, globals) {
+app.controller("globalController", function($location, gamePlay, $scope, $mdDialog, $mdMedia, socket, globals, Util) {
 
-
+    $scope.Util = Util;
     $scope.pickNameDialog = function() {
 
 

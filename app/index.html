@@ -46,9 +46,9 @@
 
 
 <div ng-app = "app" ng-controller="globalController" >
+  <div class = "info" ng-hide = "Util.infoMessage === undefined" > {{Util.infoMessage}}</div>
 
-
-  <ng-view style="overflow:hidden"></ng-view>
+  <ng-view></ng-view>
 
 
 </div>

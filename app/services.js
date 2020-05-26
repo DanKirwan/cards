@@ -2,7 +2,7 @@ let cServices = angular.module("cards.services", []);
 
 cServices.factory('socket', function($rootScope) {
 
-    let socket = io.connect('localhost:80'); //TODO change later when an actual website is created
+    let socket = io.connect('87.113.188.136:80'); //TODO change later when an actual website is created
 
     return {
         on: function(eventName, callback) {
@@ -65,26 +65,52 @@ cServices.factory('Player', function() {
 });
 
 
-cServices.factory('Util', function($mdDialog) {
+cServices.factory('Util', function($mdDialog, $timeout) {
 
     let Util = {};
+    Util.currentAlert = undefined;
 
     Util.showAlert = function(title, message, okMsg, resolveFunct, rejectFunct) {
-        okMsg = okMsg || "Okay";
+        if(typeof Util.currentAlert === "undefined") {
+            okMsg = okMsg || "Okay";
 
-        resolveFunct = resolveFunct || function(){};
-        rejectFunct = rejectFunct || function(){};
+            let resolve = function() {
+                Util.currentAlert = undefined;
+                if(typeof resolveFunct === "function") resolveFunct()
+
+            };
 
 
-        $mdDialog.show(
-            $mdDialog.alert()
-                .parent(angular.element(document.body))
-                .clickOutsideToClose(true)
-                .title(title)
-                .textContent(message)
-                .ok(okMsg)
-        ).then(resolveFunct, rejectFunct);
-    }
+            let reject = function() {
+                Util.currentAlert = undefined;
+                if(typeof rejectFunct === "function") rejectFunct();
+            };
+
+            Util.currentAlert = $mdDialog.show(
+                $mdDialog.alert()
+                    .parent(angular.element(document.body))
+                    .clickOutsideToClose(true)
+                    .title(title)
+                    .textContent(message)
+                    .ok(okMsg)
+            ).then(resolve, reject);
+
+
+        }
+
+    };
+
+
+    Util.infoMessage = undefined;
+
+    Util.showInfo = function(message, displayTime) {
+        Util.infoMessage = message;
+
+        $timeout( _ => {
+            Util.infoMessage = undefined;
+        }, displayTime * 1000);
+    };
+
 
     return Util
 
@@ -106,6 +132,8 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
     gamePlay.roundTime = 0;
     gamePlay.chosenJudgeCard = null;
 
+    gamePlay.judgeTime = 30; //TODO make this a variable in advanced settings
+
 
     //gameplay
 
@@ -119,24 +147,26 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
     gamePlay.selectCard = function(card) {
 
-        gamePlay.selectedCard = card;
+        if(!gamePlay.isJudge) {
+            gamePlay.selectedCard = card;
 
 
-        if(card.selected) {
-            socket.emit("gamePlay:pickCard", {cardText: undefined});
+            if (card.selected) {
+                socket.emit("gamePlay:pickCard", {cardText: undefined});
 
-            gamePlay.deselectAll();
-        } else {
-            socket.emit("gamePlay:pickCard", {cardText: card.text});
+                gamePlay.deselectAll();
+            } else {
+                socket.emit("gamePlay:pickCard", {cardText: card.text});
 
-            for(let cTest of gamePlay.myHand) {
-                console.log(card);
-                console.log(cTest);
-                cTest.selected = card === cTest;
+                for (let cTest of gamePlay.myHand) {
+                    console.log(card);
+                    console.log(cTest);
+                    cTest.selected = card === cTest;
+                }
+
             }
-
+            console.log(gamePlay.myHand);
         }
-        console.log(gamePlay.myHand);
     };
 
     gamePlay.pickJudgeCard = function(card) {
@@ -178,6 +208,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
 
         gamePlay.roundTime = data.roundTime;
+        gamePlay.judgeTime = data.judgeTime;
 
         gamePlay.selectedCard = null;
 
@@ -196,7 +227,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
         gamePlay.round = data.roundNo;
 
         gamePlay.isJudge = data.isJudge;
-        gamePlay.judging = data.inJudging || data.isJudge; //Goes to judging if everyone else is or if you're the judge
+        gamePlay.judging = data.inJudging;
 
 
         //Route to game if not already in
@@ -205,15 +236,21 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
         }
 
 
+        if(gamePlay.judging) {
+            globals.timer = $interval(function() {gamePlay.judgeTime --}, 1000, gamePlay.judgeTime);
+        } else {
+            globals.timer = $interval(function() {gamePlay.roundTime --} , 1000, gamePlay.roundTime);
 
-        globals.timer = $interval(function() {gamePlay.roundTime --} , 1000, gamePlay.roundTime);
+
+        }
 
 
     });
 
 
     socket.on("gamePlay:judging", function(data) {
-
+        $interval.cancel(globals.timer);
+        globals.timer = $interval(function() {gamePlay.judgeTime --}, 1000, gamePlay.judgeTime);//TODO fix this and maybe use gamePlay.countdown
         gamePlay.judging = true;
         gamePlay.judgeCards = [];
         for(let cardText of data.judgeCards) {
@@ -224,7 +261,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
     socket.on("gamePlay:alert", function(data) {
 
-       Util.showAlert(data.message, "", data.okMsg);
+       Util.showInfo(data.message, 2);
     });
 
 
@@ -367,7 +404,12 @@ cServices.factory("game", function(Util, socket, globals, Player, $location, $md
 
 
     game.updateMaxPlayers = function() {
-        socket.emit("game:setMaxPlayers", {maxPlayers: game.maxPlayers});
+        if(Number.isInteger(game.maxPlayers) && game.maxPlayers > 2 && game.maxPlayers < 21) {
+            socket.emit("game:setMaxPlayers", {maxPlayers: game.maxPlayers});
+        } else {
+            game.maxPlayers = 20;
+        }
+
     };
 
     game.begin = function() {

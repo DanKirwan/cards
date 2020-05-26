@@ -154,6 +154,8 @@ body {
        display:block;
        width:90%;
 
+       padding: 10px;
+
 
      }
   }
@@ -237,15 +239,17 @@ body {
   overflow-y:scroll;
 
   &__blackCard {
-    position:relative;
+
+
+    color:white;
     transform:translate(-50%, 0);
     height:50%;
     background-color:black;
     left:50%;
     top:50%;
 
-    margin-top:5%;
-    margin-bottom:5%;
+    margin-top:100px;
+    margin-bottom:50px;
 
     &--choosing {
       top:15%;
@@ -258,16 +262,23 @@ body {
 
     &__confirmBtn {
       display:block;
-      width:100%;
+      width:80%;
+      min-width:250px;
       height:40px;
 
-      background:red;
-      margin-left:0;
-      margin-right:0;
+      background:white;
+      margin-left:10%;
       margin-bottom:20px;
 
 
       transition: all 0.2s;
+
+      border: 2px solid black;
+      border-radius: 5px;
+
+      &:not([disabled]):hover {
+        background:#cccccc;
+      }
 
       &.ng-hide {
         margin-bottom: 0;
@@ -276,8 +287,10 @@ body {
 
 
 
+
         transition: all 0.2s;
       }
+
   }
 
 
@@ -553,3 +566,35 @@ body {
     }
   }
 }
+
+
+
+.info {
+  text-align:center;
+  position:absolute;
+  display:block;
+  transform:translate(-50%, -50%);
+  width:80%;
+  left:50%;
+  top:50%;
+  transition: all 0.2s;
+
+  z-index: 1000;
+
+
+  padding: 5px;
+  background:white;
+  border: 2px solid black;
+  border-radius: 5px;
+
+
+
+  &.ng-hide {
+    top:-50%;
+    transition: all 0.2s;
+
+
+  }
+
+}
+

@@ -30,7 +30,10 @@ db.once("open", _ => {
 
 db.on("error", err => console.log("database connection error", err))
 
-mongoose.connect(dbUrl, {useNewUrlParser: true})
+mongoose.connect(dbUrl, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
 
 
 
@@ -477,11 +480,14 @@ io.on('connection', (socket) => {
         if(typeof games[player.gameId] !== "undefined" ) {
             let game = games[player.gameId];
 
+            clearTimeout(game.judgeTimeout);
+            clearInterval(game.judgeCounter);
 
             if(game.getJudgeId() === player.id) {
                 console.log(`Judge Chose Card ${data.cardText}`);
                 game.judgeChooseCard(data.cardText);
             }
+
         }
 
 
