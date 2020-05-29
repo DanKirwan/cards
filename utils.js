@@ -108,7 +108,7 @@ exports.Game = class Game {
 
         this.judgeCards = {};
 
-        this.roundTime = 30;
+        this.roundTime = 10;
         this.currentRoundTime = this.roundTime;
         this.round = 0;
 
@@ -117,7 +117,7 @@ exports.Game = class Game {
 
         this.judgeTimeout = null;
         this.judgeCounter = null;
-        this.judgeTime = 60;
+        this.judgeTime = 10;
         this.currentJudgeTime = this.judgeTime;
 
 

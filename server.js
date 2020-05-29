@@ -28,12 +28,11 @@ db.once("open", _ => {
     })
 });
 
-db.on("error", err => console.log("database connection error", err))
 
 mongoose.connect(dbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true
-});
+}).then(res => console.log("Connected to DB").catch(err => console.log(err)));
 
 
 
@@ -456,7 +455,7 @@ io.on('connection', (socket) => {
     socket.on("gamePlay:pickCard", function(data) {
 
         //TODO make it so that if all players have picked cards then the timer goes to 10 seconds and they get a warning popup
-        if(games[player.gameId] !== null) {
+        if(games[player.gameId] !== undefined) {
             let game = games[player.gameId];
 
             if(player.myCards.indexOf(data.cardText) > -1) {

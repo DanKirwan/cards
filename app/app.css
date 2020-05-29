@@ -1,73 +1,74 @@
+*:focus {
+  outline: none; }
+
 body {
   background-color: white;
   color: #000000;
   font-family: Arial, sans-serif;
   margin: 0; }
 
-#topbar {
-  background: black;
-  color: white;
-  height: 5%;
-  width: 100%; }
-
-@media (max-width: 500px) {
-  #topbar {
-    display: none; } }
-#leaderboard {
-  margin: 0px;
-  background-color: #999999;
-  border-radius: 0 0 0 1vw;
-  float: right;
-  max-width: 25vw;
-  padding: 20px; }
-
 #title {
   line-height: 5%;
   font-size: 250%;
   float: left; }
 
-.md-button.card, .card {
-  position: relative;
-  display: inline-block;
+.card {
+  height: 0;
+  padding-top: 150%;
+  width: 100%;
+  overflow: hidden;
   border-radius: 9%/6%;
   background-color: white;
-  height: 90%;
   color: black;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-  margin: 2px;
   transition: all 0.25s;
-  overflow: hidden; }
-
-.card > img {
-  position: relative;
-  height: 71.6%;
-  /*exact aspect ratio of cards */
-  margin: 0; }
+  margin: 0;
+  z-index: 2;
+  position: relative; }
+  .card__inside, .card__inside:not([disabled]) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 88%;
+    height: 96%;
+    white-space: normal;
+    background: none;
+    overflow: auto;
+    padding: 3% 6%; }
+    .card__inside.md-ink-ripple, .card__inside:not([disabled]).md-ink-ripple {
+      border-radius: 9%/6%; }
 
 #blackCard {
-  position: absolute;
-  background-color: black;
-  color: white;
-  height: 50%;
+  width: 20vh;
   max-width: 50%;
+  position: absolute;
+  display: block;
   transform: translate(-50%, -50%);
   left: 50%;
   top: 50%;
+  transition: 0.3s;
   transition-timing-function: ease-out; }
 
 #blackCard.cardSelected {
   left: 25%;
+  transition: 0.2s;
   transition-timing-function: ease-out; }
 
 #selectedCard {
   position: absolute;
+  width: 20vh;
   max-width: 50%;
-  height: 50%;
   left: 75%;
   top: 50%;
   transform: translate(-50%, -50%);
   transition: all 0.2s;
-  padding: 0px; }
+  padding: 0px;
+  opacity: 1; }
+  #selectedCard.ng-hide {
+    max-width: 0;
+    width: 0;
+    opacity: 0;
+    transition: 0.2s; }
 
 .cardContainer {
   position: absolute;
@@ -77,55 +78,31 @@ body {
   height: 30%;
   bottom: 0;
   overflow-x: scroll;
-  overflow-y: hidden;
+  overflow-y: visible;
   white-space: nowrap;
   transition: all 0.2s;
   text-align: center; }
   .cardContainer__card {
-    white-space: normal;
-    top: 50%;
-    transform: translate(0, -50%);
-    height: 95%; }
-    .cardContainer__card__textContainer {
-      position: absolute;
-      display: block;
-      width: 90%;
-      padding: 6px; }
-  .cardContainer__card:not([disabled]):hover {
-    background-color: #f3f3f3;
-    transform: translate(0, -51.5%); }
-  .cardContainer__card--notFocused {
-    top: 120%; }
+    padding: 1.5vh 4px 4px;
+    position: static;
+    display: block;
+    height: 0;
+    width: 18vh;
+    min-width: 18vh;
+    max-width: 50%;
+    transition: all 0.2s; }
+    .cardContainer__card.ng-hide {
+      min-width: 0 !important;
+      width: 0 !important;
+      opacity: 0;
+      transition: 0.2s; }
 
-.movingCardContainer {
+.selectingContainer {
   position: absolute;
   background-color: grey;
   width: 100%;
   height: 70%;
-  top: 0;
-  /* Add something here to deal with min height 200px cards */ }
-  .movingCardContainer__popUpText {
-    position: absolute;
-    transform: translate(-50%, 0);
-    left: 50%;
-    top: 85%;
-    color: white;
-    opacity: 90%;
-    font-size: 2.5rem;
-    text-align: center;
-    white-space: nowrap;
-    transition: opacity 0.09s; }
-    .movingCardContainer__popUpText.ng-hide {
-      opacity: 0;
-      transition: opacity 1s; }
-  @media (max-height: 667px) {
-    .movingCardContainer {
-      height: auto;
-      top: 0;
-      bottom: 200px; }
-      .movingCardContainer__popUpText {
-        top: auto;
-        bottom: 10px; } }
+  top: 0; }
 
 .card.ng-hide {
   opacity: 0;
@@ -141,7 +118,7 @@ body {
   .judgeContainer__blackCard {
     color: white;
     transform: translate(-50%, 0);
-    height: 50%;
+    width: 50%;
     background-color: black;
     left: 50%;
     top: 50%;
@@ -149,7 +126,7 @@ body {
     margin-bottom: 50px; }
     .judgeContainer__blackCard--choosing {
       top: 15%;
-      height: 30%; }
+      height: 50%; }
   .judgeContainer__confirmBtn {
     display: block;
     width: 80%;
@@ -174,6 +151,8 @@ body {
     .judgeContainer__card--selected {
       z-index: 2;
       transform: scale(1.06); }
+    .judgeContainer__card:disabled {
+      background: #f9f9f9; }
     .judgeContainer__card:not([disabled]):hover {
       background-color: #f3f3f3; }
 
@@ -298,22 +277,29 @@ body {
       min-height: 0;
       transition: all 0.2s; }
 
-.info {
-  text-align: center;
+.info__container {
   position: absolute;
-  display: block;
-  transform: translate(-50%, -50%);
   width: 80%;
-  left: 50%;
+  left: 10%;
   top: 50%;
+  z-index: 1000; }
+.info__message {
+  text-align: center;
+  position: static;
+  display: block;
   transition: all 0.2s;
-  z-index: 1000;
   padding: 5px;
   background: white;
   border: 2px solid black;
-  border-radius: 5px; }
-  .info.ng-hide {
-    top: -50%;
+  border-radius: 5px;
+  margin-bottom: 4px; }
+  .info__message.ng-enter {
+    opacity: 0;
+    transition: all 0.2s; }
+  .info__message.ng-enter-active {
+    opacity: 1; }
+  .info__message.ng-leave.ng-leave-active {
+    opacity: 0;
     transition: all 0.2s; }
 
 /*# sourceMappingURL=app.css.map */

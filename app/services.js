@@ -2,7 +2,7 @@ let cServices = angular.module("cards.services", []);
 
 cServices.factory('socket', function($rootScope) {
 
-    let socket = io.connect('87.113.188.136:80'); //TODO change later when an actual website is created
+    let socket = io.connect('81.174.161.170:80'); //TODO change later when an actual website is created
 
     return {
         on: function(eventName, callback) {
@@ -101,14 +101,14 @@ cServices.factory('Util', function($mdDialog, $timeout) {
     };
 
 
-    Util.infoMessage = undefined;
+    Util.infoMessages = [];
 
     Util.showInfo = function(message, displayTime) {
-        Util.infoMessage = message;
+        Util.infoMessages.push(message);
 
         $timeout( _ => {
-            Util.infoMessage = undefined;
-        }, displayTime * 1000);
+            Util.infoMessages = Util.infoMessages.filter(msg => msg !== message);
+        }, displayTime * 1000); //TODO add a delay feature for when two come at the same time
     };
 
 
@@ -204,6 +204,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
         }
 
         Util.showInfo(`${data.playerName} Has won this round`, 3);
+        Util.showCard(data.cardText);
     });
 
     socket.on("gamePlay:gameWin", function(data) {
@@ -236,11 +237,11 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
         gamePlay.round = data.roundNo;
 
-        gamePlay.isJudge = data.isJudge;
-        gamePlay.judging = data.inJudging;
+        gamePlay.isJudge = false; //data.isJudge;
+        gamePlay.judging = false; //data.inJudging;
 
         if(gamePlay.isJudge) {
-            Util.showInfo("You are the Card Czar for this round! Wait for all plays to pick a card", 5)
+            Util.showInfo("You are the Card Czar for this round! Wait for all players to pick a card", 5)
         }
 
 
@@ -570,6 +571,7 @@ cServices.factory("lobby", function(game, socket, globals) {
 
 
         for(let pack of data.cardPacks) {
+            lobby.cardPacks = [];
             lobby.cardPacks.push(new CardPack(pack.name, pack.desc));
         }
 
@@ -586,3 +588,39 @@ cServices.factory("lobby", function(game, socket, globals) {
 
 
 });
+
+
+
+cServices.directive("whiteCard", function() {
+    return{
+        transclude:true,
+
+        template:
+            '<div class="card" >' +
+                '<div class="card__inside" md-ink-ripple="true">' +
+                    '<ng-transclude></ng-transclude>'+
+                '</div>' +
+            '</div>',
+
+
+    }
+});
+
+
+cServices.directive("blackCard", function() {
+    return{
+        transclude:true,
+
+        template:
+            '<div class="card" style="background:black; color:white; overflow:hidden;">' +
+                '<div class="card__inside"  md-ink-ripple="true">' +
+                    '<ng-transclude></ng-transclude>'+
+                '</div>' +
+            '</div>',
+
+        link: function(scope, elem, attrs) {
+            angular.element(elem).css({"margin":"0"});
+        }
+    }
+});
+

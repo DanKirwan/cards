@@ -134,7 +134,7 @@ app.controller("dialogController", function(globals, $scope, socket, $mdDialog) 
 
 
 
-app.controller("mainMenuController", function($scope, socket, game, globals) {
+app.controller("mainMenuController", function($scope, socket, game, globals, Util) {
 
     //main menu code
 
@@ -149,7 +149,6 @@ app.controller("mainMenuController", function($scope, socket, game, globals) {
         console.log(globals.gameId);
 
         game.checkExists();
-
 
 
 
@@ -201,10 +200,7 @@ app.controller("menuController", function (game, gamePlay, globals, $rootScope, 
                 lobby.populate();
             });
         }
-
-
     };
-
 
 
     $scope.startGame = function() {
