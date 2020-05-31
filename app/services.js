@@ -57,6 +57,8 @@ cServices.factory('Player', function() {
         this.name = name;
         this.admin = false;
         this.points = points;
+        this.hasPicked = false;
+        this.isJudge = false;
 
     }
 
@@ -220,6 +222,12 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
         $interval.cancel(globals.timer);
 
         gamePlay.roundJudge = data.roundJudge;
+
+        game.players.forEach(p => p.isJudge = false);
+        let pJudge = game.players[game.getIdxFromName(data.roundJudge)];
+        if(typeof pJudge !== "undefined") pJudge.isJudge = true;
+
+
         gamePlay.roundTime = data.roundTime;
         gamePlay.judgeTime = data.judgeTime;
 
@@ -301,6 +309,24 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
     });
 
 
+    socket.on("gamePlay:playerPick", function(data) {
+        //add picked to player data and deal with adding picked card to an array
+        let pickedPlayer = game.players[game.getIdxFromName(data.name)];
+
+        if(data.pickedCard && !pickedPlayer.hasPicked) {
+            gamePlay.judgeCards.push(new WhiteCard());
+        } else if(!data.pickedCard && pickedPlayer.hasPicked) {
+            gamePlay.judgeCards.pop();
+        }
+
+
+        pickedPlayer.hasPicked = data.pickedCard;
+
+
+
+    })
+
+
 
 
     return gamePlay;
@@ -356,7 +382,7 @@ cServices.factory("game", function(Util, socket, globals, Player, $location, $md
         return cont;
     }
 
-    function getIdxFromName(name) {
+    game.getIdxFromName = function(name) {
         let idx = -1;
 
         for(let i = 0; i < game.players.length; i++) {
@@ -466,7 +492,7 @@ cServices.factory("game", function(Util, socket, globals, Player, $location, $md
     socket.on("game:playerLeave", function(data) {
 
         if(containsPlayer(data.name)) {
-            game.players.splice(getIdxFromName(data.name), 1);
+            game.players.splice(game.getIdxFromName(data.name), 1);
         }
 
         console.log(globals.username + "Your name - Player To Remove" + data.name)

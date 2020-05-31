@@ -12,8 +12,9 @@
                         <label>Your Name</label>
                         <input ng-model="inputUsername" ng-change="usrNameChange()">
 
-                        <div class="hint" style="color:red" ng-show="!isNameValid && inputUsername !== ''">This username is already taken</div>
+                        <div class="hint" style="color:red" ng-show="!isNameValid && inputUsername !== '' && inputUsername.length <= 10">This username is already taken</div>
                         <div class="hint" style="color:red" ng-show="inputUsername === ''">You must enter a username</div>
+                        <div class="hint" style="color:red" ng-show="inputUsername.length > 10">Maximum length username is 10 characters</div>
 
                     </md-input-container>
                 </md-input>

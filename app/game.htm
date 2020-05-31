@@ -27,28 +27,43 @@
     </md-toolbar>
 
     <md-sidenav class="md-sidenav-left" md-component-id="left" md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()">
+
+
         <md-toolbar>
+
+            <!-- md-toolbar-tools see above -->
             <h1>Test :)</h1>
         </md-toolbar>
-        <a class = "md-button" md-whiteframe="5" href="#!" style="color:black">Menu</a>
+
+        <md-content>
+            <a class = "md-button" md-whiteframe="5" href="#!" style="color:black">Menu</a>
 
 
 
-        <h3 flex class = "cg__heading"> Players</h3>
-        <md-list>
-            <md-list-item ng-repeat="player in game.players">
-                <h3 flex>{{player.name}}</h3>
+            <h3 flex class = "cg__heading"> Players</h3>
+            <md-list>
+                <md-list-item ng-repeat="player in game.players">
+                    <h3 style="padding-right:20px;">{{player.name}}</h3>
 
-                <md-icon ng-show="game.isAdmin && !player.admin" class="md-secondary" md-svg-icon="img/remove_player-48dp.svg" ng-click="game.removePlayer(player.name)">
-                    <md-tooltip md-direction="left" md-delay = "100">Remove Player</md-tooltip>
-                </md-icon>
-
-
-                <h3>{{player.points}}</h3>
+                    <p flex style="text-align:center;" ng-show = "player.hasPicked && !player.isJudge">Waiting</p>
+                    <p flex style="text-align:center;" ng-show = "!player.hasPicked && !player.isJudge">Selecting Card</p>
+                    <p flex style="text-align:center;" ng-show="player.isJudge">Card Czar</p>
 
 
-            </md-list-item>
-        </md-list>
+
+                    <md-icon ng-show="game.isAdmin" ng-style="player.admin ? {'visibility': 'hidden'} : {'visibility' : 'visible'}" class="md-secondary" md-svg-icon="img/remove_player-48dp.svg" ng-click="game.removePlayer(player.name)">
+                        <md-tooltip md-direction="left" md-delay = "100">Remove Player</md-tooltip>
+                    </md-icon>
+
+
+                    <h3 style="padding:5px">{{player.points}}</h3>
+
+
+                </md-list-item>
+            </md-list>
+
+        </md-content>
+
 
     </md-sidenav>
 
@@ -95,7 +110,7 @@
         <md-grid-list  md-cols = "{{getCardColumns()}}" md-row-height = "2:3" md-gutter = "0.5%" style="margin-left:8px; margin-right:8px;">
 
             <md-grid-tile ng-repeat="card in gamePlay.judgeCards">
-                <white-card ng-disabled="!gamePlay.isJudge" class="judgeContainer__card  " ng-class="{'judgeContainer__card--selected': card.selected}" ng-click = 'gamePlay.pickJudgeCard(card)'>
+                <white-card  class="white-card judgeContainer__card  " ng-class="{'judgeContainer__card--selected': card.selected, 'judgeContainer__card--notJudge' : !gamePlay.isJudge}" ng-click = 'gamePlay.pickJudgeCard(card)'>
                         <div ng-bind-html="card.text"></div>
                 </white-card>
 

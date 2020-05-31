@@ -104,7 +104,6 @@ app.controller("dialogController", function(globals, $scope, socket, $mdDialog) 
 
     $scope.inputUsername = '';
 
-    $scope.nameValid = true;
 
     $scope.usrNameChange = function() {
         globals.username = $scope.inputUsername;
@@ -119,7 +118,7 @@ app.controller("dialogController", function(globals, $scope, socket, $mdDialog) 
     $scope.usrSetName = function() {
         socket.emit("user:setName", {name: globals.username});
 
-        if($scope.nameValid) {
+        if($scope.isNameValid) {
          $mdDialog.cancel();
         }
 
@@ -146,7 +145,7 @@ app.controller("mainMenuController", function($scope, socket, game, globals, Uti
 
 
     $scope.checkGame = function() {
-        console.log(globals.gameId);
+        globals.gameId = globals.gameId.toUpperCase().substring(0, 4);
 
         game.checkExists();
 

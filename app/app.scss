@@ -43,6 +43,11 @@ body {
 
   position:relative;
 
+  &:hover {
+    background: #e2e2e2;
+  }
+
+
 
 
 
@@ -217,14 +222,15 @@ body {
 
     display:block;
 
-    width:50vh;
+    width:20vh;
+    max-width:100%;
     margin: 100px auto 50px;
 
     transition:0.5s;
 
     &--choosing {
 
-      width:80vh;
+      width:40vh;
 
     }
 
@@ -278,8 +284,9 @@ body {
       border-radius:9%/6%;
 
 
-    &:disabled {
-      background: #f9f9f9;
+    &--notJudge {
+      pointer-events:none;
+      opacity:0.6;
     }
 
 
@@ -292,7 +299,7 @@ body {
 
 
 
-      &:not([disabled]):hover {
+      &:hover {
           background-color:#f3f3f3;
       }
   }
@@ -577,6 +584,8 @@ body {
 
     margin-bottom:4px;
 
+
+    opacity:0.8;
 
     &.ng-enter {
       opacity:0;

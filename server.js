@@ -95,6 +95,10 @@ function nameValid(name) {
         isValid = false;
     }
 
+    if(name.length > 10) {
+        isValid = false;
+    }
+
     return isValid;
 }
 
@@ -107,7 +111,7 @@ function safeJoinGame(gameId, player, socket) {
         return true;
     } else {
         let currentGame = player.gameId;
-        if(currentGame !== null) {
+        if(currentGame !== null && typeof games[currentGame] !== "undefined") {
             console.log(currentGame);
             games[player.gameId].removePlayer(player);
             socket.leave(player.gameId);
@@ -140,8 +144,6 @@ function safeDeleteGame(gameId) {
         io.to(gameId).emit("game:failedJoin", {message: "This game has been deleted"});
         delete games[gameId];
     }
-    console.log(games, gameId);
-    console.trace(gameId);
 }
 
 function idFromName(name) {
@@ -388,7 +390,8 @@ io.on('connection', (socket) => {
 
         if(typeof playerToRemove !== 'undefined'
             && player.gameId === playerToRemove.gameId
-            && player.id in games[clients[socket.id].gameId].admins) {
+            && player.id in games[clients[socket.id].gameId].admins
+            && ! (playerToRemove.id in games[clients[socket.id].gameId].admins)) {
 
 
             io.to(playerToRemove.gameId).emit("game:playerLeave", {name: playerToRemove.name});
@@ -473,6 +476,8 @@ io.on('connection', (socket) => {
             if(player.myCards.indexOf(data.cardText) > -1) {
                 game.judgeCards[player.id] = data.cardText;
 
+                io.to(game.id).emit("gamePlay:playerPick", {name: player.name, pickedCard: true});
+
 
                 if(Object.keys(game.judgeCards).length  === Object.keys(game.players).length - 1) {
 
@@ -494,6 +499,7 @@ io.on('connection', (socket) => {
 
             if(typeof data.cardText === 'undefined') {
                 delete game.judgeCards[player.id]
+                io.to(game.id).emit("gamePlay:playerPick", {name: player.name, pickedCard: false});
             }
 
         }
