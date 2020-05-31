@@ -1,6 +1,6 @@
 quick:
 
-fix html injection
+
 
 
 fix asking for name twice on entry  (look at server side code and check if name is already set)
@@ -9,11 +9,12 @@ seeing when others select cards
 
 pressing back to get to main menu doesnt leave the game (look into $on with location
 
-press enter to select name
 
 say error message when setting max players
 
 weird dark bit in create game screen with mdlist card packs
+
+menu button doesnt actually leave game from sidebar
 
 
 slow:
@@ -47,4 +48,6 @@ all players selected acceleration
 
 
 make judge cards darkened when you're not the judge
+press enter to select name
+fix html injection
 

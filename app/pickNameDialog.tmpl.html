@@ -10,7 +10,7 @@
                 <md-input>
                     <md-input-container>
                         <label>Your Name</label>
-                        <input ng-model="inputUsername" ng-change="usrNameChange()">
+                        <input ng-model="inputUsername" ng-change="usrNameChange()" ng-keydown="$event.keyCode  === 13 && isNameValid && username !== '' && usrSetName()">
 
                         <div class="hint" style="color:red" ng-show="!isNameValid && inputUsername !== '' && inputUsername.length <= 10">This username is already taken</div>
                         <div class="hint" style="color:red" ng-show="inputUsername === ''">You must enter a username</div>

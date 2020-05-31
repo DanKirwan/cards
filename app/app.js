@@ -116,7 +116,9 @@ app.controller("dialogController", function(globals, $scope, socket, $mdDialog) 
 
 
     $scope.usrSetName = function() {
-        socket.emit("user:setName", {name: globals.username});
+        if($scope.isNameValid || globals.username !== '') {
+            socket.emit("user:setName", {name: globals.username});
+        }
 
         if($scope.isNameValid) {
          $mdDialog.cancel();

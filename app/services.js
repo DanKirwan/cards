@@ -179,7 +179,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
     gamePlay.pickJudgeCard = function(card) {
 
-        if (gamePlay.isJudge && gamePlay.judgeCards.indexOf(card) > -1) {
+        if (gamePlay.isJudge && gamePlay.judgeCards.indexOf(card) > -1 && gamePlay.judging) {
             card.selected = !card.selected
 
             if(card.selected) {
@@ -223,7 +223,12 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
         gamePlay.roundJudge = data.roundJudge;
 
-        game.players.forEach(p => p.isJudge = false);
+        game.players.forEach(p => {
+            p.isJudge = false
+            p.hasPicked = false;
+        });
+
+
         let pJudge = game.players[game.getIdxFromName(data.roundJudge)];
         if(typeof pJudge !== "undefined") pJudge.isJudge = true;
 
@@ -243,7 +248,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
         gamePlay.blackCard = data.blackCard.text;
 
-        //TODO blackcard.pick need sto be used!
+        //TODO blackcard.pick needs to be used!
 
         gamePlay.round = data.roundNo;
 
