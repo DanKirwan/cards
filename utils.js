@@ -108,6 +108,7 @@ exports.Game = class Game {
 
         this.judgeCards = {};
 
+        this.roundTimeout = null;
         this.roundTime = 10;
         this.currentRoundTime = this.roundTime;
         this.round = 0;
@@ -171,6 +172,7 @@ exports.Game = class Game {
             roundNo: this.round,
             isJudge: this.getJudgeId() === playerId,
             inJudging: this.inJudging,
+            roundJudge: this.players[this.getJudgeId()].name
         });
     }   //TODO add multiple card picking
 
@@ -237,11 +239,49 @@ exports.Game = class Game {
         this.judgeIdx %= Object.keys(this.players).length;
     }
 
+    startJudging() {
+        clearInterval(this.roundCounter);
+        //Runs after round is completed
+        if(this.judgeCards && Object.keys(this.judgeCards).length > 0) {
+            this.inJudging = true;
+            this.io.to(this.id).emit("gamePlay:judging", {
+                judgeCards: Object.values(this.judgeCards),
+            });
+
+            for (let playerId in this.judgeCards) {
+                this.consumeCard(this.judgeCards[playerId], playerId)
+            }
+
+
+            this.judgeCounter = setInterval(_ => {
+                if(this.currentJudgeTime > 0) this.currentJudgeTime --;
+            }, 1000);
+
+            this.judgeTimeout = setTimeout( _ => {
+                this.io.to(this.id).emit("gamePlay:alert", {message: "The Card Czar didn't select a card in time. No one wins the round"});
+                clearInterval(this.judgeCounter);
+                this.newRound();
+            }, this.judgeTime * 1000);
+        } else {
+
+            this.io.to(this.id).emit("gamePlay:alert", {message: "No cards were selected, moving on to next round"});
+            this.newRound();
+        }
+
+    }
+
 
     newRound() {
         this.round ++;
         this.currentRoundTime = this.roundTime;
         this.currentJudgeTime = this.judgeTime;
+
+
+        //make sure to clear all previous rounds timeouts and counters
+        clearTimeout(this.judgeTimeout);
+        clearTimeout(this.roundTimeout);
+        clearInterval(this.judgeCounter);
+        clearInterval(this.roundCounter);
 
         this.inJudging = false;
 
@@ -253,40 +293,13 @@ exports.Game = class Game {
 
         this.judgeCards = [];
 
-        let counter = setInterval(_ => {
+        this.roundCounter = setInterval(_ => {
             if(this.currentRoundTime > 0) this.currentRoundTime --;
         }, 1000);
 
-        setTimeout(_ => {
-            clearInterval(counter)
-            //Runs after round is completed
-            if(Object.keys(this.judgeCards).length > 0) {
-                this.inJudging = true;
-                this.io.to(this.id).emit("gamePlay:judging", {
-                    judgeCards: Object.values(this.judgeCards),
-                });
-
-                for (let playerId in this.judgeCards) {
-                    this.consumeCard(this.judgeCards[playerId], playerId)
-                }
-
-
-                this.judgeCounter = setInterval(_ => {
-                    if(this.currentJudgeTime > 0) this.currentJudgeTime --;
-                }, 1000);
-
-                this.judgeTimeout = setTimeout( _ => {
-                    this.io.to(this.id).emit("gamePlay:alert", {message: "The Card Czar didn't select a card in time. No one wins the round"});
-                    clearInterval(this.judgeCounter);
-                    this.newRound();
-                }, this.judgeTime * 1000);
-            } else {
-
-                this.io.to(this.id).emit("gamePlay:alert", {message: "No cards were selected, moving on to next round"});
-                this.newRound();
-            }
-
-        }, 1000*this.roundTime);
+        this.roundTimeout = setTimeout(_ => {
+            this.startJudging();
+        }, 1000*this.roundTime); //needs wrapper function for (this) context
 
     }
 

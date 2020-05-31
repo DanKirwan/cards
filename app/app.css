@@ -23,7 +23,7 @@ body {
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
   transition: all 0.25s;
   margin: 0;
-  z-index: 2;
+  z-index: 1;
   position: relative; }
   .card__inside, .card__inside:not([disabled]) {
     position: absolute;
@@ -116,17 +116,12 @@ body {
   height: 100%;
   overflow-y: scroll; }
   .judgeContainer__blackCard {
-    color: white;
-    transform: translate(-50%, 0);
-    width: 50%;
-    background-color: black;
-    left: 50%;
-    top: 50%;
-    margin-top: 100px;
-    margin-bottom: 50px; }
+    display: block;
+    width: 50vh;
+    margin: 100px auto 50px;
+    transition: 0.5s; }
     .judgeContainer__blackCard--choosing {
-      top: 15%;
-      height: 50%; }
+      width: 80vh; }
   .judgeContainer__confirmBtn {
     display: block;
     width: 80%;
@@ -147,12 +142,14 @@ body {
       transition: all 0.2s; }
   .judgeContainer__card {
     width: 100%;
-    white-space: normal; }
+    white-space: normal;
+    transition: 0.2s;
+    border-radius: 9%/6%; }
+    .judgeContainer__card:disabled {
+      background: #f9f9f9; }
     .judgeContainer__card--selected {
       z-index: 2;
       transform: scale(1.06); }
-    .judgeContainer__card:disabled {
-      background: #f9f9f9; }
     .judgeContainer__card:not([disabled]):hover {
       background-color: #f3f3f3; }
 
@@ -226,7 +223,8 @@ body {
       background-color: #e2e2e2; }
 
 .cg__toolbar {
-  background: black; }
+  background: black;
+  z-index: 5; }
 .cg__heading {
   text-align: center;
   margin: 4%;

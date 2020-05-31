@@ -2,7 +2,7 @@
 
     <md-toolbar layout="column">
 
-        <div class="md-toolbar-tools cg__toolbar">
+        <div class="md-toolbar-tools cg__toolbar" style="z-index: 10" ng-style = "!gamePlay.isJudge ? {'box-shadow' : ' 0 0 15px rgba(100, 100, 100, 100)'} : {'box-shadow' :'none'}" >
             <md-button ng-click="game.leave()" class="md-icon-button" aria-label="Main Menu">
                 <md-icon md-svg-icon="img/arrow_back-48dp.svg" style="fill:white;"></md-icon>
             </md-button>
@@ -20,7 +20,7 @@
             </div>
         </div>
 
-        <div ng-show="gamePlay.isJudge"  class="cg__toolbar" flex>
+        <div ng-show="gamePlay.isJudge"   ng-style = "gamePlay.isJudge ? {'box-shadow' : ' 0 0 15px rgba(100, 100, 100, 100)'} : {'box-shadow' :'none'}" class="cg__toolbar" flex>
             <div style="text-align:center;"> You are the Card Czar </div>
         </div>
 
@@ -58,13 +58,13 @@
 
 
         <black-card layout="column" ng-class="{'cardSelected': gamePlay.selectedCard != null  }" id="blackCard">
-            {{gamePlay.blackCard}}
+            <div ng-bind-html="gamePlay.blackCard"></div>
         </black-card>
 
 
         <white-card ng-show="gamePlay.selectedCard !== null" id="selectedCard"  ng-click = "gamePlay.selectCard(gamePlay.selectedCard)">
 
-                {{gamePlay.selectedCard.text}}
+            {{gamePlay.selectedCard.text}}
 
         </white-card>
 
@@ -92,15 +92,12 @@
             Confirm Card Selection
         </md-button>
 
-        <md-grid-list  md-cols = "{{getCardColumns()}}" md-row-height = "63:88" md-gutter = "0.5%" style="margin-left:8px; margin-right:8px;">
+        <md-grid-list  md-cols = "{{getCardColumns()}}" md-row-height = "2:3" md-gutter = "0.5%" style="margin-left:8px; margin-right:8px;">
 
             <md-grid-tile ng-repeat="card in gamePlay.judgeCards">
-                <md-button ng-disabled="!gamePlay.isJudge" class="card judgeContainer__card  " style="height: 100%" ng-class="{'judgeContainer__card--selected': card.selected}" ng-click = 'gamePlay.pickJudgeCard(card)'>
-                    <div class = "cardContainer__card__textContainer">
-                        {{card.text}}
-                    </div>
-
-                </md-button>
+                <white-card ng-disabled="!gamePlay.isJudge" class="judgeContainer__card  " ng-class="{'judgeContainer__card--selected': card.selected}" ng-click = 'gamePlay.pickJudgeCard(card)'>
+                        <div ng-bind-html="card.text"></div>
+                </white-card>
 
             </md-grid-tile>
 

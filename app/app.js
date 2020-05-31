@@ -1,6 +1,6 @@
 
 
-const app = angular.module("app",['ngMessages','ngAnimate','ngAria','ngMaterial', 'ngRoute','ngclipboard', 'cards.services']);
+const app = angular.module("app",['ngMessages','ngAnimate','ngAria','ngMaterial', 'ngRoute','ngclipboard', 'cards.services', 'ngSanitize']);
 app.config(function($routeProvider) {
     $routeProvider
         .when("/", {

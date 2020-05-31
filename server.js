@@ -63,6 +63,9 @@ let createdSession = session({
 }); //TODO figure out what this should really be called
 
 app.use(createdSession);
+io.use(sharedSession(createdSession,  {
+    autoSave:true
+}));
 
 
 app.use(express.static("app"));
@@ -144,7 +147,6 @@ function safeDeleteGame(gameId) {
 function idFromName(name) {
     let nOut = null;
     for(let p in clients) {
-        console.log(clients[p].name + " - " + name);
         if(clients[p].name === name) {
             nOut = p;
         }
@@ -156,8 +158,15 @@ function idFromName(name) {
 
 function gameLeave(player, socket) {
 
-    //TODO check if in game and if so you cant play with less than 3 people
     let gameId = player.gameId; //Must be saved as it is deleted in safeLeaveGame()
+
+
+    let gameJudgeId = undefined;
+    if(typeof games[gameId] !== 'undefined') {
+        gameJudgeId = games[gameId].getJudgeId();
+    }
+
+
     safeLeaveGame(player.gameId, player, socket);
 
     io.to(gameId).emit("game:playerLeave", {name: player.name});
@@ -165,7 +174,7 @@ function gameLeave(player, socket) {
     let game = games[gameId];
     if(typeof game !== 'undefined') {
 
-        if(Object.keys(game.players).length === 0) {
+        if(Object.keys(game.players).length === 0) { //TODO cange this to < 3 and alert players
             console.log(`Deleting empty game ${gameId}`);
             safeDeleteGame(gameId);
 
@@ -180,12 +189,15 @@ function gameLeave(player, socket) {
 
 
         }
+
+        if(game.inGame && gameJudgeId === player.id) {
+            io.to(game.id).emit("gamePlay:alert", {message: "The Card Czar left the game, moving on to new round"})
+
+            game.newRound();
+        }
     }
 }
 
-io.use(sharedSession(createdSession,  {
-    autoSave:true
-}));
 
 
 //websocket handling
@@ -455,18 +467,25 @@ io.on('connection', (socket) => {
     socket.on("gamePlay:pickCard", function(data) {
 
         //TODO make it so that if all players have picked cards then the timer goes to 10 seconds and they get a warning popup
-        if(games[player.gameId] !== undefined) {
+        if(games[player.gameId] !== undefined && !games[player.gameId].inJudging) {
             let game = games[player.gameId];
 
             if(player.myCards.indexOf(data.cardText) > -1) {
                 game.judgeCards[player.id] = data.cardText;
 
 
-                /*if(Object.keys(game.judgeCards).length  === Object.keys(game.players).length - 1) {
+                if(Object.keys(game.judgeCards).length  === Object.keys(game.players).length - 1) {
 
                     if(game.currentRoundTime > 3) {
                         io.to(game.id).emit("gamePlay:accelTimer");
                         game.currentRoundTime = 3;
+                        clearTimeout(game.roundTimeout);
+                        game.roundTimeout = setTimeout(_ => {
+
+                            game.startJudging();
+                        }, 3000);
+                        game.currentRoundTime = 3;
+
 
 
                     }

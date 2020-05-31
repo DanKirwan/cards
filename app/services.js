@@ -138,6 +138,8 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
     gamePlay.judgeTime = 30; //TODO make this a variable in advanced settings
 
+    gamePlay.roundJudge = undefined;
+
 
     //gameplay
 
@@ -174,7 +176,8 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
     };
 
     gamePlay.pickJudgeCard = function(card) {
-        if (gamePlay.judgeCards.indexOf(card) > -1) {
+
+        if (gamePlay.isJudge && gamePlay.judgeCards.indexOf(card) > -1) {
             card.selected = !card.selected
 
             if(card.selected) {
@@ -216,8 +219,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
         $interval.cancel(globals.timer);
 
-
-
+        gamePlay.roundJudge = data.roundJudge;
         gamePlay.roundTime = data.roundTime;
         gamePlay.judgeTime = data.judgeTime;
 
@@ -237,11 +239,13 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
         gamePlay.round = data.roundNo;
 
-        gamePlay.isJudge = false; //data.isJudge;
-        gamePlay.judging = false; //data.inJudging;
+        gamePlay.isJudge = data.isJudge;
+        gamePlay.judging = data.inJudging;
 
         if(gamePlay.isJudge) {
             Util.showInfo("You are the Card Czar for this round! Wait for all players to pick a card", 5)
+        } else {
+            Util.showInfo(`This round's Card Czar is ${data.roundJudge}`, 5);
         }
 
 
@@ -264,7 +268,14 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
 
     socket.on("gamePlay:accelTimer", function() {
-        gamePlay.roundTime = 3;
+
+        $interval.cancel(globals.timer);
+
+        gamePlay.roundTime = 3; //TODO this needs to reset the timer too so it doesnt go into -s with lag
+        globals.timer = $interval(function() {gamePlay.roundTime --}, 1000, 3);
+
+        Util.showInfo("All players have selected cards, judging in 3 seconds", 3);
+
     });
 
 
@@ -569,9 +580,9 @@ cServices.factory("lobby", function(game, socket, globals) {
 
     socket.on("lobby:info", function(data) {
 
-
+        lobby.cardPacks = [];
         for(let pack of data.cardPacks) {
-            lobby.cardPacks = [];
+
             lobby.cardPacks.push(new CardPack(pack.name, pack.desc));
         }
 
@@ -618,9 +629,6 @@ cServices.directive("blackCard", function() {
                 '</div>' +
             '</div>',
 
-        link: function(scope, elem, attrs) {
-            angular.element(elem).css({"margin":"0"});
-        }
     }
 });
 

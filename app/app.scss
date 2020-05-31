@@ -39,9 +39,10 @@ body {
   box-shadow: 0 0 15px rgba(0,0,0,0.4);
   transition: all 0.25s;
   margin:0;
-  z-index:2;
+  z-index:1;
 
   position:relative;
+
 
 
 
@@ -214,19 +215,17 @@ body {
   &__blackCard {
 
 
-    color:white;
-    transform:translate(-50%, 0);
-    width:50%;
-    background-color:black;
-    left:50%;
-    top:50%;
+    display:block;
 
-    margin-top:100px;
-    margin-bottom:50px;
+    width:50vh;
+    margin: 100px auto 50px;
+
+    transition:0.5s;
 
     &--choosing {
-      top:15%;
-      height:50%;
+
+      width:80vh;
+
     }
 
 
@@ -274,24 +273,27 @@ body {
       width:100%;
       white-space:normal;
 
+      transition:0.2s;
 
-       &--selected {
-         z-index:2;
-         transform:scale(1.06);
-
+      border-radius:9%/6%;
 
 
+    &:disabled {
+      background: #f9f9f9;
+    }
 
+
+      &--selected {
+          z-index:2;
+          transform:scale(1.06);
       }
 
-      &:disabled {
-        background: #f9f9f9;
-
-      }
-        &:not([disabled]):hover {
 
 
-        background-color:#f3f3f3;
+
+
+      &:not([disabled]):hover {
+          background-color:#f3f3f3;
       }
   }
 
@@ -441,9 +443,10 @@ body {
 //creating game
 .cg {
 
-  //TODO buttons for greategame not working on safari
   &__toolbar {
     background:black;
+    z-index:5;
+
 
   }
 
