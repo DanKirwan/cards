@@ -24,7 +24,7 @@ app.config(function($routeProvider) {
 
 
 
-app.controller("globalController", function($location, gamePlay, $scope, $mdDialog, $mdMedia, socket, globals, Util) {
+app.controller("globalController", function($window, $location, gamePlay, $scope, $mdDialog, $mdMedia, socket, globals, Util) {
 
     $scope.Util = Util;
     $scope.pickNameDialog = function() {
@@ -41,6 +41,7 @@ app.controller("globalController", function($location, gamePlay, $scope, $mdDial
 
             }
         )
+
     };
 
     socket.on("user:getName", function() {
@@ -100,7 +101,7 @@ app.controller("routingController", function($scope, socket, globals, $routePara
 
 
 
-app.controller("dialogController", function(globals, $scope, socket, $mdDialog) {
+app.controller("dialogController", function(globals, $scope, socket, $mdDialog, $window) {
 
     $scope.inputUsername = '';
 
@@ -125,6 +126,8 @@ app.controller("dialogController", function(globals, $scope, socket, $mdDialog) 
         }
 
     }
+
+
 
 
 
@@ -243,7 +246,18 @@ app.controller("menuController", function (game, gamePlay, globals, $rootScope, 
 
 
 
-app.controller("cardController", function(globals, game, socket, gamePlay, $scope, $mdSidenav, $mdMedia, $timeout, $routeParams, $interval) {
+app.controller("cardController", function($location, $mdDialog, globals, game, socket, gamePlay, $scope, $mdSidenav, $mdMedia, $timeout, $routeParams, $interval) {
+
+
+    $scope.$mdMedia = $mdMedia;
+
+
+    $scope.$on("$destroy", function() {
+
+        game.leave()
+
+    });
+
 
     $scope.initGameplay = function () {
         globals.gameId = $routeParams.gameCode;
@@ -262,26 +276,28 @@ app.controller("cardController", function(globals, game, socket, gamePlay, $scop
 
     };
 
+    $scope.confirmQuit = function() {
+
+        let confirm = $mdDialog.confirm()
+            .title("Are you sure you want to Quit?")
+            .textContent("You will loose all current points")
+            .ok("Main Menu")
+            .cancel("Continue Playing")
+
+
+        $mdDialog.show(confirm).then(function() {
+            game.leave()
+        }, function() {
+           //Do nothing :)
+        });
+
+    }
+
 
     $scope.gamePlay = gamePlay;
     $scope.game = game;
     $scope.globals = globals;
 
-    $scope.selectedCard = null;
-    $scope.cardsFocussed = true;
-
-    $scope.popUpMessage = '';
-    $scope.showPopUp = false;
-
-
-
-    $scope.focusCards = function () {
-        $scope.cardsFocussed = true;
-    };
-
-    $scope.unfocusCards = function () {
-        $scope.cardsFocussed = false;
-    };
 
 
 

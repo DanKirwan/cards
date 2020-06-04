@@ -8,9 +8,9 @@
                 <h3>This is the name other players will see you with in game</h3>
 
                 <md-input>
-                    <md-input-container>
+                    <md-input-container md-autofocus="">
                         <label>Your Name</label>
-                        <input ng-model="inputUsername" ng-change="usrNameChange()" ng-keydown="$event.keyCode  === 13 && isNameValid && username !== '' && usrSetName()">
+                        <input  ng-model="inputUsername" ng-change="usrNameChange()" ng-keydown="$event.keyCode  === 13 && isNameValid && username !== '' && usrSetName()" md-autofocus>
 
                         <div class="hint" style="color:red" ng-show="!isNameValid && inputUsername !== '' && inputUsername.length <= 10">This username is already taken</div>
                         <div class="hint" style="color:red" ng-show="inputUsername === ''">You must enter a username</div>

@@ -3,12 +3,12 @@
     <md-toolbar layout="column">
 
         <div class="md-toolbar-tools cg__toolbar" style="z-index: 10" ng-style = "!gamePlay.isJudge ? {'box-shadow' : ' 0 0 15px rgba(100, 100, 100, 100)'} : {'box-shadow' :'none'}" >
-            <md-button ng-click="game.leave()" class="md-icon-button" aria-label="Main Menu">
+            <md-button ng-click="confirmQuit()" class="md-icon-button" aria-label="Main Menu">
                 <md-icon md-svg-icon="img/arrow_back-48dp.svg" style="fill:white;"></md-icon>
             </md-button>
 
             <h2 flex  style="text-align:center;" ng-hide="gamePlay.judging">Time Left: {{gamePlay.roundTime}}</h2>
-            <h2 flex  style="text-align:center;" ng-show="gamePlay.judging">Judging Countdown: {{gamePlay.judgeTime}}</h2>
+            <h2 flex  style="text-align:center;" ng-show="gamePlay.judging">Next Round: {{gamePlay.judgeTime}}</h2>
 
 
 
@@ -26,21 +26,13 @@
 
     </md-toolbar>
 
-    <section flex layout="horizontal">
+    <md-content flex layout="horizontal">
 
-        <md-sidenav class="md-sidenav-left sideNav" md-component-id="left" md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()" md-is-locked-open="$mdMedia('gt-sm')">
+        <md-sidenav ng-style="$mdMedia('gt-sm') ? {'position' : 'static'} : {'position' : 'absolute'} "  class="md-sidenav-left sideNav" md-component-id="left" md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()" md-is-locked-open="$mdMedia('gt-sm')">
 
 
-            <md-toolbar>
-
-                <!-- md-toolbar-tools see above -->
-                <h1>Test :)</h1>
-            </md-toolbar>
 
             <md-content>
-                <a class = "md-button" md-whiteframe="5" href="#!" style="color:black">Menu</a>
-
-
 
                 <h3 flex class = "cg__heading"> Players</h3>
                 <md-list>
@@ -70,7 +62,7 @@
         </md-sidenav>
 
 
-        <div id="gameContainer" flex>
+        <div id="gameContainer"  flex>
 
             <div class="selectingContainer" ng-hide="gamePlay.judging || gamePlay.isJudge;">
 
@@ -134,7 +126,7 @@
             </div>
 
         </div>
-    </section>
+    </md-content>
 
 
 
