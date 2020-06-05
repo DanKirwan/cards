@@ -5,31 +5,24 @@ quick:
 
 fix asking for name twice on entry  (look at server side code and check if name is already set)
 
-seeing when others select cards
-
-pressing back to get to main menu doesnt leave the game (look into $on with location
 
 
-say error message when setting max players
+
 
 weird dark bit in create game screen with mdlist card packs
 
-menu button doesnt actually leave game from sidebar
 
 
 slow:
 
+fix session stuff
 
 add support for multi pick cards
 
 add changing name ability
 
-
-sidebar needs fixing
-
 better play again system
 
-advanced settings
 
 
 
@@ -50,4 +43,11 @@ all players selected acceleration
 make judge cards darkened when you're not the judge
 press enter to select name
 fix html injection
+
+advanced settings
+sidebar needs fixing
+say error message when setting max players
+seeing when others select cards
+pressing back to get to main menu doesnt leave the game (look into $on with location
+
 

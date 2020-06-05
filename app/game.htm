@@ -104,17 +104,17 @@
 
 
 
-                <black-card layout="column" ng-class="{'cardSelected': gamePlay.selectedCard != null  }" id="blackCard">
+                <black-card layout="column"  id="blackCard">
                     <ng-bind-html
-                            ng-bind-html="gamePlay.blackCard">
+                            ng-bind-html="gamePlay.blackCard.text">
                     </ng-bind-html>
                 </black-card>
 
 
-                <white-card ng-show="gamePlay.selectedCard !== null" id="selectedCard"  ng-click = "gamePlay.selectCard(gamePlay.selectedCard)">
+                <white-card ng-show="gamePlay.selectedCards.length > 0" class="selectedCard" ng-repeat="card in gamePlay.selectedCards track by $index"   ng-style="$index === 0 ?  {'margin-left':'0'} : {}" ng-click = "gamePlay.selectCard(card)">
 
                     <ng-bind-html
-                            ng-bind-html="gamePlay.selectedCard.text">
+                            ng-bind-html="card.text">
                     </ng-bind-html>
 
                 </white-card>
@@ -138,7 +138,7 @@
                 <black-card class="judgeContainer__blackCard" ng-class = "{'judgeContainer__blackCard--choosing' : judgeChoosing}" ng-click="judgeChoosing = !judgeChoosing" >
 
                     <ng-bind-html
-                            ng-bind-html="gamePlay.blackCard">
+                            ng-bind-html="gamePlay.blackCard.text">
                     </ng-bind-html>
 
                 </black-card>

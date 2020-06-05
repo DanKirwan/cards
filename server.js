@@ -482,14 +482,27 @@ io.on('connection', (socket) => {
     });
 
 
-    socket.on("gamePlay:pickCard", function(data) {
+    socket.on("gamePlay:pickCards", function(data) {
 
         //TODO make it so that if all players have picked cards then the timer goes to 10 seconds and they get a warning popup
         if(games[player.gameId] !== undefined && !games[player.gameId].inJudging) {
             let game = games[player.gameId];
+            let cards = data.cards;
 
-            if(player.myCards.indexOf(data.cardText) > -1) {
-                game.judgeCards[player.id] = data.cardText;
+            let validCards = true;
+            if(typeof cards !== "undefined") {
+                for(let c of cards) {
+                    if(player.myCards.indexOf(c) === -1) {
+                        validCards = false;
+                    }
+                }
+            } else {
+                validCards = false;
+            }
+
+
+            if(validCards) {
+                game.judgeCards[player.id] = cards;
 
                 io.to(game.id).emit("gamePlay:playerPick", {name: player.name, pickedCard: true});
 
@@ -512,18 +525,16 @@ io.on('connection', (socket) => {
                 } //Check if all players have selected a card and accelerate timer*/
             }
 
-            if(typeof data.cardText === 'undefined') {
+            if(typeof data.cards === 'undefined') {
                 delete game.judgeCards[player.id]
                 io.to(game.id).emit("gamePlay:playerPick", {name: player.name, pickedCard: false});
             }
 
         }
 
-        console.log("card picked: " + data.cardText);
+        console.log("cards picked: " + data.cards);
     });
 
-
-    //TODO socket.on("gamePlay:judgeChoose...
 
     socket.on("gamePlay:judgeChoose", function(data) {
 

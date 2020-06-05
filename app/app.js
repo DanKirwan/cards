@@ -284,7 +284,7 @@ app.controller("cardController", function($location, $mdDialog, globals, game, s
             .title("Are you sure you want to Quit?")
             .textContent("You will loose all current points")
             .ok("Main Menu")
-            .cancel("Continue Playing")
+            .cancel("Continue")
 
 
         $mdDialog.show(confirm).then(function() {

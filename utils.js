@@ -250,7 +250,10 @@ exports.Game = class Game {
             });
 
             for (let playerId in this.judgeCards) {
-                this.consumeCard(this.judgeCards[playerId], playerId)
+                for(let c of this.judgeCards[playerId]) {
+                    this.consumeCard(c, playerId)
+                }
+
             }
 
 
@@ -304,9 +307,9 @@ exports.Game = class Game {
 
     }
 
-    judgeChooseCard(cardText) {
+    judgeChooseCard(cards) {
         for(let pId in this.judgeCards) {
-            if(this.judgeCards[pId] === cardText) {
+            if(this.judgeCards[pId] === cards) {
                 this.players[pId].points ++;
                 this.io.to(this.id).emit("gamePlay:roundWin", {playerName: this.players[pId].name});
 

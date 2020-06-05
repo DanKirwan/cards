@@ -134,12 +134,12 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
     gamePlay.round = 1;
     gamePlay.isJudge = null;
     gamePlay.judging = false;
-    gamePlay.selectedCard = null;
+    gamePlay.selectedCards = [];
     gamePlay.judgeCards = [];
     gamePlay.roundTime = 60;
     gamePlay.chosenJudgeCard = null;
 
-    gamePlay.judgeTime = 60; //TODO make this a variable in advanced settings
+    gamePlay.judgeTime = 60;
 
     gamePlay.roundJudge = undefined;
 
@@ -152,32 +152,43 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
     gamePlay.deselectAll = function() {
         gamePlay.myHand.forEach(card => card.selected = false);
-        gamePlay.selectedCard = null;
+        gamePlay.selectedCards = [];
     };
 
 
     gamePlay.selectCard = function(card) {
-
         if(!gamePlay.isJudge) {
-            gamePlay.selectedCard = card;
+            if(card.selected) {
+                card.selected = false;
+
+                if(gamePlay.selectedCards.length === gamePlay.blackCard.pick) {
+                    socket.emit("gamePlay:pickCards", {cards: undefined});
+                }
+
+                gamePlay.selectedCards = gamePlay.selectedCards.filter(c => c !== card);
 
 
-            if (card.selected) {
-                socket.emit("gamePlay:pickCard", {cardText: undefined});
-
-                gamePlay.deselectAll();
             } else {
-                socket.emit("gamePlay:pickCard", {cardText: card.text});
+                if(gamePlay.selectedCards.length === gamePlay.blackCard.pick) {
+                    let cToRemove = gamePlay.selectedCards.pop();
+                    cToRemove.selected = false;
+                }
 
-                for (let cTest of gamePlay.myHand) {
-                    console.log(card);
-                    console.log(cTest);
-                    cTest.selected = card === cTest;
+                gamePlay.selectedCards.push(card);
+                card.selected = true;
+
+                let cardArr = [];
+                gamePlay.selectedCards.forEach(c => cardArr.push(c.text));
+
+
+                if (gamePlay.selectedCards.length === gamePlay.blackCard.pick) {
+                    socket.emit("gamePlay:pickCards", {cards: cardArr})
                 }
 
             }
-            console.log(gamePlay.myHand);
         }
+
+
     };
 
     gamePlay.pickJudgeCard = function(card) {
@@ -240,7 +251,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
         gamePlay.judgeTime = data.judgeTime;
         gamePlay.maxPoints = data.maxPoints;
 
-        gamePlay.selectedCard = null;
+        gamePlay.selectedCards = [];
 
         gamePlay.chosenJudgeCard = null;
 
@@ -250,13 +261,13 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
             gamePlay.myHand.push(new WhiteCard(cardText))
         }
 
-        gamePlay.blackCard = data.blackCard.text;
+        gamePlay.blackCard = data.blackCard;
 
         //TODO blackcard.pick needs to be used!
 
         gamePlay.round = data.roundNo;
 
-        gamePlay.isJudge = data.isJudge;
+        gamePlay.isJudge =  false; //data.isJudge;
         gamePlay.judging = data.inJudging;
 
         if(gamePlay.isJudge) {
