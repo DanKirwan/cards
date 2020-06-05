@@ -172,7 +172,8 @@ exports.Game = class Game {
             roundNo: this.round,
             isJudge: this.getJudgeId() === playerId,
             inJudging: this.inJudging,
-            roundJudge: this.players[this.getJudgeId()].name
+            roundJudge: this.players[this.getJudgeId()].name,
+            maxPoints: this.maxPoints,
         });
     }   //TODO add multiple card picking
 
@@ -364,7 +365,8 @@ exports.Game = class Game {
             isAdmin: (player.socket.id in this.admins),
             players: this.getPlayersToBroadcast(),
             inGame: this.inGame,
-            maxPlayers: this.maxPlayers
+            maxPlayers: this.maxPlayers,
+            name: this.name,
 
             //TODO make this object return from a function inside utils.Game
         });

@@ -184,8 +184,10 @@ app.controller("menuController", function (game, gamePlay, globals, $rootScope, 
 
 
     $scope.showCardPacks = false;
+    $scope.showAdvanced = false;
     $scope.lobby = lobby;
     $scope.game = game;
+    $scope.gamePlay = gamePlay;
     $scope.globals = globals;
 
 
@@ -208,7 +210,7 @@ app.controller("menuController", function (game, gamePlay, globals, $rootScope, 
 
 
     $scope.startGame = function() {
-        game.begin();
+        gamePlay.begin();
     };
 });
 

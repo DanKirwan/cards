@@ -429,7 +429,7 @@ io.on('connection', (socket) => {
 
     //actual gameplay logic
 
-    socket.on("game:begin", function(data) {
+    socket.on("gamePlay:begin", function(data) {
 
         //TODO send selected cardpacks back to server
         let gameId = player.gameId;
@@ -441,19 +441,34 @@ io.on('connection', (socket) => {
 
             game.setMaxPlayers(data.maxPlayers);
             game.name = data.name;
+            game.maxPoints = Number.isInteger(data.maxPoints)
+                    && data.maxPoints > 0
+                    && data.maxPoints < 15
+                    ? data.maxPoints : 5;
+
+            game.roundTime = Number.isInteger(data.roundTime)
+                    && data.roundTime > 10
+                    && data.roundTime < 10000
+                    ? data.roundTime : 60;
+
+            game.judgeTime = Number.isInteger(data.judgeTime)
+                    && data.judgeTime > 10
+                    && data.judgeTime < 10000
+                    ? data.judgeTime : 60;
+
+
+
 
             game.inGame = true;
 
 
+
             if(playerCount > 0 && playerCount <= game.maxPlayers) { //TODO make it playerCount > 2 instead
-
-
                 game.populate();
 
 
 
                 game.newRound();
-                //TODO add players joining once the game has started and add their hand and send it to them
 
             } else {
                 socket.emit("game:failedStart", {message: "Not enough players in the lobby!"});

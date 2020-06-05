@@ -21,8 +21,8 @@
     <h1 flex  ng-hide="game.isAdmin" style="text-align:center;"> Waiting for game to start</h1>
 
 
-    <md-button ngclipboard data-clipboard-text="www.somecoolname.com/{{globals.gameId}}" class = "cg__shareLink" ng-mouseenter = "shareHovered = true" ng-mouseleave="shareHovered = false" flex>
-        <div ng-show = "shareHovered">www.somecoolname.com/{{globals.gameId}}</div>
+    <md-button ngclipboard data-clipboard-text="{{globals.url}}/{{globals.gameId}}" class = "cg__shareLink" ng-mouseenter = "shareHovered = true" ng-mouseleave="shareHovered = false" flex>
+        <div ng-show = "shareHovered">{{globals.url}}/{{globals.gameId}}</div>
         <div ng-hide = "shareHovered">Click to copy game link</div>
     </md-button>
 
@@ -60,8 +60,8 @@
         </form>
 
 
-        <md-button flex ng-click="showCardPacks = !showCardPacks" class = "cg__btn" layout="row"> <!-- needs styling work -->
-            <div flex> Card Packs</div>
+        <md-button flex ng-click="showCardPacks = !showCardPacks" class = "cg__btn" layout="row">
+            <div flex>Card Packs</div>
             <md-icon md-svg-icon="img/join_game.svg"  style="transition: all 0.2s;" ng-style="showCardPacks ? {transform: 'rotate(90deg)'} : {transform:'none'}"></md-icon>
         </md-button>
 
@@ -80,10 +80,53 @@
 
         </md-list>
 
-        <md-button class = "cg__btn">
-            Advanced Settings
-
+        <md-button class = "cg__btn" ng-click="showAdvanced = !showAdvanced" layout="row" >
+            <div flex>Advanced Settings</div>
+            <md-icon md-svg-icon="img/join_game.svg"  style="transition: all 0.2s;" ng-style="showAdvanced ? {transform: 'rotate(90deg)'} : {transform:'none'}"></md-icon>
         </md-button>
+
+        <form layout="column" name="advancedForm" ng-show="showAdvanced" class="cg__advanced">
+
+            <md-input-container class="cg__advanced__input"   >
+                <label>Maximum Points</label>
+                <input name="maxPoints" type="number" ng-model = "gamePlay.maxPoints" step="1" min="1" max = "20" style="border-color:black;" value="{{maxPoints}}" >
+
+                <div ng-messages="advancedForm.maxPoints.$error" multiple md-auto-hide="false">
+                    <div ng-message="min">You cant have a lower value than 1</div>
+                    <div ng-message="max">Maximum Score possible is 20</div>
+                </div>
+            </md-input-container>
+
+
+            <md-input-container class="cg__advanced__input"   >
+                <label>Card selection Time</label>
+
+                <input  name="roundTime" type="number" ng-model="gamePlay.roundTime" step="1" min="10" max="10000" style="border-color:black;"  value="{{roundTime}}">
+
+
+                <div ng-messages="advancedForm.roundTime.$error" multiple md-auto-hide="false">
+                    <div ng-message="min">How are you going to play a round in less than 10 seconds</div>
+                    <div ng-message="max">Someone will die before you finish this game</div>
+                </div>
+
+            </md-input-container>
+
+
+            <md-input-container class="cg__advanced__input">
+                <label>Judging Time</label>
+                <input name="judgeTime" type="number" ng-model="gamePlay.judgeTime" step="1" min = "20" max ="10000" style="border-color:black;" value="{{judgeTime}}">
+
+
+                <div ng-messages="advancedForm.judgeTime.$error" multiple md-auto-hide="false">
+                    <div ng-message="min">How are you going to pick good cards in less than 20 seconds?</div>
+                    <div ng-message="max">You need new friends that spend less time making decisions</div>
+                </div>
+            </md-input-container>
+
+        </form>
+
+    </div>
+
 
 
     </div>

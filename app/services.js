@@ -36,6 +36,7 @@ cServices.factory("globals", function() {
         timer: null, //Used as the universal countdown which we can cancel before setting another
         players: [],
         gameId: '',
+        url:'blackandwhitecards.com',
     }
 });
 
@@ -135,12 +136,14 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
     gamePlay.judging = false;
     gamePlay.selectedCard = null;
     gamePlay.judgeCards = [];
-    gamePlay.roundTime = 0;
+    gamePlay.roundTime = 60;
     gamePlay.chosenJudgeCard = null;
 
-    gamePlay.judgeTime = 30; //TODO make this a variable in advanced settings
+    gamePlay.judgeTime = 60; //TODO make this a variable in advanced settings
 
     gamePlay.roundJudge = undefined;
+
+    gamePlay.maxPoints = 5;
 
 
     //gameplay
@@ -235,6 +238,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
         gamePlay.roundTime = data.roundTime;
         gamePlay.judgeTime = data.judgeTime;
+        gamePlay.maxPoints = data.maxPoints;
 
         gamePlay.selectedCard = null;
 
@@ -279,6 +283,17 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
     });
 
+    gamePlay.begin = function() {
+        socket.emit("gamePlay:begin", {
+            name: game.name,
+            maxPlayers: game.maxPlayers,
+            maxPoints: gamePlay.maxPoints,
+            roundTime: gamePlay.roundTime,
+            judgeTime: gamePlay.judgeTime
+
+
+        });
+    };
 
     socket.on("gamePlay:accelTimer", function() {
 
@@ -479,12 +494,7 @@ cServices.factory("game", function(Util, socket, globals, Player, $location, $md
 
     };
 
-    game.begin = function() {
-        socket.emit("game:begin", {
-            name: game.name,
-            maxPlayers: game.maxPlayers
-        });
-    };
+
 
 
     socket.on("game:maxPlayers", function(data) {

@@ -34,7 +34,40 @@
 
             <md-content>
 
-                <h3 flex class = "cg__heading"> Players</h3>
+
+                <h2 flex class="cg__heading" >Info</h2>
+                <md-list>
+
+                    <md-list-item>
+                        <h4 flex>Your Name</h4>
+                        {{globals.username}}
+                    </md-list-item>
+
+                    <md-list-item>
+                        <h4 flex>Players</h4>
+                        {{game.players.length}}/{{game.maxPlayers}}
+                    </md-list-item>
+
+                    <md-list-item>
+                        <h4 flex>Winning Score</h4>
+                        {{gamePlay.maxPoints}}
+                    </md-list-item>
+
+                    <md-list-item ng-show="game.name != undefined">
+                        <h4 flex>Game Name</h4>
+                        {{game.name}}
+                    </md-list-item>
+
+
+
+                </md-list>
+
+
+
+                <h3 ng-show="game.isAdmin" style="text-align:center">You are Game Admin</h3>
+
+
+                <h2 flex class = "cg__heading" style="padding-top: 10vh;"> Players</h2>
                 <md-list>
                     <md-list-item ng-repeat="player in game.players">
                         <h3 style="padding-right:20px;">{{player.name}}</h3>
@@ -56,13 +89,16 @@
                     </md-list-item>
                 </md-list>
 
+
+
+
             </md-content>
 
 
         </md-sidenav>
 
 
-        <div id="gameContainer"  flex>
+        <div id="gameContainer"  flex md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()">
 
             <div class="selectingContainer" ng-hide="gamePlay.judging || gamePlay.isJudge;">
 
@@ -97,7 +133,7 @@
 
             <!-- Page setup when judge -->
 
-            <div style="background:grey;" ng-controller = "judgeController" class="judgeContainer" ng-show = "gamePlay.judging || gamePlay.isJudge;"  md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()">
+            <div style="background:grey;" ng-controller = "judgeController" class="judgeContainer" ng-show = "gamePlay.judging || gamePlay.isJudge;"   md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()">
 
                 <black-card class="judgeContainer__blackCard" ng-class = "{'judgeContainer__blackCard--choosing' : judgeChoosing}" ng-click="judgeChoosing = !judgeChoosing" >
 
