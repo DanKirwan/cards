@@ -336,50 +336,28 @@ app.controller("cardController", function($location, $mdDialog, globals, game, s
 });
 
 
-app.controller("judgeController", function ($scope, $mdMedia) {
+app.controller("judgeController", function ($scope, $mdMedia, gamePlay) {
     //Judge Setup
-    $scope.chosenJudgeCard = null;
-
-
-    class JudgeCard {
-        constructor(text) {
-            this.text = text;
-            this.selected = false;
-        }
-
-        onClick() {
-            let selected = this.selected;
-            for (let x = 0; x < $scope.judgeCards.length; x++) {
-                let card = $scope.judgeCards[x];
-                card.selected = false;
-            }
-
-            this.selected = !selected;
-
-            if(this.selected) $scope.chosenJudgeCard = this;
-            else $scope.chosenJudgeCard = null;
-            console.debug(this.text + " Seleceted");
-        }
-    }
-
-    $scope.judgeCards = [
-        new JudgeCard('TestOne'),
-        new JudgeCard('TestTwo'),
-        new JudgeCard('TestOne'),
-        new JudgeCard('TestTwo'),
-        new JudgeCard('TestOne'),
-        new JudgeCard('TestTwo')
-    ];
-
-
-
     $scope.judgeChoosing = true;
 
+    $scope.tempCards = [
+        ["test1", "test2","a"],
+        ["test3", "test4","b"],
+        ["test5", "test6","c"]
+    ];
 
-
-    $scope.confirmJudgeCard = function () {
-        //send stuff to server about winning card
-
+    $scope.getColumns = function() {
+        if($mdMedia('xs')) {
+            return gamePlay.blackCard.pick > 1 ? 90 : 45;
+        } else if($mdMedia("gt-md")) {
+            if(gamePlay.blackCard.pick > 3) return 45;
+            else if(gamePlay.blackCard.pick > 1) return 30;
+            else return 25;
+        } else {
+            if(gamePlay.blackCard.pick > 3) return 90;
+            else if(gamePlay.blackCard.pick > 1) return 45;
+            else return 30;
+        }
     };
 
 

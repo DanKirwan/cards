@@ -501,7 +501,7 @@ io.on('connection', (socket) => {
             }
 
 
-            if(validCards) {
+            if(validCards && cards.length === game.currentBlackCard.pick) {
                 game.judgeCards[player.id] = cards;
 
                 io.to(game.id).emit("gamePlay:playerPick", {name: player.name, pickedCard: true});
@@ -544,9 +544,9 @@ io.on('connection', (socket) => {
             clearTimeout(game.judgeTimeout);
             clearInterval(game.judgeCounter);
 
-            if(game.getJudgeId() === player.id) {
-                console.log(`Judge Chose Card ${data.cardText}`);
-                game.judgeChooseCard(data.cardText);
+            if(game.getJudgeId() === player.id && data.idx > -1 && data.idx < Object.keys(game.judgeCards).length) {
+                console.log(`Judge Chose Cards ${game.judgeCards[data.idx]}`);
+                game.judgeChooseCard(game.judgeCards[data.idx]);
             }
 
         }

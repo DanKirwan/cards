@@ -104,20 +104,23 @@
 
 
 
-                <black-card layout="column"  id="blackCard">
+                <black-card  id="blackCard">
                     <ng-bind-html
                             ng-bind-html="gamePlay.blackCard.text">
                     </ng-bind-html>
                 </black-card>
 
 
-                <white-card ng-show="gamePlay.selectedCards.length > 0" class="selectedCard" ng-repeat="card in gamePlay.selectedCards track by $index"   ng-style="$index === 0 ?  {'margin-left':'0'} : {}" ng-click = "gamePlay.selectCard(card)">
+                    <white-card ng-show="gamePlay.selectedCards.length > 0" class="selectedCard" ng-repeat="card in gamePlay.selectedCards track by $index"   ng-style="$index === 0 ?  {'margin-left':'0'} : {}" ng-click = "gamePlay.selectCard(card)">
 
-                    <ng-bind-html
-                            ng-bind-html="card.text">
-                    </ng-bind-html>
+                        <div ng-show="gamePlay.blackCard.pick > 1" class="judgeContainer__countVal" flex>{{$index+1}}</div>
+                        <ng-bind-html
+                                ng-bind-html="card.text">
+                        </ng-bind-html>
 
-                </white-card>
+                    </white-card>
+
+
 
             </div>
 
@@ -143,22 +146,25 @@
 
                 </black-card>
 
-                <md-button class = "judgeContainer__confirmbtn" ng-show = 'gamePlay.chosenJudgeCard !== null' ng-click="gamePlay.confirmJudgeCard()">
+                <md-button class = "judgeContainer__confirmbtn" ng-show = 'gamePlay.selectedJudgeIdx > -1' ng-click="gamePlay.confirmJudgeCard()">
                     Confirm Card Selection
                 </md-button>
 
-                <md-grid-list  md-cols = "{{getCardColumns()}}" md-row-height = "2:3" md-gutter = "0.5%" style="margin-left:8px; margin-right:8px;">
 
-                    <md-grid-tile ng-repeat="card in gamePlay.judgeCards">
-                        <white-card  class="white-card judgeContainer__card  " ng-class="{'judgeContainer__card--selected': card.selected, 'judgeContainer__card--notJudge' : !gamePlay.isJudge || !gamePlay.judging}" ng-click = 'gamePlay.pickJudgeCard(card)'>
-                            <ng-bind-html
-                                    ng-bind-html="card.text">
+                <div layout="row" layout-wrap="" layout-align="space-around center">
+                    <div class="judgeContainer__cardContainer" flex="{{getColumns()}}" ng-repeat="cards in gamePlay.judgeCards track by $index" layout="row">
+                        <white-card flex ng-repeat="card in cards track by $index" ng-class="{'judgeContainer__card--selected': $parent.$index === gamePlay.selectedJudgeIdx, 'judgeContainer__card--notJudge' : !gamePlay.isJudge || !gamePlay.judging}" class="judgeContainer__card" ng-click = "gamePlay.pickJudgeCards($parent.$index)">
+
+                            <div ng-show="gamePlay.blackCard.pick > 1" class="judgeContainer__countVal" flex>{{$index+1}}</div>
+                            <ng-bind-html ng-show="gamePlay.judging"
+                                    ng-bind-html="card">
                             </ng-bind-html>
                         </white-card>
+                    </div>
+                </div>
 
-                    </md-grid-tile>
+                <!-- TODO selecting containers rather than individual cards here and possibly sending the server an index rather than the text itself also possibly consider graphical thing, sending a set of cards ontop of eachother eg pick 3 so 3 cards when waiting for judging-->
 
-                </md-grid-list>
             </div>
 
         </div>

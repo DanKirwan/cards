@@ -137,13 +137,15 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
     gamePlay.selectedCards = [];
     gamePlay.judgeCards = [];
     gamePlay.roundTime = 60;
-    gamePlay.chosenJudgeCard = null;
+    gamePlay.selectedJudgeIdx = -1;
 
     gamePlay.judgeTime = 60;
 
     gamePlay.roundJudge = undefined;
 
     gamePlay.maxPoints = 5;
+
+
 
 
     //gameplay
@@ -191,28 +193,16 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
     };
 
-    gamePlay.pickJudgeCard = function(card) {
+    gamePlay.pickJudgeCards = function(idx) {
+        if (gamePlay.isJudge && idx < gamePlay.judgeCards.length && gamePlay.judging) {
 
-        if (gamePlay.isJudge && gamePlay.judgeCards.indexOf(card) > -1 && gamePlay.judging) {
-            card.selected = !card.selected
-
-            if(card.selected) {
-                gamePlay.chosenJudgeCard = card;
-
-                gamePlay.judgeCards.forEach(c => {
-                    if(c !== card) c.selected = false;
-                })
-            } else {
-                gamePlay.chosenJudgeCard = null;
-
-            }
-
+            gamePlay.selectedJudgeIdx = gamePlay.selectedJudgeIdx === idx ? -1 : idx;
         }
     };
 
     gamePlay.confirmJudgeCard = function() {
-        if(gamePlay.chosenJudgeCard !== null) {
-            socket.emit("gamePlay:judgeChoose", {cardText: gamePlay.chosenJudgeCard.text});
+        if(gamePlay.selectedJudgeIdx > -1 && gamePlay.selectedJudgeIdx < gamePlay.judgeCards.length) {
+            socket.emit("gamePlay:judgeChoose", {idx: gamePlay.selectedJudgeIdx});
         }
     };
 
@@ -224,6 +214,8 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
         Util.showInfo(`${data.playerName} Has won this round`, 3);
         Util.showCard(data.cardText);
+
+        //TODO make this work
     });
 
     socket.on("gamePlay:gameWin", function(data) {
@@ -238,7 +230,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
         gamePlay.roundJudge = data.roundJudge;
 
         game.players.forEach(p => {
-            p.isJudge = false
+            p.isJudge = false;
             p.hasPicked = false;
         });
 
@@ -253,7 +245,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
         gamePlay.selectedCards = [];
 
-        gamePlay.chosenJudgeCard = null;
+        gamePlay.selectedJudgeIdx = -1;
 
         gamePlay.judgeCards = [];
         gamePlay.myHand = [];
@@ -267,7 +259,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
         gamePlay.round = data.roundNo;
 
-        gamePlay.isJudge =  false; //data.isJudge;
+        gamePlay.isJudge = data.isJudge;
         gamePlay.judging = data.inJudging;
 
         if(gamePlay.isJudge) {
@@ -290,7 +282,6 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
 
         }
-
 
     });
 
@@ -320,6 +311,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
     socket.on("gamePlay:judging", function(data) {
 
+
         Util.showInfo("Judging is now in progress", 2);
 
 
@@ -327,10 +319,8 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
         $interval.cancel(globals.timer);
         globals.timer = $interval(function() {gamePlay.judgeTime --}, 1000, gamePlay.judgeTime);//TODO fix this and maybe use gamePlay.countdown
         gamePlay.judging = true;
-        gamePlay.judgeCards = [];
-        for(let cardText of data.judgeCards) {
-            gamePlay.judgeCards.push(new WhiteCard(cardText))
-        }
+        gamePlay.selectedJudgeIdx = -1;
+        gamePlay.judgeCards = data.judgeCards;
 
     });
 
@@ -345,7 +335,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
         let pickedPlayer = game.players[game.getIdxFromName(data.name)];
 
         if(data.pickedCard && !pickedPlayer.hasPicked) {
-            gamePlay.judgeCards.push(new WhiteCard());
+            gamePlay.judgeCards.push('');
         } else if(!data.pickedCard && pickedPlayer.hasPicked) {
             gamePlay.judgeCards.pop();
         }

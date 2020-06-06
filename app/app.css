@@ -42,12 +42,12 @@ body {
 
 #blackCard {
   width: 25vh;
-  max-width: 50%;
+  min-width: 120px;
   display: block;
-  margin: 10%;
-  flex-shrink: 0.3; }
+  margin: 10%; }
 
 .selectedCard {
+  min-width: 70px;
   width: 20vh;
   padding: 0;
   margin: 1%; }
@@ -97,7 +97,8 @@ body {
   top: 0;
   display: flex;
   justify-content: center;
-  align-items: center; }
+  align-items: center;
+  overflow-y: auto; }
 
 .card.ng-hide {
   opacity: 0;
@@ -110,6 +111,21 @@ body {
   width: 100%;
   height: 100%;
   overflow-y: scroll; }
+  .judgeContainer__countVal {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    border-radius: 8px;
+    height: 16px;
+    width: 16px;
+    background: black;
+    color: white;
+    text-align: center; }
+  .judgeContainer__cardContainer {
+    border: 2px solid black;
+    border-radius: 5px;
+    padding: 8px;
+    margin: 1%; }
   .judgeContainer__blackCard {
     display: block;
     width: 20vh;
@@ -137,10 +153,10 @@ body {
       min-height: 0;
       transition: all 0.2s; }
   .judgeContainer__card {
-    width: 100%;
     white-space: normal;
     transition: 0.2s;
-    border-radius: 9%/6%; }
+    border-radius: 9%/6%;
+    margin: 3px; }
     .judgeContainer__card--notJudge {
       pointer-events: none;
       opacity: 0.6; }
