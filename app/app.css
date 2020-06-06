@@ -71,7 +71,7 @@ body {
   height: 30%;
   bottom: 0;
   overflow-x: scroll;
-  overflow-y: visible;
+  overflow-y: hidden;
   white-space: nowrap;
   text-align: center; }
   .cardContainer__card {
@@ -79,8 +79,8 @@ body {
     position: static;
     display: block;
     height: 0;
-    width: 18vh;
-    min-width: 18vh;
+    width: 17vh;
+    min-width: 17vh;
     max-width: 50%;
     transition: all 0.2s; }
     .cardContainer__card.ng-hide {
@@ -122,7 +122,7 @@ body {
     color: white;
     text-align: center; }
   .judgeContainer__cardContainer {
-    border: 2px solid black;
+    border: 2px solid #737373;
     border-radius: 5px;
     padding: 8px;
     margin: 1%; }

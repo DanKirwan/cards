@@ -123,6 +123,8 @@ exports.Game = class Game {
 
 
         this.maxPoints = 5;
+
+        this.judge = undefined;
     }
 
     getPlayersToBroadcast() {
@@ -157,6 +159,7 @@ exports.Game = class Game {
     populate() {
         for (let p in this.players) {
             this.populatePlayer(p);
+            this.players[p].points = 0;
         }
 
 
@@ -170,9 +173,9 @@ exports.Game = class Game {
             hand: this.players[playerId].myCards,
             blackCard: this.currentBlackCard,
             roundNo: this.round,
-            isJudge: this.getJudgeId() === playerId,
+            isJudge: this.judge === playerId,
             inJudging: this.inJudging,
-            roundJudge: this.players[this.getJudgeId()].name,
+            roundJudge: this.players[this.judge].name,
             maxPoints: this.maxPoints,
         });
     }   //TODO add multiple card picking
@@ -213,6 +216,12 @@ exports.Game = class Game {
                 this.populatePlayer(player.id);
                 this.sendHand(player.id);
             }
+
+            if(this.inJudging) {
+                player.socket.emit("gamePlay:judging", {
+                    judgeCards: Object.values(this.judgeCards),
+                });
+            }
         }
 
 
@@ -231,13 +240,12 @@ exports.Game = class Game {
         delete this.admins[player.id];
     }
 
-    getJudgeId() {
-        return Object.keys(this.players)[this.judgeIdx];
-    }
+
 
     itrJudge() {
         this.judgeIdx += 1;
         this.judgeIdx %= Object.keys(this.players).length;
+        this.judge = Object.keys(this.players)[this.judgeIdx];
     }
 
     startJudging() {
@@ -310,12 +318,17 @@ exports.Game = class Game {
     judgeChooseCard(cards) {
         for(let pId in this.judgeCards) {
             if(this.judgeCards[pId] === cards) {
-                this.players[pId].points ++;
-                this.io.to(this.id).emit("gamePlay:roundWin", {playerName: this.players[pId].name});
+                if(typeof this.players[pId] !== "undefined") {
+                    this.players[pId].points++;
+                    this.io.to(this.id).emit("gamePlay:roundWin", {playerName: this.players[pId].name});
 
 
-                if(this.players[pId].points >= this.maxPoints) {
-                    this.io.to(this.id).emit("gamePlay:gameWin", {playerName: this.players[pId].name});
+                    if(this.players[pId].points >= this.maxPoints) {
+                        this.io.to(this.id).emit("gamePlay:gameWin", {playerName: this.players[pId].name});
+                    }
+                } else {
+                    this.io.to(this.id).emit("gamePlay:alert", {message: "Player who won the round has left the game, next round"})
+
                 } //TODO make this nicer so it asks if you want to play again etc
             }
         }

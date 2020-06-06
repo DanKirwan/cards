@@ -72,9 +72,10 @@
                     <md-list-item ng-repeat="player in game.players">
                         <h3 style="padding-right:20px;">{{player.name}}</h3>
 
-                        <p flex style="text-align:center;" ng-show = "player.hasPicked && !player.isJudge">Waiting</p>
-                        <p flex style="text-align:center;" ng-show = "!player.hasPicked && !player.isJudge">Selecting Card</p>
+                        <p flex style="text-align:center;" ng-show = "player.hasPicked && !player.isJudge && !gamePlay.judging">Waiting</p>
+                        <p flex style="text-align:center;" ng-show = "!player.hasPicked && !player.isJudge && !gamePlay.judging">Selecting Card</p>
                         <p flex style="text-align:center;" ng-show="player.isJudge">Card Czar</p>
+                        <p flex ng-show="!player.isJudge && gamePlay.judging"></p>
 
 
 
@@ -155,7 +156,7 @@
                     <div class="judgeContainer__cardContainer" flex="{{getColumns()}}" ng-repeat="cards in gamePlay.judgeCards track by $index" layout="row">
                         <white-card flex ng-repeat="card in cards track by $index" ng-class="{'judgeContainer__card--selected': $parent.$index === gamePlay.selectedJudgeIdx, 'judgeContainer__card--notJudge' : !gamePlay.isJudge || !gamePlay.judging}" class="judgeContainer__card" ng-click = "gamePlay.pickJudgeCards($parent.$index)">
 
-                            <div ng-show="gamePlay.blackCard.pick > 1" class="judgeContainer__countVal" flex>{{$index+1}}</div>
+                            <div ng-show="gamePlay.blackCard.pick > 1 && gamePlay.judging" class="judgeContainer__countVal" flex>{{$index+1}}</div>
                             <ng-bind-html ng-show="gamePlay.judging"
                                     ng-bind-html="card">
                             </ng-bind-html>
@@ -163,7 +164,7 @@
                     </div>
                 </div>
 
-                <!-- TODO selecting containers rather than individual cards here and possibly sending the server an index rather than the text itself also possibly consider graphical thing, sending a set of cards ontop of eachother eg pick 3 so 3 cards when waiting for judging-->
+
 
             </div>
 

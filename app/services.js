@@ -335,7 +335,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
         let pickedPlayer = game.players[game.getIdxFromName(data.name)];
 
         if(data.pickedCard && !pickedPlayer.hasPicked) {
-            gamePlay.judgeCards.push('');
+            gamePlay.judgeCards.push(['']);
         } else if(!data.pickedCard && pickedPlayer.hasPicked) {
             gamePlay.judgeCards.pop();
         }

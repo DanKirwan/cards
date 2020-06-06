@@ -143,7 +143,7 @@ body {
   bottom:0;
 
   overflow-x:scroll;
-  overflow-y: visible;
+  overflow-y: hidden;
 
   white-space: nowrap;
 
@@ -162,8 +162,8 @@ body {
 
     display:block;
     height:0;
-    width:18vh;
-    min-width:18vh;
+    width:17vh;
+    min-width:17vh;
     max-width: 50%;
 
     transition: all 0.2s;
@@ -234,10 +234,11 @@ body {
   }
 
   &__cardContainer {
-    border: 2px solid rgba(0,0,0,100);
+    border: 2px solid rgb(115, 115, 115);
     border-radius: 5px;
     padding: 8px;
     margin:1%;
+
 
 
 

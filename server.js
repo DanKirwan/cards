@@ -165,7 +165,7 @@ function gameLeave(player, socket) {
 
     let gameJudgeId = undefined;
     if(typeof games[gameId] !== 'undefined') {
-        gameJudgeId = games[gameId].getJudgeId();
+        gameJudgeId = games[gameId].judge;
     }
 
 
@@ -544,9 +544,9 @@ io.on('connection', (socket) => {
             clearTimeout(game.judgeTimeout);
             clearInterval(game.judgeCounter);
 
-            if(game.getJudgeId() === player.id && data.idx > -1 && data.idx < Object.keys(game.judgeCards).length) {
-                console.log(`Judge Chose Cards ${game.judgeCards[data.idx]}`);
-                game.judgeChooseCard(game.judgeCards[data.idx]);
+            if(game.judge === player.id && data.idx > -1 && data.idx < Object.keys(game.judgeCards).length) {
+                console.log(`Judge Chose Cards ${Object.values(game.judgeCards)[data.idx]}`);
+                game.judgeChooseCard(Object.values(game.judgeCards)[data.idx]);
             }
 
         }
