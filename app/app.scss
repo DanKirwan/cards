@@ -236,11 +236,7 @@ body {
   &__cardContainer {
     border: 2px solid rgb(115, 115, 115);
     border-radius: 5px;
-    padding: 8px;
     margin:1%;
-
-
-
 
   }
 
@@ -303,20 +299,28 @@ body {
 
   &__card {
 
-      white-space:normal;
-      transition:0.2s;
-      border-radius:9%/6%;
+    white-space:normal;
+    transition:0.2s;
+    border-radius:9%/6%;
 
-      margin:3px;
+    margin:1%;
+
+    text-align:center;
 
     &--notJudge {
-      pointer-events:none;
       opacity:0.6;
     }
 
     &--selected {
       z-index:2;
       transform:scale(1.06);
+    }
+
+    &--won {
+      z-index:2;
+      transform:scale(1.1);
+      box-shadow: 0 0 15px white;
+      margin:2%;
     }
 
     &:hover {
@@ -640,6 +644,7 @@ body {
 
   }
 
+
   &__message {
     text-align: center;
     position:static;
@@ -680,3 +685,12 @@ body {
 }
 
 
+.replayDialog {
+  &__btn {
+    background-color:white;
+    border: 2px solid black;
+    border-radius: 5px;
+
+    text-align:center;
+  }
+}

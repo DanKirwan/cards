@@ -2,7 +2,7 @@ let cServices = angular.module("cards.services", []);
 
 cServices.factory('socket', function($rootScope) {
 
-    let socket = io.connect('84.51.151.69:80'); //TODO change later when an actual website is created
+    let socket = io.connect('81.174.215.4:80'); //TODO change later when an actual website is created
 
     return {
         on: function(eventName, callback) {
@@ -121,10 +121,7 @@ cServices.factory('Util', function($mdDialog, $timeout) {
 });
 
 
-cServices.factory("gamePlay", function(Util, $location, socket, game, globals, WhiteCard, $interval) {
-
-    //TODO say somewhere when you're the judge
-    //TODO Tell everyone else whos judge
+cServices.factory("gamePlay", function($timeout, Util, $mdDialog, $location, socket, game, globals, WhiteCard, $interval) {
 
 
     let gamePlay = {};
@@ -145,6 +142,8 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
     gamePlay.maxPoints = 5;
 
+
+    gamePlay.winningCardsIdx = -1;
 
 
 
@@ -203,6 +202,8 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
     gamePlay.confirmJudgeCard = function() {
         if(gamePlay.selectedJudgeIdx > -1 && gamePlay.selectedJudgeIdx < gamePlay.judgeCards.length) {
             socket.emit("gamePlay:judgeChoose", {idx: gamePlay.selectedJudgeIdx});
+            gamePlay.selectedJudgeIdx = -1;
+            gamePlay.isJudge = false;
         }
     };
 
@@ -212,14 +213,32 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
             if(p.name === data.playerName) p.points ++;
         }
 
-        Util.showInfo(`${data.playerName} Has won this round`, 3);
-        Util.showCard(data.cardText);
+        Util.showInfo(`${data.playerName} Has won this round`, 4);
+
+
+        $interval.cancel(globals.timer);
+        gamePlay.winningCardsIdx = data.cardsIdx;
 
         //TODO make this work
     });
 
     socket.on("gamePlay:gameWin", function(data) {
-        Util.showAlert(`${data.playerName} Has Won!`, "", "Main Menu", function(){game.leave()}, function(){game.leave()});
+
+        $timeout(_ =>
+            $mdDialog.show({
+                templateUrl: "endGameDialog.tmpl.html",
+                locals: {name: data.playerName},
+                parent:angular.element(document.body),
+                clickOutsideToClose: false,
+
+            }), 2000);
+
+        gamePlay.points = 0;
+
+        game.players.forEach(p => p.points = 0);
+
+
+
     });
 
     socket.on("gamePlay:newRound", function(data) {
@@ -246,6 +265,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
         gamePlay.selectedCards = [];
 
         gamePlay.selectedJudgeIdx = -1;
+        gamePlay.winningCardsIdx = -1;
 
         gamePlay.judgeCards = [];
         gamePlay.myHand = [];
@@ -270,9 +290,13 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
 
         //Route to game if not already in
-        if($location.path() !== "/game/"+globals.gameId) {
-            $location.path("/game/"+globals.gameId);
+
+        if(globals.gameId !== null) {
+            if($location.path() !== "/game/"+globals.gameId) {
+                $location.path("/game/"+globals.gameId);
+            }
         }
+
 
 
         if(gamePlay.judging) {
@@ -320,9 +344,11 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
         globals.timer = $interval(function() {gamePlay.judgeTime --}, 1000, gamePlay.judgeTime);//TODO fix this and maybe use gamePlay.countdown
         gamePlay.judging = true;
         gamePlay.selectedJudgeIdx = -1;
+        gamePlay.winningCardsIdx = -1;
         gamePlay.judgeCards = data.judgeCards;
 
     });
+
 
     socket.on("gamePlay:alert", function(data) {
 
@@ -345,7 +371,7 @@ cServices.factory("gamePlay", function(Util, $location, socket, game, globals, W
 
 
 
-    })
+    });
 
 
 
@@ -544,12 +570,11 @@ cServices.factory("game", function(Util, socket, globals, Player, $location, $md
         game.isAdmin = data.isAdmin;
 
         //Handle routing
-        if(data.inGame) {
+        if(data.inGame && globals.gameId !== null) {
             if($location.path() !== '/game/' + globals.gameId) {
                 $location.path('/game/' + globals.gameId);
             }
 
-            //TODO get ingame info
         } else {
             if($location.path() !== '/lobby/' + globals.gameId) {
                 $location.path('/lobby/' + globals.gameId);

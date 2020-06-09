@@ -17,9 +17,7 @@ slow:
 
 fix session stuff
 
-add support for multi pick cards
 
-add changing name ability
 
 better play again system
 
@@ -51,3 +49,4 @@ seeing when others select cards
 pressing back to get to main menu doesnt leave the game (look into $on with location
 
 
+add support for multi pick cards

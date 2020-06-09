@@ -1,0 +1,36 @@
+
+<md-dialog aria-label="End game dialog" ng-controller="endGameController">
+
+    <md-dialog-content>
+        <div style="padding:20px;">
+
+            <h2>Game Over!</h2>
+            <h3>{{name}} has won the game!</h3>
+            <br>
+
+            <h3 ng-show="replay">You have selected to play again!</h3>
+            <p>{{replayCount}}/3 Players needed to start new game</p>
+
+
+        </div>
+
+
+    </md-dialog-content>
+
+    <md-dialog-actions>
+
+
+        <md-button class="replayDialog__btn" ng-click="playAgain()">
+            Play Again!
+        </md-button>
+
+
+        <md-button class="replayDialog__btn" ng-click="mainMenu()">
+            Main Menu
+        </md-button>
+
+
+    </md-dialog-actions>
+
+
+</md-dialog>

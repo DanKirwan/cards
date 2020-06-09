@@ -52,6 +52,7 @@ const Game = util.Game;
 
 
 
+
 server.listen(80);
 
 let createdSession = session({
@@ -91,11 +92,7 @@ function nameValid(name) {
         }
     });
 
-    if(name === '') {
-        isValid = false;
-    }
-
-    if(name.length > 10) {
+    if(name === '' || name === null || name.length > 10) {
         isValid = false;
     }
 
@@ -187,6 +184,7 @@ function gameLeave(player, socket) {
             //Ugly way of setting the next available player to admin
 
             game.sendInfo(newAdmin);
+            newAdmin.socket.emit("gamePlay:alert", {message: "The admin has left the game, you are the new admin"})
 
 
 
@@ -255,7 +253,7 @@ io.on('connection', (socket) => {
                         socket.emit("game:failedJoin", {message:"This game is full!"});
 
                     }
-                    console.log(new Date() + "  - User " + socket.id + " failed to join game " + "id");
+                    console.log(new Date() + "  - User " + socket.id + " failed to join game " + id);
 
 
                     session.gameId = null;
@@ -343,7 +341,7 @@ io.on('connection', (socket) => {
 
         let id = data.gameId;
 
-        if(safeJoinGame(id, player, socket)){
+        if(id !== null && id !== undefined && safeJoinGame(id, player, socket)){
             console.log("Sending game info to " + id);
 
             games[id].sendInfo(player);
@@ -360,7 +358,7 @@ io.on('connection', (socket) => {
                 socket.emit("game:failedJoin", {message:"This game is full!"});
 
             }
-            console.log(new Date() + "  - User " + socket.id + " failed to join game " + "id");
+            console.log(new Date() + "  - User " + socket.id + " failed to join game " + id);
         }
 
     });
@@ -541,12 +539,14 @@ io.on('connection', (socket) => {
         if(typeof games[player.gameId] !== "undefined" ) {
             let game = games[player.gameId];
 
-            clearTimeout(game.judgeTimeout);
-            clearInterval(game.judgeCounter);
 
-            if(game.judge === player.id && data.idx > -1 && data.idx < Object.keys(game.judgeCards).length) {
+
+            if(game.inJudging && game.judge === player.id && data.idx > -1 && data.idx < Object.keys(game.judgeCards).length) {
                 console.log(`Judge Chose Cards ${Object.values(game.judgeCards)[data.idx]}`);
-                game.judgeChooseCard(Object.values(game.judgeCards)[data.idx]);
+                game.judgeChooseCards(data.idx);
+
+                clearTimeout(game.judgeTimeout);
+                clearInterval(game.judgeCounter);
             }
 
         }
@@ -555,6 +555,38 @@ io.on('connection', (socket) => {
    });
 
 
+
+    socket.on("game:playerReplay", function(data) {
+
+        if(player.gameId !== null && typeof games[player.gameId] !== "undefined") {
+            let game = games[player.gameId];
+
+            if(data.replay) {
+                if(!game.replayPlayers.includes(socket.id, 0)) {
+                    game.replayPlayers.push(socket.id);
+                }
+            } else {
+                game.replayPlayers = game.replayPlayers.filter(p => p !== socket.id);
+            }
+
+            io.to(game.id).emit("game:replay", {replayCount: game.replayPlayers.length});
+
+
+            if(game.replayPlayers.length> 2) {
+
+                game.replayPlayers = [];
+                game.inGame = false;
+
+                console.log(`Restarting game ${game.id}`);
+
+                for(let pId in game.players) {
+                    game.sendInfo(game.players[pId]);
+                }
+
+            }
+        }
+
+    })
 
 
 

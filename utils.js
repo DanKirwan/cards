@@ -125,6 +125,12 @@ exports.Game = class Game {
         this.maxPoints = 5;
 
         this.judge = undefined;
+
+
+        //Handling replaying game
+
+        this.replayPlayers = []
+
     }
 
     getPlayersToBroadcast() {
@@ -157,6 +163,10 @@ exports.Game = class Game {
     }
 
     populate() {
+        this.blackCardHistory = [];
+        this.round = 0;
+
+
         for (let p in this.players) {
             this.populatePlayer(p);
             this.players[p].points = 0;
@@ -238,6 +248,14 @@ exports.Game = class Game {
         delete this.players[player.id];
 
         delete this.admins[player.id];
+
+
+        if(this.replayPlayers.length > 0) {
+
+            this.replayPlayers = this.replayPlayers.filter(p => p !== player.id);
+
+            this.io.to(this.id).emit("game:replay", {replayCount: this.replayPlayers.length});
+        }
     }
 
 
@@ -273,7 +291,7 @@ exports.Game = class Game {
                 this.io.to(this.id).emit("gamePlay:alert", {message: "The Card Czar didn't select a card in time. No one wins the round"});
                 clearInterval(this.judgeCounter);
                 this.newRound();
-            }, this.judgeTime * 1000);
+            }, this.judgeTime * 1000 + 500);
         } else {
 
             this.io.to(this.id).emit("gamePlay:alert", {message: "No cards were selected, moving on to next round"});
@@ -311,30 +329,34 @@ exports.Game = class Game {
 
         this.roundTimeout = setTimeout(_ => {
             this.startJudging();
-        }, 1000*this.roundTime); //needs wrapper function for (this) context
+        }, 1000*this.roundTime + 500); //needs wrapper function for (this) context also +500 just incase you select at the very end
 
     }
 
-    judgeChooseCard(cards) {
+    judgeChooseCards(idx) {
+
+        let cards = Object.values(this.judgeCards)[idx];
         for(let pId in this.judgeCards) {
             if(this.judgeCards[pId] === cards) {
                 if(typeof this.players[pId] !== "undefined") {
                     this.players[pId].points++;
-                    this.io.to(this.id).emit("gamePlay:roundWin", {playerName: this.players[pId].name});
+                    this.io.to(this.id).emit("gamePlay:roundWin", {cardsIdx: idx, playerName: this.players[pId].name});
 
 
                     if(this.players[pId].points >= this.maxPoints) {
                         this.io.to(this.id).emit("gamePlay:gameWin", {playerName: this.players[pId].name});
+                    } else {
+                        this.inJudging = false;
+                        setTimeout( _ => this.newRound(), 4000);
                     }
                 } else {
                     this.io.to(this.id).emit("gamePlay:alert", {message: "Player who won the round has left the game, next round"})
-
+                    this.newRound();
                 } //TODO make this nicer so it asks if you want to play again etc
             }
         }
 
 
-        this.newRound();
     }
 
 
@@ -376,16 +398,19 @@ exports.Game = class Game {
 
 
     sendInfo(player) {
-        player.socket.emit("game:info", {
-            gameId: this.id,
-            isAdmin: (player.socket.id in this.admins),
-            players: this.getPlayersToBroadcast(),
-            inGame: this.inGame,
-            maxPlayers: this.maxPlayers,
-            name: this.name,
 
-            //TODO make this object return from a function inside utils.Game
-        });
+        if(typeof player !== "undefined") {
+            player.socket.emit("game:info", {
+                gameId: this.id,
+                isAdmin: (player.socket.id in this.admins),
+                players: this.getPlayersToBroadcast(),
+                inGame: this.inGame,
+                maxPlayers: this.maxPlayers,
+                name: this.name,
+            });
+
+        }
+
     }
 }
 ;

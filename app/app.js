@@ -1,6 +1,7 @@
 
-
 const app = angular.module("app",['ngMessages','ngAnimate','ngAria','ngMaterial', 'ngRoute','ngclipboard', 'cards.services', 'ngSanitize']);
+
+
 app.config(function($routeProvider) {
     $routeProvider
         .when("/", {
@@ -366,4 +367,38 @@ app.controller("judgeController", function ($scope, $mdMedia, gamePlay) {
         if ($mdMedia('sm') || $mdMedia('md')) return 5;
         return 10;
     };
+});
+
+
+app.controller("endGameController", function($scope, $mdDialog, gamePlay, socket, game, Util){
+
+    $scope.replay = false;
+
+    $scope.replayCount = 0;
+
+    socket.on("game:replay", function(data){
+
+        $scope.replayCount = data.replayCount;
+
+        if($scope.replayCount > 3) $scope.replayCount = 3;
+
+        if(data.replayCount > 2) {
+
+            Util.showInfo("At least 3 players selected to replay, a new game is starting!", 5);
+            $mdDialog.hide();
+        }
+    });
+
+
+    $scope.playAgain = function() {
+        socket.emit("game:playerReplay", {replay: true});
+    };
+
+    $scope.mainMenu = function() {
+        $mdDialog.cancel();
+
+        game.leave();
+        socket.emit("game:playerReplay", {replay:false});
+    };
+
 });

@@ -8,7 +8,7 @@
             </md-button>
 
             <h2 flex  style="text-align:center;" ng-hide="gamePlay.judging">Time Left: {{gamePlay.roundTime}}</h2>
-            <h2 flex  style="text-align:center;" ng-show="gamePlay.judging">Next Round: {{gamePlay.judgeTime}}</h2>
+            <h2 flex  style="text-align:center;" ng-show="gamePlay.judging">Judging Ends: {{gamePlay.judgeTime}}</h2>
 
 
 
@@ -154,8 +154,10 @@
 
                 <div layout="row" layout-wrap="" layout-align="space-around center">
                     <div class="judgeContainer__cardContainer" flex="{{getColumns()}}" ng-repeat="cards in gamePlay.judgeCards track by $index" layout="row">
-                        <white-card flex ng-repeat="card in cards track by $index" ng-class="{'judgeContainer__card--selected': $parent.$index === gamePlay.selectedJudgeIdx, 'judgeContainer__card--notJudge' : !gamePlay.isJudge || !gamePlay.judging}" class="judgeContainer__card" ng-click = "gamePlay.pickJudgeCards($parent.$index)">
+                        <white-card flex ng-repeat="card in cards track by $index" ng-class="{'judgeContainer__card--won': $parent.$index === gamePlay.winningCardsIdx, 'judgeContainer__card--selected': $parent.$index === gamePlay.selectedJudgeIdx, 'judgeContainer__card--notJudge' : !gamePlay.isJudge || !gamePlay.judging}" class="judgeContainer__card" ng-click = "gamePlay.pickJudgeCards($parent.$index)">
 
+
+                            <h2 style="text-align:center;" ng-show="$parent.$parent.$index === gamePlay.winningCardsIdx">Winning Card</h2>
                             <div ng-show="gamePlay.blackCard.pick > 1 && gamePlay.judging" class="judgeContainer__countVal" flex>{{$index+1}}</div>
                             <ng-bind-html ng-show="gamePlay.judging"
                                     ng-bind-html="card">

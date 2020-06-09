@@ -124,7 +124,6 @@ body {
   .judgeContainer__cardContainer {
     border: 2px solid #737373;
     border-radius: 5px;
-    padding: 8px;
     margin: 1%; }
   .judgeContainer__blackCard {
     display: block;
@@ -156,13 +155,18 @@ body {
     white-space: normal;
     transition: 0.2s;
     border-radius: 9%/6%;
-    margin: 3px; }
+    margin: 1%;
+    text-align: center; }
     .judgeContainer__card--notJudge {
-      pointer-events: none;
       opacity: 0.6; }
     .judgeContainer__card--selected {
       z-index: 2;
       transform: scale(1.06); }
+    .judgeContainer__card--won {
+      z-index: 2;
+      transform: scale(1.1);
+      box-shadow: 0 0 15px white;
+      margin: 2%; }
     .judgeContainer__card:hover {
       background-color: #f3f3f3; }
 
@@ -340,5 +344,11 @@ body {
   .info__message.ng-leave.ng-leave-active {
     opacity: 0;
     transition: all 0.2s; }
+
+.replayDialog__btn {
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 5px;
+  text-align: center; }
 
 /*# sourceMappingURL=app.css.map */
