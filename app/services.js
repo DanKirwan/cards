@@ -145,6 +145,8 @@ cServices.factory("gamePlay", function($timeout, Util, $mdDialog, $location, soc
 
     gamePlay.winningCardsIdx = -1;
 
+    gamePlay.winningName = undefined;
+
 
 
     //gameplay
@@ -224,12 +226,13 @@ cServices.factory("gamePlay", function($timeout, Util, $mdDialog, $location, soc
 
     socket.on("gamePlay:gameWin", function(data) {
 
+        gamePlay.winningName = data.playerName;
         $timeout(_ =>
             $mdDialog.show({
                 templateUrl: "endGameDialog.tmpl.html",
-                locals: {name: data.playerName},
                 parent:angular.element(document.body),
                 clickOutsideToClose: false,
+
 
             }), 2000);
 

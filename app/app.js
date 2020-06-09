@@ -370,7 +370,10 @@ app.controller("judgeController", function ($scope, $mdMedia, gamePlay) {
 });
 
 
-app.controller("endGameController", function($scope, $mdDialog, gamePlay, socket, game, Util){
+app.controller("endGameController", function(gamePlay, $scope, $mdDialog, gamePlay, socket, game, Util){
+
+
+    $scope.name = gamePlay.winningName;
 
     $scope.replay = false;
 
@@ -391,6 +394,7 @@ app.controller("endGameController", function($scope, $mdDialog, gamePlay, socket
 
 
     $scope.playAgain = function() {
+        $scope.replay = true;
         socket.emit("game:playerReplay", {replay: true});
     };
 

@@ -5,7 +5,7 @@
         <div style="padding:20px;">
 
             <h2>Game Over!</h2>
-            <h3>{{name}} has won the game!</h3>
+            <h3>{{name}} has won the game</h3>
             <br>
 
             <h3 ng-show="replay">You have selected to play again!</h3>
@@ -17,15 +17,15 @@
 
     </md-dialog-content>
 
-    <md-dialog-actions>
+    <md-dialog-actions style="padding:0;">
 
 
-        <md-button class="replayDialog__btn" ng-click="playAgain()">
+        <md-button class="replayDialog__btn" ng-click="playAgain()" flex>
             Play Again!
         </md-button>
 
 
-        <md-button class="replayDialog__btn" ng-click="mainMenu()">
+        <md-button class="replayDialog__btn" ng-click="mainMenu()" flex>
             Main Menu
         </md-button>
 
