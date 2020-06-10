@@ -1,5 +1,6 @@
 
 const { v1: uuidv1} = require('uuid');
+const credentials = require('credentials');
 
 //TODO check ips and make sure no more than 5 can connect from the same address
 
@@ -13,7 +14,7 @@ const session = require("express-session");
 
 
 const mongoose = require('mongoose');
-const dbUrl = 'mongodb://127.0.0.1:27017/cards';
+const dbUrl = "mongodb+srv://" + credentials.username + ":" + credentials.password  + "@bandwcards-v8i5e.mongodb.net/<dbname>?retryWrites=true&w=majority";
 const MongoStore = require('connect-mongo')(session);
 
 const db = mongoose.connection;

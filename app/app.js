@@ -81,14 +81,14 @@ app.controller("routingController", function($scope, socket, globals, $routePara
         if(globals.username !== null){
             game.reset();
             socket.emit("game:leave");
-            globals.gameId = $routeParams.gameCode;
+            globals.gameId = $routeParams.gameCode.toUpperCase();
             game.join();
         } else {
 
             socket.on("user:confirmName", function(data) {
                 globals.username = data.name;
                 game.reset();
-                globals.gameId = $routeParams.gameCode;
+                globals.gameId = $routeParams.gameCode.toUpperCase();
                 game.join();
             }
         )}
@@ -195,7 +195,7 @@ app.controller("menuController", function (game, gamePlay, globals, $rootScope, 
 
 
     $scope.initLobby= function () {
-        globals.gameId = $routeParams.gameCode;
+        globals.gameId = $routeParams.gameCode.toUpperCase();
         if(globals.username !== null){
             game.join();
             lobby.populate();
@@ -263,7 +263,7 @@ app.controller("cardController", function($location, $mdDialog, globals, game, s
 
 
     $scope.initGameplay = function () {
-        globals.gameId = $routeParams.gameCode;
+        globals.gameId = $routeParams.gameCode.toUpperCase();
         if(globals.username !== null){
             game.join();
 

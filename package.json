@@ -2,7 +2,7 @@
   "name": "cards",
   "private": true,
   "version": "0.0.0",
-  "description": "A fun and very original online cardgame",
+  "description": "A fun and very original online card game",
   "repository": "https://github.com/dankirwan/cards",
   "license": "CC BY-NC-SA 4.0",
   "dependencies": {
