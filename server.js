@@ -106,6 +106,29 @@ function nameValid(name) {
 }
 
 
+
+function safeDeleteGame(gameId) {
+    if(games[gameId] !== undefined) {
+
+        io.to(gameId).emit("game:failedJoin", {message: "This game has been deleted"});
+        delete games[gameId];
+    }
+}
+
+function safeLeaveGame(gameId, player, socket) {
+    if(games[gameId] !== undefined && gameId === player.gameId ) {
+        player.gameId = null;
+        games[gameId].removePlayer(player);
+        socket.leave(gameId);
+
+        if(Object.keys(games[gameId].players).length === 0) {
+            safeDeleteGame(gameId);
+            console.log("deleting empty game")
+        }
+    }
+}
+
+
 function safeJoinGame(gameId, player, socket) {
 
 
@@ -114,10 +137,11 @@ function safeJoinGame(gameId, player, socket) {
         return true;
     } else {
         let currentGame = player.gameId;
+        console.log(currentGame);
         if(currentGame !== null && typeof games[currentGame] !== "undefined") {
-            console.log(currentGame);
-            games[player.gameId].removePlayer(player);
-            socket.leave(player.gameId);
+            console.log(`leaving game: ${currentGame}`);
+            io.to(gameId).emit("game:playerLeave", {name: player.name});
+            safeLeaveGame(currentGame, player, socket);
         }
 
         let newGame = games[gameId];
@@ -130,23 +154,6 @@ function safeJoinGame(gameId, player, socket) {
     }
 
     return false;
-}
-
-
-function safeLeaveGame(gameId, player, socket) {
-    if(games[gameId] !== undefined && gameId === player.gameId ) {
-        player.gameId = null;
-        games[gameId].removePlayer(player);
-        socket.leave(gameId);
-    }
-}
-
-function safeDeleteGame(gameId) {
-    if(games[gameId] !== undefined) {
-
-        io.to(gameId).emit("game:failedJoin", {message: "This game has been deleted"});
-        delete games[gameId];
-    }
 }
 
 function idFromName(name) {
@@ -179,11 +186,7 @@ function gameLeave(player, socket) {
     let game = games[gameId];
     if(typeof game !== 'undefined') {
 
-        if(Object.keys(game.players).length === 0) { //TODO cange this to < 3 and alert players
-            console.log(`Deleting empty game ${gameId}`);
-            safeDeleteGame(gameId);
-
-        } else if(Object.keys(game.admins).length === 0) {
+        if(Object.keys(game.admins).length === 0 && Object.keys(game.players).length > 0) {
 
             let newAdmin = game.players[Object.keys(game.players)[0]];
             game.setGameAdmin(newAdmin);
@@ -349,7 +352,7 @@ io.on('connection', (socket) => {
 
         if(id !== null && id !== undefined && safeJoinGame(id, player, socket)){
             console.log("Sending game info to " + id);
-
+            player.points = 0;
             games[id].sendInfo(player);
 
             io.to(data.gameId).emit("game:playerJoin", {name: player.name, points: player.points});
@@ -387,9 +390,7 @@ io.on('connection', (socket) => {
             io.to(playerToRemove.gameId).emit("game:playerLeave", {name: playerToRemove.name});
             safeLeaveGame(playerToRemove.gameId, playerToRemove, playerToRemove.socket);
 
-            if(games[player.gameId].players.length === 0) {
-               safeDeleteGame(player.gameId);
-            }
+
         }
 
 

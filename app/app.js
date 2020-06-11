@@ -27,6 +27,8 @@ app.config(function($routeProvider) {
 
 app.controller("globalController", function($window, $location, gamePlay, $scope, $mdDialog, $mdMedia, socket, globals, Util) {
 
+
+
     $scope.Util = Util;
     $scope.pickNameDialog = function() {
 
@@ -252,6 +254,7 @@ app.controller("menuController", function (game, gamePlay, globals, $rootScope, 
 app.controller("cardController", function($location, $mdDialog, globals, game, socket, gamePlay, $scope, $mdSidenav, $mdMedia, $timeout, $routeParams, $interval) {
 
 
+
     $scope.$mdMedia = $mdMedia;
 
 
@@ -260,6 +263,8 @@ app.controller("cardController", function($location, $mdDialog, globals, game, s
         game.leave()
 
     });
+
+
 
 
     $scope.initGameplay = function () {

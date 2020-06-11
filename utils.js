@@ -182,17 +182,21 @@ exports.Game = class Game {
 
 
     sendHand(playerId) {
-        this.io.to(playerId).emit('gamePlay:newRound', {
-            roundTime: this.currentRoundTime,
-            judgeTime: this.currentJudgeTime,
-            hand: this.players[playerId].myCards,
-            blackCard: this.currentBlackCard,
-            roundNo: this.round,
-            isJudge: this.judge === playerId,
-            inJudging: this.inJudging,
-            roundJudge: this.players[this.judge].name,
-            maxPoints: this.maxPoints,
-        });
+        if(this.players.length !== 0) {
+            this.io.to(playerId).emit('gamePlay:newRound', {
+                roundTime: this.currentRoundTime,
+                judgeTime: this.currentJudgeTime,
+                hand: this.players[playerId].myCards,
+                blackCard: this.currentBlackCard,
+                roundNo: this.round,
+                isJudge: this.judge === playerId,
+                inJudging: this.inJudging,
+                roundJudge: this.players[this.judge].name,
+                maxPoints: this.maxPoints,
+            });
+
+        }
+
     }
 
     sendHandToAll() {
