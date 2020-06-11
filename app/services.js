@@ -2,7 +2,7 @@ let cServices = angular.module("cards.services", []);
 
 cServices.factory('socket', function($rootScope) {
 
-    let socket = io.connect('81.174.215.4:80'); //TODO change later when an actual website is created
+    let socket = io.connect('localhost:80'); //TODO change later when an actual website is created
 
     return {
         on: function(eventName, callback) {
@@ -121,7 +121,7 @@ cServices.factory('Util', function($mdDialog, $timeout) {
 });
 
 
-cServices.factory("gamePlay", function($timeout, Util, $mdDialog, $location, socket, game, globals, WhiteCard, $interval) {
+cServices.factory("gamePlay", function($timeout, Util, $mdDialog, $location, socket, game, globals, WhiteCard, $interval, lobby) {
 
 
     let gamePlay = {};
@@ -313,12 +313,22 @@ cServices.factory("gamePlay", function($timeout, Util, $mdDialog, $location, soc
     });
 
     gamePlay.begin = function() {
+
+        let selectedPacks = [];
+        lobby.cardPacks.forEach(pack => {
+            if(pack.selected) {
+                selectedPacks.push(pack.key);
+            }
+        });
+
+
         socket.emit("gamePlay:begin", {
             name: game.name,
             maxPlayers: game.maxPlayers,
             maxPoints: gamePlay.maxPoints,
             roundTime: gamePlay.roundTime,
-            judgeTime: gamePlay.judgeTime
+            judgeTime: gamePlay.judgeTime,
+            cardPacks: selectedPacks,
 
 
         });
@@ -629,9 +639,9 @@ cServices.factory("lobby", function(game, socket, globals) {
     let lobby = {};
 
     class CardPack {
-        constructor(name, description) {
-            this.name=name;
-            this.desc = description;
+        constructor(key, name) {
+            this.key = key;
+            this.name = name;
             this.selected = false;
 
         }
@@ -653,21 +663,13 @@ cServices.factory("lobby", function(game, socket, globals) {
         lobby.cardPacks = [];
         for(let pack of data.cardPacks) {
 
-            lobby.cardPacks.push(new CardPack(pack.name, pack.desc));
+            lobby.cardPacks.push(new CardPack(pack.key, pack.name));
         }
 
     });
 
 
     return lobby;
-
-
-
-
-    //Admin handling
-
-
-
 });
 
 

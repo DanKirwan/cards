@@ -44,14 +44,14 @@ exports.getNewGameID = function() {
 
 
 
-getUniqueCard = function(source, cardLog, maxAttempts) { //both are arrays
+getUniqueCard = function(sourceIdxs, source, cardLog, maxAttempts) { //both are arrays
     maxAttempts = (typeof maxAttempts === 'undefined') ? 1000 : maxAttempts;
     let counter = 0;
     let finding = true;
-    let testCard = null;
+    let testCard= null;
     while(finding) {
         counter ++;
-        testCard = source[Math.floor(Math.random() * source.length)];
+        testCard = source[sourceIdxs[Math.floor(Math.random() * sourceIdxs.length)]]; //Not the most elegant approach but it works
         if(cardLog.indexOf(testCard) === -1) {
             finding = false;
         }
@@ -131,6 +131,11 @@ exports.Game = class Game {
 
         this.replayPlayers = []
 
+
+        //Handling which cards to select
+        this.whiteIdxs = [];
+        this.blackIdxs = [];
+
     }
 
     getPlayersToBroadcast() {
@@ -148,7 +153,7 @@ exports.Game = class Game {
         for (let j = 0; j < 10; j++) {
 
 
-            let cardText = getUniqueCard(cards.whiteCards, this.cardsInPlay);
+            let cardText = getUniqueCard(this.whiteIdxs, cards.whiteCards, this.cardsInPlay);
             if(typeof this.cardsInPlay !== "undefined") {
                 this.cardsInPlay.push(cardText);
 
@@ -188,7 +193,7 @@ exports.Game = class Game {
             roundJudge: this.players[this.judge].name,
             maxPoints: this.maxPoints,
         });
-    }   //TODO add multiple card picking
+    }
 
     sendHandToAll() {
         for(let p in this.players) {
@@ -197,7 +202,7 @@ exports.Game = class Game {
     }
 
     consumeCard(cardText, playerId) { //only to be used at the end of the round
-        let newCard = getUniqueCard(cards.whiteCards, this.cardsInPlay);
+        let newCard = getUniqueCard(this.whiteIdxs, cards.whiteCards, this.cardsInPlay);
 
 
         let p = this.players[playerId];
@@ -315,8 +320,10 @@ exports.Game = class Game {
 
         this.inJudging = false;
 
-        if(this.currentBlackCard !== null) this.blackCardHistory.push(this.currentBlackCard);
-        this.currentBlackCard = getUniqueCard(cards.blackCards, this.blackCardHistory);
+
+        this.currentBlackCard = getUniqueCard(this.blackIdxs, cards.blackCards,  this.blackCardHistory);
+
+        this.blackCardHistory.push(this.currentBlackCard);
 
         this.itrJudge();
         this.sendHandToAll();

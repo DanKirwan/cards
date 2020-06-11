@@ -1,21 +1,30 @@
 
-const { v1: uuidv1} = require('uuid');
-const credentials = require('credentials');
 
+const { v1: uuidv1} = require('uuid');
 //TODO check ips and make sure no more than 5 can connect from the same address
 
 
-
+const credentials = require("./credentials");
 const express = require('express');
 const app  = express();
 const server = require('http').Server(app);
 const io = require('socket.io')(server);
 const session = require("express-session");
 
-
 const mongoose = require('mongoose');
-const dbUrl = "mongodb+srv://" + credentials.username + ":" + credentials.password  + "@bandwcards-v8i5e.mongodb.net/<dbname>?retryWrites=true&w=majority";
+const dbUrl = "mongodb+srv://" + credentials.username + ":" + credentials.password  + "@bandwcards-v8i5e.mongodb.net/blackandwhite?retryWrites=true&w=majority";
 const MongoStore = require('connect-mongo')(session);
+
+const cardPacks = require("./cards.js").packs;
+
+
+
+
+
+mongoose.connect(dbUrl, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
 
 const db = mongoose.connection;
 db.once("open", _ => {
@@ -28,12 +37,8 @@ db.once("open", _ => {
         }
     })
 });
+db.on('error', console.error.bind(console, 'connection error:'));
 
-
-mongoose.connect(dbUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(res => console.log("Connected to DB").catch(err => console.log(err)));
 
 
 
@@ -367,20 +372,6 @@ io.on('connection', (socket) => {
 
 
 
-
-    //Temporarily here
-    class CardPack {
-        constructor(name, description) {
-            this.name=name;
-            this.desc = description;
-
-
-        }
-    }
-
-
-
-
     socket.on("game:removePlayer", function(data) {
 
         console.log(`Trying to remove player ${data.name}`)
@@ -462,11 +453,36 @@ io.on('connection', (socket) => {
 
 
 
+
             if(playerCount > 0 && playerCount <= game.maxPlayers) { //TODO make it playerCount > 2 instead
+
+                //Handle card packs stuff here
+
+                let packs = data.cardPacks;
+
+                let whiteSet = new Set();
+                let blackSet = new Set();
+
+                if(packs.length === 0) {
+                    game.blackIdxs = cardPacks.Base.black;
+                    game.whiteIdxs = cardPacks.Base.white;
+                } else {
+                    data.cardPacks.forEach(packKey => {
+                        if(typeof cardPacks[packKey] !== "undefined") {
+                            cardPacks[packKey].black.forEach(idx => blackSet.add(idx));
+                            cardPacks[packKey].white.forEach(idx => whiteSet.add(idx));
+                        }
+                    });
+
+
+                    game.blackIdxs = Array.from(blackSet);
+                    game.whiteIdxs = Array.from(whiteSet);
+                    console.log(game.whiteIdxs);
+
+                }
+
+
                 game.populate();
-
-
-
                 game.newRound();
 
             } else {
@@ -600,16 +616,19 @@ io.on('connection', (socket) => {
         let gameLobby = games[player.gameId];
 
 
+        let packsToSend = [];
+
+        Object.keys(cardPacks).forEach(pKey => {
+            packsToSend.push({
+                key: pKey,
+                name: cardPacks[pKey].name,
+            })
+        })
+
         if(gameLobby !== undefined) {
 
             socket.emit("lobby:info", {
-
-
-                cardPacks:[
-                    new CardPack("UK TEST", "Obviously superior set of cards"),
-                    new CardPack("US Test", "not as funny america sucks"),
-                    new CardPack("Custom Pack", "Something less witty as it wasn't written by the Cards against humanity team")]
-
+                cardPacks: packsToSend
             });
 
 
