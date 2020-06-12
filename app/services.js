@@ -2,7 +2,7 @@ let cServices = angular.module("cards.services", []);
 
 cServices.factory('socket', function($rootScope) {
 
-    let socket = io.connect('ws://bnwcards.eu-west-1.elasticbeanstalk.com'); //TODO change later when an actual website is created
+    let socket = io.connect('wss://bnwcards.eu-west-1.elasticbeanstalk.com'); //TODO change later when an actual website is created
 
     return {
         on: function(eventName, callback) {
