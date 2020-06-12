@@ -39,7 +39,7 @@ db.once("open", _ => {
 db.on('error', console.error.bind(console, 'connection error:'));
 
 
-
+console.log(process.env.DB_PASSWORD)
 
 
 
@@ -56,9 +56,9 @@ const Game = util.Game;
 
 
 
+const port= process.env.PORT || 8080;
 
-
-server.listen(8081);
+server.listen(port);
 
 let createdSession = session({
 
