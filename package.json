@@ -44,7 +44,6 @@
     "sass": "^1.26.5"
   },
   "scripts": {
-    "postinstall": "npm run copy-libs",
     "update-deps": "npm update",
     "postupdate-deps": "npm run copy-libs",
     "prestart": "npm install",
