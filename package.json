@@ -27,8 +27,6 @@
     "koa-session": "^6.0.0",
     "mongoose": "^5.9.15",
     "ngclipboard": "^2.0.0",
-    "redis": "^3.0.2",
-    "sass": "^1.26.5",
     "socket.io": "^2.3.0",
     "uuid": "^8.0.0"
   },
@@ -42,7 +40,8 @@
     "karma-firefox-launcher": "^1.1.0",
     "karma-jasmine": "^1.1.2",
     "nodemon": "^2.0.3",
-    "protractor": "^5.4.1"
+    "protractor": "^5.4.1",
+    "sass": "^1.26.5"
   },
   "scripts": {
     "postinstall": "npm run copy-libs",
