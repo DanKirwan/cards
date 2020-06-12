@@ -68,6 +68,13 @@ let createdSession = session({
     store: new MongoStore({mongooseConnection: db})
 }); //TODO figure out what this should really be called
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "blackandwhitecards.com"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
+
 app.use(createdSession);
 io.use(sharedSession(createdSession,  {
     autoSave:true
