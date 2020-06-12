@@ -101,7 +101,7 @@
 
         <div id="gameContainer"  flex md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()">
 
-            <div class="selectingContainer" ng-hide="gamePlay.judging || gamePlay.isJudge;">
+            <div class="selectingContainer" ng-hide="gamePlay.judging || gamePlay.isJudge;" md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()">
 
 
 
@@ -126,7 +126,7 @@
             </div>
 
 
-            <div class="cardContainer" layout="row" md-swipe-down = 'unfocusCards()'  md-swipe-up = 'focusCards()' ng-hide="gamePlay.judging|| gamePlay.isJudge;" >
+            <div class="cardContainer" layout="row" md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()" ng-hide="gamePlay.judging|| gamePlay.isJudge;" >
                 <white-card  ng-repeat="card in gamePlay.myHand"  class="cardContainer__card " ng-click = "gamePlay.selectCard(card)" ng-hide="card.selected">
                     <ng-bind-html
                             ng-bind-html="card.text">

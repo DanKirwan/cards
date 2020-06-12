@@ -9,3 +9,8 @@ tmp
 /app/.sass-cache/95327b909a1c40dca75fb9336c4129dabca04d0b/
 /lib/
 credentials.json
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

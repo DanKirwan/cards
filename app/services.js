@@ -2,7 +2,7 @@ let cServices = angular.module("cards.services", []);
 
 cServices.factory('socket', function($rootScope) {
 
-    let socket = io.connect('localhost:80'); //TODO change later when an actual website is created
+    let socket = io.connect('blackandwhitecards.com'); //TODO change later when an actual website is created
 
     return {
         on: function(eventName, callback) {
