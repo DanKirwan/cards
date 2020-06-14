@@ -2,8 +2,7 @@ let cServices = angular.module("cards.services", []);
 
 cServices.factory('socket', function($rootScope) {
 
-    let socket = io.connect('wss://bnwcards.eu-west-1.elasticbeanstalk.com'); //TODO change later when an actual website is created
-
+    let socket = io.connect('wss://www.blackandwhitecards.com');
     return {
         on: function(eventName, callback) {
             socket.removeAllListeners(eventName); //this makes it so socket.on sets a unique callback for this event
