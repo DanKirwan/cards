@@ -1,24 +1,39 @@
 <div class = "mainMenu" id="mainMenu" ng-init="globals.gameId = null"  ng-controller="mainMenuController">
+    <div layout="column" layout-align="start center"  class="mainMenu__contentContainer">
 
-    <h1 class = "mainMenu__title">Black and White Cards</h1>
-
-        <div class="mainMenu__joinGame__wrapper">
-            <div class="mainMenu__joinGame">
+        <img src="logo.PNG" class = "mainMenu__title" alt="Black And White Cards">
 
 
-                <input  spellcheck="false" class="mainMenu__joinGame__input" placeholder="GAME CODE" ng-model="globals.gameId" ng-change="checkGame()" ng-keydown="$event.keyCode === 13 && joinGame()">
-                <!-- TODO make it so you dont need capitalised code-->
-                <md-button ng-click="joinGame()" ng-disabled = "!game.valid || globals.username === null" class= " mainMenu__joinGame__btn" >
-                    <md-icon ng-show="game.valid" md-svg-icon="img/join_game.svg" style="position:absolute; transform:translate(-50%, -50%); top:50%;"></md-icon>
-                </md-button>
+        <div layout="column" layout-align="start center" class="mainMenu__buttonContainer">
+            <div class="mainMenu__joinGame__wrapper">
+                <div class="mainMenu__joinGame">
 
+
+                    <input  spellcheck="false" class="mainMenu__joinGame__input" placeholder="GAME CODE" ng-model="globals.gameId" ng-change="checkGame()" ng-keydown="$event.keyCode === 13 && joinGame()">
+                    <md-button ng-click="joinGame()" ng-disabled = "!game.valid || globals.username === null" class= " mainMenu__joinGame__btn" >
+                        <md-icon ng-show="game.valid" md-svg-icon="img/join_game.svg" style="position:absolute; transform:translate(-50%, -50%); top:50%;"></md-icon>
+                    </md-button>
+
+                </div>
+
+
+
+                <div class="hint" style="color:red;" ng-hide="game.valid">This is not a valid code</div>
             </div>
 
-            <div class="hint" style="color:red;" ng-hide="game.valid">This is not a valid code</div>
+            <md-button  ng-disabled = "globals.username === null"  ng-click = "createGame()"  class = " mainMenu__btn" style="bottom:20px;">Create New Game</md-button>
+
+
+
+
         </div>
 
 
-    <md-button  ng-disabled = "globals.username === null"  ng-click = "createGame()"  class = " mainMenu__btn" style="bottom:20px;">Create New Game</md-button>
+
+
+
+
+    </div>
 
 
 

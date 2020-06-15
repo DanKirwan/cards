@@ -346,8 +346,30 @@ body {
   color:black;
   margin:0;
 
+
+  &__contentContainer {
+    height:100%;
+  }
+
+  &__buttonContainer {
+    width:100%;
+
+
+  }
+
   &__title {
-    margin-bottom: 20%;
+    margin-bottom:10vh;
+    position:static;
+    width:70%;
+
+    @media screen and (min-width:600px) and (max-width:1279px) {
+      width:30%;
+      margin-bottom:5vh;
+    }
+
+    @media screen and (min-width:1280px) {
+      width:20%;
+    }
   }
 
 
@@ -365,18 +387,28 @@ body {
     white-space:nowrap;
 
     &__wrapper{
-      position:absolute;
+      position:static;
 
       width:70%;
       height:50px;
 
-      left:50%;
-      transform:translate(-50%);
+      margin-bottom:15vh;
 
-      top:35%;
 
+
+      @media screen and (min-width:600px) and (max-width: 1279px) {
+        width:40%;
+        margin-bottom:8vh;
+      }
+
+      @media screen and (min-width:1280px) {
+        margin-bottom:8vh;
+        width:30%;
+      }
 
     }
+
+
     &__btn {
       width:20%;
       min-width:10%;
@@ -438,14 +470,14 @@ body {
 
 
   &__btn {
-    position:absolute;
+    position:static;
+
+
     height:50px;
+    min-height:50px;
     font-weight:bold;
 
 
-    transform:translate(-50%, 0);
-    left:50%;
-    top: 55%;
 
     width:70%;
     background-color:white;
@@ -455,7 +487,18 @@ body {
     text-align:center;
 
     padding:0;
-    margin:0;
+    margin:0 0 20px;
+
+    @media screen and (min-width:600px) and (max-width: 1279px) {
+      width:40%;
+    }
+
+    @media screen and (min-width:1280px) {
+      width:30%;
+    }
+
+
+
 
 
     &:not([disabled]):hover {

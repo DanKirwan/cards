@@ -179,8 +179,21 @@ body {
   background-color: #f9f9f9;
   color: black;
   margin: 0; }
+  .mainMenu__contentContainer {
+    height: 100%; }
+  .mainMenu__buttonContainer {
+    width: 100%; }
   .mainMenu__title {
-    margin-bottom: 20%; }
+    margin-bottom: 10vh;
+    position: static;
+    width: 70%; }
+    @media screen and (min-width: 600px) and (max-width: 1279px) {
+      .mainMenu__title {
+        width: 30%;
+        margin-bottom: 5vh; } }
+    @media screen and (min-width: 1280px) {
+      .mainMenu__title {
+        width: 20%; } }
   .mainMenu__joinGame {
     position: relative;
     display: block;
@@ -189,12 +202,18 @@ body {
     overflow: visible;
     white-space: nowrap; }
     .mainMenu__joinGame__wrapper {
-      position: absolute;
+      position: static;
       width: 70%;
       height: 50px;
-      left: 50%;
-      transform: translate(-50%);
-      top: 35%; }
+      margin-bottom: 15vh; }
+      @media screen and (min-width: 600px) and (max-width: 1279px) {
+        .mainMenu__joinGame__wrapper {
+          width: 40%;
+          margin-bottom: 8vh; } }
+      @media screen and (min-width: 1280px) {
+        .mainMenu__joinGame__wrapper {
+          margin-bottom: 8vh;
+          width: 30%; } }
     .mainMenu__joinGame__btn {
       width: 20%;
       min-width: 10%;
@@ -223,19 +242,23 @@ body {
         font-size: 20px;
         transition: all 0.1s; }
   .mainMenu__btn {
-    position: absolute;
+    position: static;
     height: 50px;
+    min-height: 50px;
     font-weight: bold;
-    transform: translate(-50%, 0);
-    left: 50%;
-    top: 55%;
     width: 70%;
     background-color: white;
     border: 2px solid black;
     border-radius: 5px;
     text-align: center;
     padding: 0;
-    margin: 0; }
+    margin: 0 0 20px; }
+    @media screen and (min-width: 600px) and (max-width: 1279px) {
+      .mainMenu__btn {
+        width: 40%; } }
+    @media screen and (min-width: 1280px) {
+      .mainMenu__btn {
+        width: 30%; } }
     .mainMenu__btn:not([disabled]):hover {
       background-color: #e2e2e2; }
 
