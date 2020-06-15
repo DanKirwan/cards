@@ -2,7 +2,7 @@ let cServices = angular.module("cards.services", []);
 
 cServices.factory('socket', function($rootScope) {
 
-    let socket = io.connect('wss://www.blackandwhitecards.com');
+    let socket = io.connect(process.env.WS_POINTER);
     return {
         on: function(eventName, callback) {
             socket.removeAllListeners(eventName); //this makes it so socket.on sets a unique callback for this event
@@ -35,7 +35,7 @@ cServices.factory("globals", function() {
         timer: null, //Used as the universal countdown which we can cancel before setting another
         players: [],
         gameId: '',
-        url:'blackandwhitecards.com',
+        url:'blackandwhitecards.com/#!',
     }
 });
 
