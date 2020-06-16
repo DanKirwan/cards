@@ -2,7 +2,7 @@ let cServices = angular.module("cards.services", []);
 
 cServices.factory('socket', function($rootScope) {
 
-    let socket = io.connect('81.174.212.97');//wss://www.blackandwhitecards.com
+    let socket = io.connect('wss://www.blackandwhitecards.com');//81.174.212.97
     return {
         on: function(eventName, callback) {
             socket.removeAllListeners(eventName); //this makes it so socket.on sets a unique callback for this event
