@@ -12,7 +12,6 @@ fix session stuff
 
 
 
-stop admin changing when play again
 
 
 add timer to game win with a timeout to leave
@@ -54,4 +53,5 @@ better play again system
 card selection time needs to stop  interval when new game started
 points should not reset at game win but when new game is started
 
+stop admin changing when play again
 

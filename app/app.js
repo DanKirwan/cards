@@ -375,7 +375,7 @@ app.controller("endGameController", function(gamePlay, $scope, $mdDialog, global
 
         if($scope.replayCount > 3) $scope.replayCount = 3;
 
-        if(data.replayCount > 1) { //TODO change this back to 2
+        if(data.replayCount > 2) {
 
             Util.showInfo("At least 3 players selected to replay, a new game is starting!", 5);
             $mdDialog.hide();

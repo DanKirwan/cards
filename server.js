@@ -329,7 +329,7 @@ io.on('connection', (socket) => {
 
     socket.on("game:create", function() {
 
-        let id = util.getNewGameID();
+        let id = util.getNewGameID(games);
         games[id] = new Game(io, id, null, 20);
 
         if(safeJoinGame(id, player, socket)) {
@@ -594,7 +594,7 @@ io.on('connection', (socket) => {
             io.to(game.id).emit("game:replay", {replayCount: game.replayPlayers.length});
 
 
-            if(game.replayPlayers.length> 1) {
+            if(game.replayPlayers.length > 2) {
 
                 game.replayPlayers = [];
                 game.inGame = false;

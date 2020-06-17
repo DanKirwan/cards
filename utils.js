@@ -3,17 +3,11 @@ const cards = require('./cards');
 
 
 
-function getRandomKey(obj) {
-    return Object.keys(obj)[Math.floor(Math.random() * Object.keys(obj).length)];
-}
-
-function getRandomIndex(arr) {
-    return arr
-}
 
 
 
-exports.getNewGameID = function() {
+
+exports.getNewGameID = function(games) {
     //TODO Fix this horrible way of getting an ID
     let alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     let attempts = 0;
@@ -44,17 +38,26 @@ exports.getNewGameID = function() {
 
 
 
-getUniqueCard = function(sourceIdxs, source, cardLog, maxAttempts) { //both are arrays
+getUniqueCard = function(sourceIdxs, source, cardLog, maxAttempts) { //handles both finding and recording cards into the log
     maxAttempts = (typeof maxAttempts === 'undefined') ? 1000 : maxAttempts;
     let counter = 0;
     let finding = true;
     let testCard= null;
     while(finding) {
         counter ++;
-        testCard = source[sourceIdxs[Math.floor(Math.random() * sourceIdxs.length)]]; //Not the most elegant approach but it works
+        let testIdx = sourceIdxs[Math.floor(Math.random() * sourceIdxs.length)];
+
+        testCard = source[testIdx];
+
         if(cardLog.indexOf(testCard) === -1) {
             finding = false;
+            cardLog.push(testCard); //change later to push indexes rather than card pointer
         }
+
+        if(cardLog.length >= sourceIdxs.length) {
+            cardLog = [];
+        }
+
 
         if(counter > maxAttempts) {
             console.log('Error finding unique random card');
@@ -104,7 +107,7 @@ exports.Game = class Game {
         this.judgeIdx = 0;
         this.currentBlackCard = null;
         this.blackCardHistory = [];
-        this.cardsInPlay = [];
+        this.whiteCardHistory = [];
 
         this.judgeCards = {};
 
@@ -129,7 +132,7 @@ exports.Game = class Game {
 
         //Handling replaying game
 
-        this.replayPlayers = []
+        this.replayPlayers = [];
 
 
         //Handling which cards to select
@@ -153,10 +156,8 @@ exports.Game = class Game {
         for (let j = 0; j < 10; j++) {
 
 
-            let cardText = getUniqueCard(this.whiteIdxs, cards.whiteCards, this.cardsInPlay);
-            if(typeof this.cardsInPlay !== "undefined") {
-                this.cardsInPlay.push(cardText);
-
+            let cardText = getUniqueCard(this.whiteIdxs, cards.whiteCards, this.whiteCardHistory);
+            if(typeof this.whiteCardHistory !== "undefined") {
 
                 this.players[playerId].myCards.push(cardText);
 
@@ -212,16 +213,14 @@ exports.Game = class Game {
     }
 
     consumeCard(cardText, playerId) { //only to be used at the end of the round
-        let newCard = getUniqueCard(this.whiteIdxs, cards.whiteCards, this.cardsInPlay);
+        let newCard = getUniqueCard(this.whiteIdxs, cards.whiteCards, this.whiteCardHistory);
 
 
         let p = this.players[playerId];
         if(typeof p !== 'undefined') {
             p.myCards = p.myCards.filter(cText => cText !== cardText);
 
-            this.cardsInPlay = this.cardsInPlay.filter(cText => cText !== cardText);
 
-            this.cardsInPlay.push(newCard);
             p.myCards.push(newCard);
 
         }
