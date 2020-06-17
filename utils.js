@@ -171,6 +171,12 @@ exports.Game = class Game {
         this.blackCardHistory = [];
         this.round = 0;
 
+        clearTimeout(this.judgeTimeout);
+        clearInterval(this.judgeCounter);
+
+        clearTimeout(this.roundTimeout);
+        clearInterval(this.roundCounter);
+
 
         for (let p in this.players) {
             this.populatePlayer(p);
@@ -418,6 +424,7 @@ exports.Game = class Game {
                 inGame: this.inGame,
                 maxPlayers: this.maxPlayers,
                 name: this.name,
+                judge: this.inGame && this.players[this.judge] ? this.players[this.judge].name : undefined,
             });
 
         }

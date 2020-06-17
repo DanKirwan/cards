@@ -351,10 +351,14 @@ io.on('connection', (socket) => {
 
         let id = data.gameId;
 
+        let prevGameId = player.gameId;
+
         if(id !== null && id !== undefined && safeJoinGame(id, player, socket)){
             console.log("Sending game info to " + id);
             player.points = 0;
+
             games[id].sendInfo(player);
+
 
             io.to(data.gameId).emit("game:playerJoin", {name: player.name, points: player.points});
 
@@ -458,7 +462,6 @@ io.on('connection', (socket) => {
 
             if(playerCount > 0 && playerCount <= game.maxPlayers) { //TODO make it playerCount > 2 instead
 
-                //Handle card packs stuff here
 
                 let packs = data.cardPacks;
 
@@ -591,7 +594,7 @@ io.on('connection', (socket) => {
             io.to(game.id).emit("game:replay", {replayCount: game.replayPlayers.length});
 
 
-            if(game.replayPlayers.length> 2) {
+            if(game.replayPlayers.length> 1) {
 
                 game.replayPlayers = [];
                 game.inGame = false;

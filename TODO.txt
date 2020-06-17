@@ -1,14 +1,5 @@
 quick:
 
-
-
-
-fix asking for name twice on entry  (look at server side code and check if name is already set)
-
-
-
-
-
 weird dark bit in create game screen with mdlist card packs
 
 
@@ -19,9 +10,15 @@ fix session stuff
 
 
 
-better play again system
 
 
+stop admin changing when play again
+
+
+add timer to game win with a timeout to leave
+
+
+card selection time gets set to 0 and judging time to 57 need to reset to 60
 
 
 
@@ -50,3 +47,11 @@ pressing back to get to main menu doesnt leave the game (look into $on with loca
 
 
 add support for multi pick cards
+
+
+first round it doesnt tell you who the card czar is
+better play again system
+card selection time needs to stop  interval when new game started
+points should not reset at game win but when new game is started
+
+

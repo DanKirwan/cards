@@ -1,4 +1,4 @@
-<section flex  style="height:100%" ng-controller="cardController" ng-init="initGameplay()" layout="column"  md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()" >
+<section flex  style="height:100%" ng-controller="cardController as cCtrl" ng-init="initGameplay()" layout="column"  md-swipe-right="openSideNav()" md-swipe-left = "closeSideNav()" >
 
     <md-toolbar layout="column">
 
@@ -76,6 +76,7 @@
                         <p flex style="text-align:center;" ng-show = "!player.hasPicked && !player.isJudge && !gamePlay.judging">Selecting Card</p>
                         <p flex style="text-align:center;" ng-show="player.isJudge">Card Czar</p>
                         <p flex ng-show="!player.isJudge && gamePlay.judging"></p>
+
 
 
 

@@ -82,7 +82,6 @@ app.controller("routingController", function($scope, socket, globals, $routePara
     $scope.initFunct = function() {
         if(globals.username !== null){
             game.reset();
-            socket.emit("game:leave");
             globals.gameId = $routeParams.gameCode.toUpperCase();
             game.join();
         } else {
@@ -256,11 +255,16 @@ app.controller("cardController", function($location, $mdDialog, globals, game, s
 
 
     $scope.$mdMedia = $mdMedia;
+    $scope.gamePlay = gamePlay;
+    $scope.game = game;
+    $scope.globals = globals;
+
 
 
     $scope.$on("$destroy", function() {
-
-        game.leave()
+        if(!globals.replaying) {
+            game.leave()
+        }
 
     });
 
@@ -302,11 +306,6 @@ app.controller("cardController", function($location, $mdDialog, globals, game, s
     }
 
 
-    $scope.gamePlay = gamePlay;
-    $scope.game = game;
-    $scope.globals = globals;
-
-
 
 
 
@@ -331,26 +330,12 @@ app.controller("cardController", function($location, $mdDialog, globals, game, s
 
 
 
-
-
-
-
-
-
-
-
 });
 
 
 app.controller("judgeController", function ($scope, $mdMedia, gamePlay) {
     //Judge Setup
     $scope.judgeChoosing = true;
-
-    $scope.tempCards = [
-        ["test1", "test2","a"],
-        ["test3", "test4","b"],
-        ["test5", "test6","c"]
-    ];
 
     $scope.getColumns = function() {
         if($mdMedia('xs')) {
@@ -375,7 +360,7 @@ app.controller("judgeController", function ($scope, $mdMedia, gamePlay) {
 });
 
 
-app.controller("endGameController", function(gamePlay, $scope, $mdDialog, gamePlay, socket, game, Util){
+app.controller("endGameController", function(gamePlay, $scope, $mdDialog, globals, socket, game, Util){
 
 
     $scope.name = gamePlay.winningName;
@@ -390,10 +375,11 @@ app.controller("endGameController", function(gamePlay, $scope, $mdDialog, gamePl
 
         if($scope.replayCount > 3) $scope.replayCount = 3;
 
-        if(data.replayCount > 2) {
+        if(data.replayCount > 1) { //TODO change this back to 2
 
             Util.showInfo("At least 3 players selected to replay, a new game is starting!", 5);
             $mdDialog.hide();
+            globals.replaying = true;
         }
     });
 

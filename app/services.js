@@ -1,8 +1,8 @@
 let cServices = angular.module("cards.services", []);
 
-cServices.factory('socket', function($rootScope) {
+cServices.service('socket', function($rootScope) {
 
-    let socket = io.connect('wss://www.blackandwhitecards.com');//81.174.212.97
+    let socket = io.connect('localhost:8080');//www.blackandwhitecards.com
     return {
         on: function(eventName, callback) {
             socket.removeAllListeners(eventName); //this makes it so socket.on sets a unique callback for this event
@@ -29,13 +29,15 @@ cServices.factory('socket', function($rootScope) {
 
 });
 
-cServices.factory("globals", function() {
+
+cServices.service("globals", function() {
     return {
         username: null,
         timer: null, //Used as the universal countdown which we can cancel before setting another
         players: [],
         gameId: '',
-        url:'blackandwhitecards.com',
+        url:'blackandwhitecards.com/#!',
+        replaying: false,
     }
 });
 
@@ -67,7 +69,7 @@ cServices.factory('Player', function() {
 });
 
 
-cServices.factory('Util', function($mdDialog, $timeout) {
+cServices.service('Util', function($mdDialog, $timeout) {
 
     let Util = {};
     Util.currentAlert = undefined;
@@ -120,7 +122,7 @@ cServices.factory('Util', function($mdDialog, $timeout) {
 });
 
 
-cServices.factory("gamePlay", function($timeout, Util, $mdDialog, $location, socket, game, globals, WhiteCard, $interval, lobby) {
+cServices.service("gamePlay", function($route, $timeout, $rootScope, Util, $mdDialog, $location, socket, game, globals, WhiteCard, $interval, lobby) {
 
 
     let gamePlay = {};
@@ -214,7 +216,7 @@ cServices.factory("gamePlay", function($timeout, Util, $mdDialog, $location, soc
             if(p.name === data.playerName) p.points ++;
         }
 
-        Util.showInfo(`${data.playerName} Has won this round`, 4);
+        Util.showInfo(`${data.playerName} has won this round`, 4);
 
 
         $interval.cancel(globals.timer);
@@ -235,13 +237,10 @@ cServices.factory("gamePlay", function($timeout, Util, $mdDialog, $location, soc
 
             }), 2000);
 
-        gamePlay.points = 0;
-
-        game.players.forEach(p => p.points = 0);
-
 
 
     });
+
 
     socket.on("gamePlay:newRound", function(data) {
 
@@ -250,14 +249,13 @@ cServices.factory("gamePlay", function($timeout, Util, $mdDialog, $location, soc
 
         gamePlay.roundJudge = data.roundJudge;
 
+
+
+        //Not sure why the view isn't being updated but something to do with being a socket callback so just moved to next digest cycle
         game.players.forEach(p => {
-            p.isJudge = false;
+            p.isJudge = p.name === data.roundJudge;
             p.hasPicked = false;
         });
-
-
-        let pJudge = game.players[game.getIdxFromName(data.roundJudge)];
-        if(typeof pJudge !== "undefined") pJudge.isJudge = true;
 
 
         gamePlay.roundTime = data.roundTime;
@@ -301,6 +299,10 @@ cServices.factory("gamePlay", function($timeout, Util, $mdDialog, $location, soc
 
 
 
+
+
+
+
         if(gamePlay.judging) {
             globals.timer = $interval(function() {gamePlay.judgeTime --}, 1000, gamePlay.judgeTime);
         } else {
@@ -308,6 +310,9 @@ cServices.factory("gamePlay", function($timeout, Util, $mdDialog, $location, soc
 
 
         }
+
+
+        console.table(game.players);
 
     });
 
@@ -394,7 +399,7 @@ cServices.factory("gamePlay", function($timeout, Util, $mdDialog, $location, soc
 });
 
 
-cServices.factory("game", function(Util, socket, globals, Player, $location, $mdDialog, $interval) {
+cServices.service("game", function(Util, socket, globals, Player, $location, $mdDialog, $interval) {
 
     //Right now, only the first time you join you can create a game, afterwards it wont let you
     let game = {};
@@ -410,11 +415,8 @@ cServices.factory("game", function(Util, socket, globals, Player, $location, $md
     game.inGame = null;
 
     game.players = [];
-
     game.isAdmin = null;
-
     game.populated = false;
-
 
 
 
@@ -567,17 +569,24 @@ cServices.factory("game", function(Util, socket, globals, Player, $location, $md
     });
 
     socket.on("game:info", function(data) {
-        globals.gameId = data.gameId;
+
+
         game.populated = true;
         game.inGame = data.inGame;
-        game.players = [];
+
         game.maxPlayers = data.maxPlayers;
 
-
+        game.players = [];
         for(let p of data.players) {
             addPlayer(p.name, p.points);
+
         }
 
+        if(typeof data.judge !== "undefined" && typeof game.players[game.getIdxFromName(data.judge)] !== "undefined") game.players[game.getIdxFromName(data.judge)].isJudge = true;
+
+
+
+        globals.gameId = data.gameId;
 
         game.isAdmin = data.isAdmin;
 
@@ -631,7 +640,7 @@ cServices.factory("game", function(Util, socket, globals, Player, $location, $md
 });
 
 
-cServices.factory("lobby", function(game, socket, globals) {
+cServices.service("lobby", function(game, socket, globals, $interval) {
 
     //Card Packs
 
@@ -659,6 +668,11 @@ cServices.factory("lobby", function(game, socket, globals) {
 
     socket.on("lobby:info", function(data) {
 
+
+        globals.replaying = false; //stops player from leaving game during reset
+
+
+        $interval.cancel(globals.timer);
         lobby.cardPacks = [];
         for(let pack of data.cardPacks) {
 
