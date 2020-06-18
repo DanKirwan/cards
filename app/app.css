@@ -124,15 +124,21 @@ body {
   .judgeContainer__cardContainer {
     border: 2px solid #737373;
     border-radius: 5px;
-    margin: 1%; }
+    min-width: 150px; }
+    .judgeContainer__cardContainer__flexContainer {
+      margin: 0;
+      padding: 1%; }
   .judgeContainer__blackCard {
     display: block;
     width: 20vh;
     max-width: 100%;
-    margin: 100px auto 50px;
+    margin: 50px auto 50px;
     transition: 0.5s; }
     .judgeContainer__blackCard--choosing {
       width: 40vh; }
+      @media screen and (min-width: 600px) {
+        .judgeContainer__blackCard--choosing {
+          width: 20vh; } }
   .judgeContainer__confirmBtn {
     display: block;
     width: 80%;
@@ -152,10 +158,11 @@ body {
       min-height: 0;
       transition: all 0.2s; }
   .judgeContainer__card {
+    margin: 1%;
+    position: relative;
     white-space: normal;
     transition: 0.2s;
     border-radius: 9%/6%;
-    margin: 1%;
     text-align: center; }
     .judgeContainer__card--notJudge {
       opacity: 0.6; }
@@ -270,7 +277,7 @@ body {
   margin: 4%;
   border-bottom: 2px solid black; }
 .cg__input {
-  width: 60%;
+  width: 92%;
   margin-left: 4%;
   background-color: white;
   margin-bottom: 0; }
@@ -280,6 +287,9 @@ body {
   margin: 4%;
   background: white;
   color: black; }
+  @media screen and (min-width: 600px) {
+    .cg__shareLink {
+      margin: 2% 10%; } }
   .cg__shareLink:not([disabled]):hover {
     background-color: black;
     color: white; }
@@ -290,18 +300,28 @@ body {
   color: white;
   font-weight: bold;
   font-size: 20px;
-  padding: 10px; }
+  padding: 10px;
+  transition: all 0.5s; }
   .cg__startGame:not([disabled]):hover {
     background: #1b1b1b; }
+  @media screen and (min-width: 600px) {
+    .cg__startGame {
+      margin: 2% 30%; } }
+  .cg__startGame.ng-hide {
+    opacity: 0; }
 .cg__btn {
   position: relative;
-  width: 60%;
+  width: 92%;
   min-width: 250px;
   margin-left: 4%;
   border: 2px solid black;
   border-radius: 5px;
   margin-top: 5%; }
 .cg__packList {
+  margin-left: 4%;
+  width: 92%;
+  border: 2px solid black;
+  border-radius: 5px;
   transition-delay: 0.1s;
   transition: 0.2s; }
   .cg__packList.ng-hide {
@@ -322,7 +342,7 @@ body {
   margin-left: 4%;
   overflow: hidden;
   padding: 20px;
-  width: 60%;
+  width: 92%;
   min-width: 250px;
   height: auto;
   display: block; }

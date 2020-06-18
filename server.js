@@ -141,8 +141,9 @@ function safeJoinGame(gameId, player, socket) {
         console.log(currentGame);
         if(currentGame !== null && typeof games[currentGame] !== "undefined") {
             console.log(`leaving game: ${currentGame}`);
-            io.to(gameId).emit("game:playerLeave", {name: player.name});
             safeLeaveGame(currentGame, player, socket);
+            io.to(currentGame).emit("game:playerLeave", {name: player.name});
+
         }
 
         let newGame = games[gameId];

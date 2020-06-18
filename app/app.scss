@@ -236,7 +236,13 @@ body {
   &__cardContainer {
     border: 2px solid rgb(115, 115, 115);
     border-radius: 5px;
-    margin:1%;
+
+    min-width:150px;
+
+    &__flexContainer {
+      margin:0;
+      padding:1%;
+    }
 
   }
 
@@ -247,13 +253,19 @@ body {
 
     width:20vh;
     max-width:100%;
-    margin: 100px auto 50px;
+    margin: 50px auto 50px;
 
     transition:0.5s;
 
     &--choosing {
 
       width:40vh;
+
+
+
+      @media screen and (min-width:600px) {
+        width:20vh;
+      }
 
     }
 
@@ -298,12 +310,13 @@ body {
 
 
   &__card {
-
+    margin:1%;
+    position:relative;
     white-space:normal;
     transition:0.2s;
     border-radius:9%/6%;
 
-    margin:1%;
+
 
     text-align:center;
 
@@ -524,12 +537,13 @@ body {
     text-align:center;
     margin:4%;
     border-bottom:2px solid black;
+
   }
 
 
   &__input {
 
-    width: 60%;
+    width: 92%;
     margin-left: 4%;
     background-color: white;
 
@@ -541,8 +555,6 @@ body {
   &__shareLink {
 
 
-
-
     border: 2px solid black;
     border-radius: 5px;
     margin:4%;
@@ -551,6 +563,13 @@ body {
 
     background:white;
     color:black;
+
+    @media screen and (min-width:600px) {
+      margin: 2% 10%;
+    }
+
+
+
 
 
     &:not([disabled]):hover {
@@ -577,13 +596,25 @@ body {
       background: #1b1b1b;
     }
 
+    @media screen and (min-width:600px) {
+      margin: 2% 30%;
+    }
+
+    transition: all 0.5s;
+
+    &.ng-hide {
+      opacity:0;
+
+    }
+
+
   }
 
 
   &__btn {
 
     position:relative;
-    width: 60%;
+    width: 92%;
     min-width:250px;
     margin-left: 4%;
 
@@ -594,6 +625,12 @@ body {
   }
 
   &__packList {
+
+    margin-left:4%;
+    width:92%;
+
+    border: 2px solid black;
+    border-radius: 5px;
 
 
     transition-delay:0.1s;
@@ -633,7 +670,7 @@ body {
 
     padding:20px;
 
-    width:60%;
+    width:92%;
     min-width:250px;
 
 

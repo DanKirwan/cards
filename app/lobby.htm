@@ -26,123 +26,136 @@
         <div ng-hide = "shareHovered">Click to copy game link</div>
     </md-button>
 
-    <div ng-show="game.isAdmin">
-        <md-button class = "cg__startGame" ng-click="startGame()" flex >Start Game</md-button>
+    <md-button ng-show="game.isAdmin" class = "cg__startGame" ng-click="startGame()" flex >Start Game</md-button>
 
-        <h3 class="cg__heading">Settings</h3>
 
-        <md-input-container class="cg__input">
-            <label>Game Name</label>
-            <input type="text" style="border-color:black;" ng-model="game.name">
-            <div class="hint" style="font-size:10px">Optional</div>
-        </md-input-container>
+    <div layout="column" layout-gt-xs = "row">
 
-        <form name="maxPlayerForm">
+
+
+        <div ng-show="game.isAdmin" flex>
+
+            <h3 class="cg__heading">Settings</h3>
+
             <md-input-container class="cg__input">
-                <label>Max Players</label>
-                <input name="playerCount" type="number" ng-blur="game.updateMaxPlayers();" ng-model = "game.maxPlayers" step="1" min="3" max = "20" style="border-color:black;" value="{{maxPlayers}}" >
+                <label>Game Name</label>
+                <input type="text" style="border-color:black;" ng-model="game.name">
+                <div class="hint" style="font-size:10px">Optional</div>
+            </md-input-container>
+
+            <form name="maxPlayerForm">
+                <md-input-container class="cg__input">
+                    <label>Max Players</label>
+                    <input name="playerCount" type="number" ng-blur="game.updateMaxPlayers();" ng-model = "game.maxPlayers" step="1" min="3" max = "20" style="border-color:black;" value="{{maxPlayers}}" >
 
 
-                <div ng-messages="maxPlayerForm.playerCount.$error" multiple md-auto-hide="false">
+                    <div ng-messages="maxPlayerForm.playerCount.$error" multiple md-auto-hide="false">
 
-                    <div ng-message="min">
-                        You cant play with less than 3 people!
+                        <div ng-message="min">
+                            You cant play with less than 3 people!
+                        </div>
+
+                        <div ng-message="max">
+                            Maximum players in a game is 20
+                        </div>
                     </div>
 
-                    <div ng-message="max">
-                        Maximum players in a game is 20
+
+                </md-input-container>
+
+            </form>
+
+
+            <md-button flex ng-click="showCardPacks = !showCardPacks" class = "cg__btn" layout="row">
+                <div flex>Card Packs</div>
+                <md-icon md-svg-icon="img/join_game.svg"  style="transition: all 0.2s;" ng-style="showCardPacks ? {transform: 'rotate(90deg)'} : {transform:'none'}"></md-icon>
+            </md-button>
+
+
+            <md-list ng-show="showCardPacks" class="cg__packList md-2-line">
+                <md-list-item ng-repeat="pack in lobby.cardPacks" ng-show="showCardPacks" class="cg__packList__item">
+                    <img ng-src="img/temp_cards-48dp.svg">
+                    <div class="md-list-item-text" flex>
+                        <h3>{{pack.name}}</h3>
                     </div>
-                </div>
+
+                    <md-checkbox ng-model="pack.selected"></md-checkbox>
+                </md-list-item>
 
 
-            </md-input-container>
+            </md-list>
 
-        </form>
+            <md-button class = "cg__btn" ng-click="showAdvanced = !showAdvanced" layout="row" >
+                <div flex>Advanced Settings</div>
+                <md-icon md-svg-icon="img/join_game.svg"  style="transition: all 0.2s;" ng-style="showAdvanced ? {transform: 'rotate(90deg)'} : {transform:'none'}"></md-icon>
+            </md-button>
 
+            <form layout="column" name="advancedForm" ng-show="showAdvanced" class="cg__advanced">
 
-        <md-button flex ng-click="showCardPacks = !showCardPacks" class = "cg__btn" layout="row">
-            <div flex>Card Packs</div>
-            <md-icon md-svg-icon="img/join_game.svg"  style="transition: all 0.2s;" ng-style="showCardPacks ? {transform: 'rotate(90deg)'} : {transform:'none'}"></md-icon>
-        </md-button>
+                <md-input-container class="cg__advanced__input"   >
+                    <label>Maximum Points</label>
+                    <input name="maxPoints" type="number" ng-model = "gamePlay.maxPoints" step="1" min="1" max = "20" style="border-color:black;" value="{{maxPoints}}" >
 
-
-        <md-list ng-show="showCardPacks" class="cg__packList md-2-line">
-            <md-list-item ng-repeat="pack in lobby.cardPacks" ng-show="showCardPacks" class="cg__packList__item">
-                <img ng-src="img/temp_cards-48dp.svg">
-                <div class="md-list-item-text" flex>
-                    <h3>{{pack.name}}</h3>
-                </div>
-
-                <md-checkbox ng-model="pack.selected"></md-checkbox>
-            </md-list-item>
+                    <div ng-messages="advancedForm.maxPoints.$error" multiple md-auto-hide="false">
+                        <div ng-message="min">You cant have a lower value than 1</div>
+                        <div ng-message="max">Maximum Score possible is 20</div>
+                    </div>
+                </md-input-container>
 
 
-        </md-list>
+                <md-input-container class="cg__advanced__input"   >
+                    <label>Card selection Time</label>
 
-        <md-button class = "cg__btn" ng-click="showAdvanced = !showAdvanced" layout="row" >
-            <div flex>Advanced Settings</div>
-            <md-icon md-svg-icon="img/join_game.svg"  style="transition: all 0.2s;" ng-style="showAdvanced ? {transform: 'rotate(90deg)'} : {transform:'none'}"></md-icon>
-        </md-button>
-
-        <form layout="column" name="advancedForm" ng-show="showAdvanced" class="cg__advanced">
-
-            <md-input-container class="cg__advanced__input"   >
-                <label>Maximum Points</label>
-                <input name="maxPoints" type="number" ng-model = "gamePlay.maxPoints" step="1" min="1" max = "20" style="border-color:black;" value="{{maxPoints}}" >
-
-                <div ng-messages="advancedForm.maxPoints.$error" multiple md-auto-hide="false">
-                    <div ng-message="min">You cant have a lower value than 1</div>
-                    <div ng-message="max">Maximum Score possible is 20</div>
-                </div>
-            </md-input-container>
+                    <input  name="roundTime" type="number" ng-model="gamePlay.roundTime" step="1" min="10" max="10000" style="border-color:black;"  value="60">
 
 
-            <md-input-container class="cg__advanced__input"   >
-                <label>Card selection Time</label>
+                    <div ng-messages="advancedForm.roundTime.$error" multiple md-auto-hide="false">
+                        <div ng-message="min">How are you going to play a round in less than 10 seconds</div>
+                        <div ng-message="max">Someone will die before you finish this game</div>
+                    </div>
 
-                <input  name="roundTime" type="number" ng-model="gamePlay.roundTime" step="1" min="10" max="10000" style="border-color:black;"  value="{{roundTime}}">
-
-
-                <div ng-messages="advancedForm.roundTime.$error" multiple md-auto-hide="false">
-                    <div ng-message="min">How are you going to play a round in less than 10 seconds</div>
-                    <div ng-message="max">Someone will die before you finish this game</div>
-                </div>
-
-            </md-input-container>
+                </md-input-container>
 
 
-            <md-input-container class="cg__advanced__input">
-                <label>Judging Time</label>
-                <input name="judgeTime" type="number" ng-model="gamePlay.judgeTime" step="1" min = "20" max ="10000" style="border-color:black;" value="{{judgeTime}}">
+                <md-input-container class="cg__advanced__input">
+                    <label>Judging Time</label>
+                    <input name="judgeTime" type="number" ng-model="gamePlay.judgeTime" step="1" min = "20" max ="10000" style="border-color:black;" value="60">
 
 
-                <div ng-messages="advancedForm.judgeTime.$error" multiple md-auto-hide="false">
-                    <div ng-message="min">How are you going to pick good cards in less than 20 seconds?</div>
-                    <div ng-message="max">You need new friends that spend less time making decisions</div>
-                </div>
-            </md-input-container>
+                    <div ng-messages="advancedForm.judgeTime.$error" multiple md-auto-hide="false">
+                        <div ng-message="min">How are you going to pick good cards in less than 20 seconds?</div>
+                        <div ng-message="max">You need new friends that spend less time making decisions</div>
+                    </div>
+                </md-input-container>
 
-        </form>
+            </form>
+
+        </div>
+
+
+
+
+
+        <div layout = "column" flex>
+            <h3 class = "cg__heading"> Players</h3>
+            <md-list>
+                <md-list-item ng-repeat="player in game.players">
+                    <h3 flex>{{player.name}}</h3>
+
+
+                    <md-icon ng-show="game.isAdmin && !player.admin" class="md-secondary" md-svg-icon="img/remove_player-48dp.svg" ng-click="game.removePlayer(player.name)">
+                        <md-tooltip md-direction="left" md-delay = "100">Remove Player</md-tooltip>
+                    </md-icon>
+                </md-list-item>
+            </md-list>
+
+
+        </div>
 
     </div>
 
+    <md-button ng-show="game.isAdmin && (showCardPacks || showAdvanced)" class = "cg__startGame" ng-click="startGame()" flex >Start Game</md-button>
 
 
-</div>
-
-
-
-
-    <h3 flex class = "cg__heading"> Players</h3>
-    <md-list>
-        <md-list-item ng-repeat="player in game.players">
-            <h3 flex>{{player.name}}</h3>
-
-
-            <md-icon ng-show="game.isAdmin && !player.admin" class="md-secondary" md-svg-icon="img/remove_player-48dp.svg" ng-click="game.removePlayer(player.name)">
-                <md-tooltip md-direction="left" md-delay = "100">Remove Player</md-tooltip>
-            </md-icon>
-        </md-list-item>
-    </md-list>
 
 </div>

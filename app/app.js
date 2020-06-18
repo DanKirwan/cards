@@ -82,6 +82,7 @@ app.controller("routingController", function($scope, socket, globals, $routePara
     $scope.initFunct = function() {
         if(globals.username !== null){
             game.reset();
+            game.leave();
             globals.gameId = $routeParams.gameCode.toUpperCase();
             game.join();
         } else {
@@ -250,7 +251,7 @@ app.controller("menuController", function (game, gamePlay, globals, $rootScope, 
 
 
 
-app.controller("cardController", function($location, $mdDialog, globals, game, socket, gamePlay, $scope, $mdSidenav, $mdMedia, $timeout, $routeParams, $interval) {
+app.controller("cardController", function(Util, $location, $mdDialog, globals, game, socket, gamePlay, $scope, $mdSidenav, $mdMedia, $timeout, $routeParams, $interval) {
 
 
 
@@ -275,13 +276,21 @@ app.controller("cardController", function($location, $mdDialog, globals, game, s
         globals.gameId = $routeParams.gameCode.toUpperCase();
         if(globals.username !== null){
             game.join();
+            if(!$mdMedia("gt-sm")) {
+                Util.showInfo("Swipe right to open the menu!", 6);
+
+            }
+
 
         } else {
 
             socket.on("user:confirmName", function(data) {
                 globals.username = data.name;
                 game.join();
-                //TODO maybe remove need for lobby:populate?
+
+                if(!$mdMedia("gt-sm")) {
+                    Util.showInfo("Swipe right to open the menu!", 6);
+                }
             });
         }
 
@@ -337,26 +346,6 @@ app.controller("judgeController", function ($scope, $mdMedia, gamePlay) {
     //Judge Setup
     $scope.judgeChoosing = true;
 
-    $scope.getColumns = function() {
-        if($mdMedia('xs')) {
-            return gamePlay.blackCard.pick > 1 ? 90 : 45;
-        } else if($mdMedia("gt-md")) {
-            if(gamePlay.blackCard.pick > 3) return 45;
-            else if(gamePlay.blackCard.pick > 1) return 30;
-            else return 25;
-        } else {
-            if(gamePlay.blackCard.pick > 3) return 90;
-            else if(gamePlay.blackCard.pick > 1) return 45;
-            else return 30;
-        }
-    };
-
-
-    $scope.getCardColumns = function () {
-        if ($mdMedia('xs')) return 2;
-        if ($mdMedia('sm') || $mdMedia('md')) return 5;
-        return 10;
-    };
 });
 
 

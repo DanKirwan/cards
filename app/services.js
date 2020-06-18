@@ -399,7 +399,7 @@ cServices.service("gamePlay", function($route, $timeout, $rootScope, Util, $mdDi
 });
 
 
-cServices.service("game", function(Util, socket, globals, Player, $location, $mdDialog, $interval) {
+cServices.service("game", function(Util, socket, globals, Player, $location, $mdDialog, $interval, $mdMedia) {
 
     //Right now, only the first time you join you can create a game, afterwards it wont let you
     let game = {};
@@ -571,6 +571,7 @@ cServices.service("game", function(Util, socket, globals, Player, $location, $md
     socket.on("game:info", function(data) {
 
 
+
         game.populated = true;
         game.inGame = data.inGame;
 
@@ -594,6 +595,7 @@ cServices.service("game", function(Util, socket, globals, Player, $location, $md
         if(data.inGame && globals.gameId !== null) {
             if($location.path() !== '/game/' + globals.gameId) {
                 $location.path('/game/' + globals.gameId);
+
             }
 
         } else {
@@ -613,7 +615,8 @@ cServices.service("game", function(Util, socket, globals, Player, $location, $md
             "Make sure you typed the game code right and try again",
             "Okay!",
             function() {
-            $location.path("/")
+                $location.path("/")
+                game.leave();
             });
 
     });
