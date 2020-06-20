@@ -8,6 +8,9 @@ app.config(function($routeProvider) {
             templateUrl: "mainMenu.htm",
             controller: "mainMenuController"
         })
+        .when("/attribution", {
+            templateUrl: "attrib.htm"
+        })
         .when("/:gameCode", {
             templateUrl: "routing.htm",
             controller: "routingController"
@@ -19,7 +22,8 @@ app.config(function($routeProvider) {
         .when("/lobby/:gameCode", {
             templateUrl: "lobby.htm",
             controller: "menuController"
-    });
+        });
+
 
 
 });
@@ -152,6 +156,9 @@ app.controller("mainMenuController", function($scope, socket, game, globals, Uti
 
     //TODO fix this join game thing and route to main menu if not a valid game code
 
+    $scope.showAttrib = function() {
+        Util.showAlert("Attribution", "All cards originally sourced from Cards Against Humanity via JSON against humanity")
+    }
 
     $scope.checkGame = function() {
         globals.gameId = globals.gameId.toUpperCase().substring(0, 4);

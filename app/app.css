@@ -268,6 +268,12 @@ body {
         width: 30%; } }
     .mainMenu__btn:not([disabled]):hover {
       background-color: #e2e2e2; }
+  .mainMenu__bottomBar {
+    padding: 10px;
+    color: grey;
+    width: 100%;
+    position: fixed;
+    bottom: 0; }
 
 .cg__toolbar {
   background: black;
@@ -405,5 +411,18 @@ body {
   @media screen and (max-width: 600px) {
     .routing__logo {
       width: 80%; } }
+
+a:link {
+  text-decoration: none;
+  font-weight: bold;
+  color: dimgrey; }
+a:visited {
+  color: #343434; }
+a:hover {
+  color: #646464;
+  transform: scale(1.05); }
+a:active {
+  text-shadow: 0 0 5px black;
+  color: white; }
 
 /*# sourceMappingURL=app.css.map */
