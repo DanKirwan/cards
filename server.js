@@ -111,7 +111,7 @@ function nameValid(name) {
 function safeDeleteGame(gameId) {
     if(games[gameId] !== undefined) {
 
-        io.to(gameId).emit("game:failedJoin", {message: "This game has been deleted"});
+        io.to(gameId).emit("game:failedJoin", {message: "There are not enough players in the game so this game has been deleted!"});
         delete games[gameId];
     }
 }
@@ -122,12 +122,13 @@ function safeLeaveGame(gameId, player, socket) {
         games[gameId].removePlayer(player);
         socket.leave(gameId);
 
-        if(Object.keys(games[gameId].players).length === 0) {
+        if(Object.keys(games[gameId].players).length < 3) {
             safeDeleteGame(gameId);
             console.log("deleting empty game")
         }
     }
 }
+
 
 
 function safeJoinGame(gameId, player, socket) {
@@ -461,7 +462,7 @@ io.on('connection', (socket) => {
 
 
 
-            if(playerCount > 0 && playerCount <= game.maxPlayers) { //TODO make it playerCount > 2 instead
+            if(playerCount > 2 && playerCount <= game.maxPlayers) { //TODO make it playerCount > 2 instead
 
 
                 let packs = data.cardPacks;
