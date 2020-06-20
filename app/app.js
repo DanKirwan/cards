@@ -351,6 +351,7 @@ app.controller("cardController", function(Util, $location, $mdDialog, globals, g
 
 
 app.controller("judgeController", function ($scope, $mdMedia, gamePlay) {
+
     //Judge Setup
     $scope.judgeChoosing = true;
 

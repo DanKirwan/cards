@@ -237,12 +237,9 @@ body {
     border: 2px solid rgb(115, 115, 115);
     border-radius: 5px;
 
-    min-width:150px;
+    margin:1%;
+    display:flex;
 
-    &__flexContainer {
-      margin:0;
-      padding:1%;
-    }
 
   }
 
@@ -311,10 +308,13 @@ body {
 
   &__card {
     margin:1%;
-    position:relative;
     white-space:normal;
     transition:0.2s;
     border-radius:9%/6%;
+
+    width:150px;
+    display:block;
+
 
 
 
