@@ -41,7 +41,6 @@ db.once("open", _ => {
 db.on('error', console.error.bind(console, 'connection error:'));
 
 
-console.log(process.env.DB_PASSWORD)
 
 
 
@@ -142,7 +141,6 @@ function safeJoinGame(gameId, player, socket) {
         return true;
     } else {
         let currentGame = player.gameId;
-        console.log(currentGame);
         if(currentGame !== null && typeof games[currentGame] !== "undefined") {
             console.log(`leaving game: ${currentGame}`);
             safeLeaveGame(currentGame, player, socket);
@@ -237,7 +235,6 @@ io.on('connection', (socket) => {
   session.connected ++;
   session.save();
 
-  console.log(session);
     if(session.connected > 1) {
         //Already open on this browser dont allow second connection
 
@@ -289,7 +286,6 @@ io.on('connection', (socket) => {
 
 
 
-  console.log("Connected: " + socket.id);
 
 
   //User handling
@@ -306,7 +302,6 @@ io.on('connection', (socket) => {
 
 
             session.username = data.name;
-            console.log(clients);
             socket.emit("user:confirmName", {name: data.name});
         } else {
             console.log(new Date() + " Error when setting name: " + socket.id)
@@ -339,7 +334,6 @@ io.on('connection', (socket) => {
 
         if(safeJoinGame(id, player, socket)) {
             games[id].setGameAdmin(clients[socket.id]);
-            console.log(games);
             console.log('Player created game: ' + socket.id + "Client: " + clients[socket.id]);
 
             socket.emit('game:confirmCreate', {
@@ -387,7 +381,6 @@ io.on('connection', (socket) => {
 
     socket.on("game:removePlayer", function(data) {
 
-        console.log(`Trying to remove player ${data.name}`)
         let playerToRemove = clients[idFromName(data.name)];
 
 
@@ -487,7 +480,6 @@ io.on('connection', (socket) => {
 
                     game.blackIdxs = Array.from(blackSet);
                     game.whiteIdxs = Array.from(whiteSet);
-                    console.log(game.whiteIdxs);
 
                 }
 
@@ -557,7 +549,6 @@ io.on('connection', (socket) => {
 
         }
 
-        console.log("cards picked: " + data.cards);
     });
 
 
@@ -569,7 +560,6 @@ io.on('connection', (socket) => {
 
 
             if(game.inJudging && game.judge === player.id && data.idx > -1 && data.idx < Object.keys(game.judgeCards).length) {
-                console.log(`Judge Chose Cards ${Object.values(game.judgeCards)[data.idx]}`);
                 game.judgeChooseCards(data.idx);
 
                 clearTimeout(game.judgeTimeout);
