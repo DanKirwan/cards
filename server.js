@@ -16,7 +16,9 @@ const MongoStore = require('connect-mongo')(session);
 
 const cardPacks = require("./cards.js").packs;
 
-
+//Handling saving games to the database
+const analytics = require("./analytics");
+const gameModel = mongoose.model("Game", analytics.gameSchema);
 
 
 
@@ -112,6 +114,7 @@ function safeDeleteGame(gameId) {
     if(games[gameId] !== undefined) {
 
         io.to(gameId).emit("game:failedJoin", {message: "There are not enough players in the game so this game has been deleted!"});
+        games[gameId].end();
         delete games[gameId];
     }
 }
@@ -332,7 +335,7 @@ io.on('connection', (socket) => {
     socket.on("game:create", function() {
 
         let id = util.getNewGameID(games);
-        games[id] = new Game(io, id, null, 20);
+        games[id] = new Game(io, id, null, 20, new analytics.GameAnalytics(gameModel));
 
         if(safeJoinGame(id, player, socket)) {
             games[id].setGameAdmin(clients[socket.id]);

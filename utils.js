@@ -94,7 +94,7 @@ exports.Player =  class Player {
 
 
 exports.Game = class Game {
-    constructor(io, gameId, name, maxPlayers) {
+    constructor(io, gameId, name, maxPlayers, analytics) {
         this.inGame = false; //this means that its in the lobby
         this.name = '';
         this.id = gameId;
@@ -138,6 +138,8 @@ exports.Game = class Game {
         //Handling which cards to select
         this.whiteIdxs = [];
         this.blackIdxs = [];
+
+        this.analytics = analytics;
 
     }
 
@@ -359,7 +361,15 @@ exports.Game = class Game {
                     this.io.to(this.id).emit("gamePlay:roundWin", {cardsIdx: idx, playerName: this.players[pId].name});
 
 
+                    //Analytics handling
+                    this.analytics.addRound(this.currentBlackCard.text, this.judgeCards, idx, this.judge.name, this.players);
+
+
                     if(this.players[pId].points >= this.maxPoints) {
+                        //Analytics handling
+                        this.analytics.save(this, this.players[pId].name);
+
+
                         this.io.to(this.id).emit("gamePlay:gameWin", {playerName: this.players[pId].name});
                     } else {
                         this.inJudging = false;
@@ -428,6 +438,14 @@ exports.Game = class Game {
 
         }
 
+    }
+
+
+    end() {
+        clearTimeout(this.judgeTimeout);
+        clearTimeout(this.roundTimeout);
+        clearInterval(this.judgeCounter);
+        clearInterval(this.roundCounter);
     }
 }
 ;

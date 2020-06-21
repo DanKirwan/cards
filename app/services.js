@@ -1,8 +1,10 @@
 let cServices = angular.module("cards.services", []);
 
 cServices.service('socket', function($rootScope) {
+    let protocol = "ws://";
+    if(window.location.protocol === "https:") protocol = "wss://";
+    let socket = io.connect(protocol + window.location.host);// //localhost:8080wss://www.blackandwhitecards.com
 
-    let socket = io.connect('wss://www.blackandwhitecards.com');// //localhost:8080
     return {
         on: function(eventName, callback) {
             socket.removeAllListeners(eventName); //this makes it so socket.on sets a unique callback for this event
