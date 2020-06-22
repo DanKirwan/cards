@@ -146,10 +146,14 @@ app.controller("dialogController", function(globals, $scope, socket, $mdDialog, 
 
 
 
-app.controller("mainMenuController", function($scope, socket, game, globals, Util) {
+app.controller("mainMenuController", function($scope, socket, game, globals, Util, $mdMedia) {
 
     //main menu code
 
+
+    $scope.showBottomBar = function() {
+        return window.innerWidth/window.innerHeight < 3/5;
+    };
 
     $scope.game = game;
     $scope.globals = globals;
