@@ -1,0 +1,46 @@
+<md-dialog aria-label="Leave Feedback" ng-controller="feedbackController">
+
+
+    <md-dialog-content style="">
+        <div style="padding:20px">
+            <h2> Feedback</h2>
+
+            <p>If you have found a bug please <a href="https://github.com/dankirwan/cards/issues" target="_blank">Report it Here</a></p>
+
+            <md-input-container md-autofocus="">
+                <label>Name (Optional)</label>
+                <input  ng-model="feedback.name">
+            </md-input-container>
+
+            <md-input-container md-autofocus="">
+                <label>Email (Optional)</label>
+                <input  type="email" ng-model="feedback.email">
+            </md-input-container>
+
+            <md-input-container style="width:100%">
+
+                <label>Feedback</label>
+                <textarea ng-model="feedback.text" md-maxlength="1000" rows="5" md-select-on-focus>
+
+                </textarea>
+            </md-input-container>
+        </div>
+    </md-dialog-content>
+
+    <md-dialog-actions style="padding:0; text-align:center; ">
+
+
+
+
+        <md-button class = "mainMenu__btn" style="position:static; transform: none; margin:20px;" ng-disabled="feedback.text.length < 1" ng-click="sendFeedback()" flex>
+            Send Feedback
+        </md-button>
+
+
+    </md-dialog-actions>
+
+
+
+
+
+</md-dialog>

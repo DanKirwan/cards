@@ -21,7 +21,7 @@
                 <div class="hint" style="color:red;" ng-hide="game.valid">This is not a valid code</div>
             </div>
 
-            <md-button  ng-disabled = "globals.username === null"  ng-click = "createGame()"  class = " mainMenu__btn" style="bottom:20px;">Create New Game</md-button>
+            <md-button  ng-disabled = "globals.username === null"  ng-click = "createGame()"  class = " mainMenu__btn" >Create New Game</md-button>
 
         </div>
     </div>
@@ -33,8 +33,8 @@
 
     <div layout="row" class="mainMenu__bottomBar" layout-align="space-around center" ng-show="showBottomBar()">
         <a href="/#!/attribution">Attribution</a>
-        <p>By Dan Kirwan</p>
-        <a href="https://github.com/dankirwan/cards/issues" target="_blank">Report a Bug</a>
+        <p>Beta 1.0.0!</p>
+        <a href="/" ng-click="openFeedback()">Feedback</a>
     </div>
 
 

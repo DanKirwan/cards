@@ -20,6 +20,12 @@ const cardPacks = require("./cards.js").packs;
 const analytics = require("./analytics");
 const gameModel = mongoose.model("Game", analytics.gameSchema);
 
+const feedbackModel = mongoose.model("Feedback", mongoose.Schema({
+    name: String,
+    email: String,
+    text:String,
+}));
+
 
 
 mongoose.connect(dbUrl, {
@@ -639,6 +645,19 @@ io.on('connection', (socket) => {
 
 
 
+    socket.on("user:feedback", function(data) {
+        if(data.text && data.text.length > 1) {
+            feedbackModel.create({
+                name: data.name,
+                email: data.email,
+                text: data.text,
+            }, function(err, res) {
+                if(err) console.log(`Error saving feedback from player ${player.name}: ${err}`);
+
+            });
+
+        }
+    });
 
     socket.on("disconnect", function() {
         session.gameId = player.gameId;

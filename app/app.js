@@ -142,17 +142,33 @@ app.controller("dialogController", function(globals, $scope, socket, $mdDialog, 
 });
 
 
+app.controller("feedbackController", function($scope, socket, $mdDialog) {
+
+    $scope.feedback = {
+        name: '',
+        email: '',
+        text: '',
+    };
+
+    $scope.sendFeedback = function() {
+        $mdDialog.hide();
+        socket.emit("user:feedback", $scope.feedback);
+    };
+
+
+});
 
 
 
 
-app.controller("mainMenuController", function($scope, socket, game, globals, Util, $mdMedia) {
+
+app.controller("mainMenuController", function($scope, socket, game, globals, Util, $mdDialog) {
 
     //main menu code
 
 
     $scope.showBottomBar = function() {
-        return window.innerWidth/window.innerHeight < 3/5;
+        return window.innerWidth/window.innerHeight < 3/5 || window.innerHeight > 600;
     };
 
     $scope.game = game;
@@ -186,6 +202,14 @@ app.controller("mainMenuController", function($scope, socket, game, globals, Uti
         game.create();
     }
 
+
+    $scope.openFeedback = function() {
+        $mdDialog.show({
+            templateUrl: "feedbackDialog.tmpl.html",
+            parent:angular.element(document.body),
+
+        })
+    }
 
 });
 
