@@ -258,7 +258,7 @@ body {
     border-radius: 5px;
     text-align: center;
     padding: 0;
-    margin: 0 0 20px; }
+    margin: 0 0 40px; }
     @media screen and (min-width: 600px) and (max-width: 1279px) {
       .mainMenu__btn {
         width: 40%; } }
@@ -274,6 +274,11 @@ body {
     position: fixed;
     bottom: 0; }
 
+.cg__layoutColumn {
+  width: 100%; }
+  @media screen and (min-width: 600px) {
+    .cg__layoutColumn {
+      width: 50%; } }
 .cg__toolbar {
   background: black;
   z-index: 5; }

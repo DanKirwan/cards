@@ -21,19 +21,19 @@
     <h1 flex  ng-hide="game.isAdmin" style="text-align:center;"> Waiting for game to start</h1>
 
 
-    <md-button ngclipboard data-clipboard-text="{{globals.url}}/{{globals.gameId}}" class = "cg__shareLink" ng-mouseenter = "shareHovered = true" ng-mouseleave="shareHovered = false" flex>
+    <md-button ngclipboard data-clipboard-text="{{globals.url}}/{{globals.gameId}}" class = "cg__shareLink" ng-mouseenter = "shareHovered = true" ng-mouseleave="shareHovered = false" >
         <div ng-show = "shareHovered">{{globals.url}}/{{globals.gameId}}</div>
         <div ng-hide = "shareHovered">Click to copy game link</div>
     </md-button>
 
-    <md-button ng-show="game.isAdmin" class = "cg__startGame" ng-click="startGame()" flex >Start Game</md-button>
+    <md-button ng-show="game.isAdmin" class = "cg__startGame" ng-click="startGame()">Start Game</md-button>
 
 
     <div layout="column" layout-gt-xs = "row">
 
 
 
-        <div ng-show="game.isAdmin" flex>
+        <div ng-show="game.isAdmin"   class="cg__layoutColumn">
 
             <h3 class="cg__heading">Settings</h3>
 
@@ -136,7 +136,7 @@
 
 
 
-        <div layout = "column" flex>
+        <div layout = "column"  class="cg__layoutColumn" ng-style="game.isAdmin ? {'width' : '50%'} : {'width':'100%'}">
             <h3 class = "cg__heading"> Players</h3>
             <md-list>
                 <md-list-item ng-repeat="player in game.players">
@@ -154,7 +154,7 @@
 
     </div>
 
-    <md-button ng-show="game.isAdmin && (showCardPacks || showAdvanced)" class = "cg__startGame" ng-click="startGame()" flex >Start Game</md-button>
+    <md-button ng-show="game.isAdmin && (showCardPacks || showAdvanced)" class = "cg__startGame" ng-click="startGame()" >Start Game</md-button>
 
 
 
