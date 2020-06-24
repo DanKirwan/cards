@@ -313,9 +313,6 @@ cServices.service("gamePlay", function($route, $timeout, $rootScope, Util, $mdDi
 
         }
 
-
-        console.table(game.players);
-
     });
 
     gamePlay.begin = function() {
@@ -460,7 +457,6 @@ cServices.service("game", function(Util, socket, globals, Player, $location, $md
 
     function addPlayer(name, points) {
         if(!containsPlayer(name) && typeof name !== 'undefined') {
-            console.log("adding Player");
             let p = new Player(name, points);
 
             if(p.name === globals.username) {
@@ -663,7 +659,6 @@ cServices.service("lobby", function(game, socket, globals, $interval) {
     lobby.cardPacks = [];
 
     lobby.populate = function() {
-        console.log("POPULATING LOBBY");
 
         socket.emit("lobby:populate", {gameId: globals.gameId});
 

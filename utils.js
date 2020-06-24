@@ -191,7 +191,7 @@ exports.Game = class Game {
 
 
     sendHand(playerId) {
-        if(this.players.length !== 0) {
+        if(this.players.length !== 0 && this.players[this.judge]) {
             this.io.to(playerId).emit('gamePlay:newRound', {
                 roundTime: this.currentRoundTime,
                 judgeTime: this.currentJudgeTime,

@@ -38,7 +38,6 @@ app.controller("globalController", function($window, $location, gamePlay, $scope
     $scope.pickNameDialog = function() {
 
 
-        console.log("Showing Popup");
         $mdDialog.show(
             {
                 templateUrl: 'pickNameDialog.tmpl.html',
@@ -48,7 +47,7 @@ app.controller("globalController", function($window, $location, gamePlay, $scope
 
 
             }
-        )
+        );
 
     };
 
@@ -68,7 +67,7 @@ app.controller("globalController", function($window, $location, gamePlay, $scope
                 .clickOutsideToClose(true)
                 .title(data.message)
                 .ok("Okay")
-        )
+        );
 
         $location.path('/');
     });
@@ -200,16 +199,16 @@ app.controller("mainMenuController", function($scope, socket, game, globals, Uti
 
     $scope.createGame = function() {
         game.create();
-    }
+    };
 
 
     $scope.openFeedback = function() {
         $mdDialog.show({
             templateUrl: "feedbackDialog.tmpl.html",
             parent:angular.element(document.body),
-
-        })
-    }
+            clickOutsideToClose: true,
+        });
+    };
 
 });
 

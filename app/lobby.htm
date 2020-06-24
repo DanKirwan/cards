@@ -21,7 +21,7 @@
     <h1 flex  ng-hide="game.isAdmin" style="text-align:center;"> Waiting for game to start</h1>
 
 
-    <md-button ngclipboard data-clipboard-text="{{globals.url}}/{{globals.gameId}}" class = "cg__shareLink" ng-mouseenter = "shareHovered = true" ng-mouseleave="shareHovered = false" >
+    <md-button  aria-label="Click to copy game link"ngclipboard data-clipboard-text="{{globals.url}}/{{globals.gameId}}" class = "cg__shareLink" ng-mouseenter = "shareHovered = true" ng-mouseleave="shareHovered = false" >
         <div ng-show = "shareHovered">{{globals.url}}/{{globals.gameId}}</div>
         <div ng-hide = "shareHovered">Click to copy game link</div>
     </md-button>
@@ -68,18 +68,18 @@
 
             <md-button flex ng-click="showCardPacks = !showCardPacks" class = "cg__btn" layout="row">
                 <div flex>Card Packs</div>
-                <md-icon md-svg-icon="img/join_game.svg"  style="transition: all 0.2s;" ng-style="showCardPacks ? {transform: 'rotate(90deg)'} : {transform:'none'}"></md-icon>
+                <md-icon md-svg-icon="img/join_game.svg" aria-label="Card dropdown indicator" style="transition: all 0.2s;" ng-style="showCardPacks ? {transform: 'rotate(90deg)'} : {transform:'none'}"></md-icon>
             </md-button>
 
 
             <md-list ng-show="showCardPacks" class="cg__packList md-2-line">
                 <md-list-item ng-repeat="pack in lobby.cardPacks" ng-show="showCardPacks" class="cg__packList__item">
-                    <img ng-src="img/temp_cards-48dp.svg">
-                    <div class="md-list-item-text" flex>
+                    <img ng-src="img/temp_cards-48dp.svg" aria-label="Cards Logo">
+                    <div class="md-list-item-text" aria-label="Name of pack: {{pack.name}}" flex>
                         <h3>{{pack.name}}</h3>
                     </div>
 
-                    <md-checkbox ng-model="pack.selected"></md-checkbox>
+                    <md-checkbox ng-model="pack.selected" aria-label="Select Card Pack"></md-checkbox>
                 </md-list-item>
 
 
@@ -143,7 +143,7 @@
                     <h3 flex>{{player.name}}</h3>
 
 
-                    <md-icon ng-show="game.isAdmin && !player.admin" class="md-secondary" md-svg-icon="img/remove_player-48dp.svg" ng-click="game.removePlayer(player.name)">
+                    <md-icon aria-label="Remove Player" ng-show="game.isAdmin && !player.admin" class="md-secondary" md-svg-icon="img/remove_player-48dp.svg" ng-click="game.removePlayer(player.name)">
                         <md-tooltip md-direction="left" md-delay = "100">Remove Player</md-tooltip>
                     </md-icon>
                 </md-list-item>

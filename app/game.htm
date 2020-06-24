@@ -80,7 +80,7 @@
 
 
 
-                        <md-icon ng-show="game.isAdmin" ng-style="player.admin ? {'visibility': 'hidden'} : {'visibility' : 'visible'}" class="md-secondary" md-svg-icon="img/remove_player-48dp.svg" ng-click="game.removePlayer(player.name)">
+                        <md-icon aria-label="Remove Player" ng-show="game.isAdmin" ng-style="player.admin ? {'visibility': 'hidden'} : {'visibility' : 'visible'}" class="md-secondary" md-svg-icon="img/remove_player-48dp.svg" ng-click="game.removePlayer(player.name)">
                             <md-tooltip md-direction="left" md-delay = "100">Remove Player</md-tooltip>
                         </md-icon>
 
