@@ -33,7 +33,7 @@
     "mongoose": "^5.9.15",
     "ngclipboard": "^2.0.0",
     "require.js": "^1.0.0",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.4.0",
     "uuid": "^8.0.0"
   },
   "devDependencies": {
