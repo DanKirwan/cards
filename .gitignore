@@ -14,3 +14,5 @@ credentials.json
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+.env
+app/.sass-cache/daafeac3736ce64f638a604d93ed378b274d49e2/app.scssc

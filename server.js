@@ -36,13 +36,13 @@ mongoose.connect(dbUrl, {
 const db = mongoose.connection;
 db.once("open", _ => {
     console.log("database connected", dbUrl);
-    db.dropCollection("sessions", function(err, result) { //TODO remove this in production
-        if(err){
-            console.log("error deleting sessions", err)
-        } else {
-            console.log("deleted sessions");
-        }
-    })
+    // db.dropCollection("sessions", function(err, result) { //TODO remove this in production
+    //     if(err){
+    //         console.log("error deleting sessions", err)
+    //     } else {
+    //         console.log("deleted sessions");
+    //     }
+    // })
 });
 db.on('error', console.error.bind(console, 'connection error:'));
 

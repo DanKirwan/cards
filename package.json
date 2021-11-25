@@ -5,6 +5,11 @@
   "description": "A fun and very original online card game",
   "repository": "https://github.com/dankirwan/cards",
   "license": "CC BY-NC-SA 4.0",
+  "main": "server.js",
+  "author": "Dan Kirwan",
+  "engines": {
+    "node": "12.x"
+  },
   "dependencies": {
     "angular": "^1.7.9",
     "angular-animate": "^1.7.9",
